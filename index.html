@@ -36,6 +36,7 @@
             <div id="login-overlay" class="hidden absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
                 <i data-lucide="loader-2" class="w-10 h-10 text-blue-600 animate-spin mb-4"></i>
                 <p class="text-blue-800 font-bold">Zpracovávám přihlášení...</p>
+                <p class="text-slate-500 text-sm mt-2 px-4">Čekám na přesměrování z Googlu.</p>
             </div>
 
             <div class="w-20 h-20 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -242,7 +243,8 @@
     <!-- JAVASCRIPT & FIREBASE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        // ZMĚNA: Přidán signInWithRedirect a getRedirectResult místo signInWithPopup
+        import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- 1. FIREBASE CONFIG ---
@@ -322,30 +324,14 @@
         let unsubscribeCloud = null;
 
         // --- 4. FUNKCE APLIKACE ---
+        
+        // ZMĚNA: Použití signInWithRedirect pro absolutní spolehlivost
         function loginWithGoogle() {
             document.getElementById('login-overlay').classList.remove('hidden');
             
-            signInWithPopup(auth, provider).catch((err) => {
+            signInWithRedirect(auth, provider).catch((err) => {
                 document.getElementById('login-overlay').classList.add('hidden');
-                
-                // VYLEPŠENÉ CHYBOVÉ HLÁŠKY
-                let errorText = "Chyba přihlášení:\n" + err.message;
-                
-                if (err.code === 'auth/unauthorized-domain') {
-                    errorText = "CHYBA DOMÉNY (Nejčastější problém):\n\n" +
-                                "Vaše adresa z GitHubu není ve Firebase povolena k přihlašování.\n\n" +
-                                "👉 Běžte do Firebase -> sekce Authentication -> záložka Settings -> Authorized domains.\n" +
-                                "👉 Klikněte na Add domain.\n" +
-                                "👉 Přidejte vaši adresu striktně BEZ https:// a BEZ lomítek (např. 'mojeskola.github.io').\n\n" +
-                                "Někdy trvá i 5-10 minut, než si to Google propíše!";
-                } else if (err.code === 'auth/popup-closed-by-user') {
-                    errorText = "Přihlašovací okno bylo zavřeno dříve, než se přihlášení dokončilo. Zkuste to prosím znovu.";
-                } else if (err.code === 'auth/cancelled-popup-request') {
-                    errorText = "Otevřeli jste více přihlašovacích oken najednou. Zkuste obnovit stránku (F5).";
-                }
-
-                alert(errorText);
-                console.error("Detailní chyba Firebase:", err);
+                alert("Nepodařilo se zahájit přihlášení: " + err.message);
             });
         }
 
@@ -753,21 +739,37 @@
             auth = getAuth(app);
             db = getFirestore(app);
             provider = new GoogleAuthProvider();
-            provider.setCustomParameters({ prompt: 'select_account' }); 
+            // provider.setCustomParameters({ prompt: 'select_account' }); Může blokovat redirect v Safari
+
+            // Záchyt chyb z redirectu (když se vrátí z Googlu s chybou)
+            getRedirectResult(auth).catch((err) => {
+                document.getElementById('login-overlay').classList.add('hidden');
+                let errorText = "Chyba při návratu z přihlášení:\n" + err.message;
+                if (err.code === 'auth/unauthorized-domain') {
+                    errorText = "CHYBA DOMÉNY: Vaše adresa z GitHubu není ve Firebase povolena k přihlašování. Běžte do Firebase -> Authentication -> Settings -> Authorized domains a přidejte ji.";
+                }
+                alert(errorText);
+            });
 
             // Auth Observer
             onAuthStateChanged(auth, (user) => {
-                // Skrytí loading overlaye, pokud běžel
+                // Skrytí loading overlaye
                 document.getElementById('login-overlay').classList.add('hidden');
 
                 if (user) {
-                    currentUserInfo = user.email;
+                    const userEmail = (user.email || "").toLowerCase();
+                    if(!userEmail) {
+                        alert("Váš Google účet neposkytl e-mailovou adresu. Nelze se přihlásit.");
+                        return;
+                    }
+
+                    currentUserInfo = userEmail;
                     const teacherEmails = TEACHERS.map(t => t.email.toLowerCase());
                     
-                    if (teacherEmails.includes(user.email.toLowerCase())) {
+                    if (teacherEmails.includes(userEmail)) {
                         currentRole = 'teacher';
-                        const foundTeacher = TEACHERS.find(t=>t.email.toLowerCase()===user.email.toLowerCase());
-                        const tName = foundTeacher ? foundTeacher.name : user.email;
+                        const foundTeacher = TEACHERS.find(t=>t.email.toLowerCase()===userEmail);
+                        const tName = foundTeacher ? foundTeacher.name : userEmail;
                         
                         document.getElementById('tb-teacher-name').textContent = tName;
                         document.getElementById('login-screen').classList.add('hidden');
@@ -793,6 +795,7 @@
                         }
                     }
                 } else {
+                    // Je-li odhlášen, zobrazí se login
                     document.getElementById('login-screen').classList.remove('hidden');
                     document.getElementById('startup-screen').classList.add('hidden');
                     document.getElementById('student-setup-screen').classList.add('hidden');
