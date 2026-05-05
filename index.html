@@ -32,7 +32,12 @@
 
     <!-- 1. LOGIN SCREEN -->
     <div id="login-screen" class="fixed inset-0 bg-slate-100 z-[100] flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl shadow-2xl p-10 max-w-md w-full border border-slate-200 text-center">
+        <div class="bg-white rounded-3xl shadow-2xl p-10 max-w-md w-full border border-slate-200 text-center relative overflow-hidden">
+            <div id="login-overlay" class="hidden absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
+                <i data-lucide="loader-2" class="w-10 h-10 text-blue-600 animate-spin mb-4"></i>
+                <p class="text-blue-800 font-bold">Zpracovávám přihlášení...</p>
+            </div>
+
             <div class="w-20 h-20 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
                 <i data-lucide="shield-check" class="w-10 h-10"></i>
             </div>
@@ -240,7 +245,7 @@
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- 1. FIREBASE CONFIG (Zkopírováno z vašeho účtu) ---
+        // --- 1. FIREBASE CONFIG ---
         const firebaseConfig = {
             apiKey: "AIzaSyDm0v4wviD36KgLr3WUDtkNZ-DPmXFDZbs",
             authDomain: "hodnocenigalaxie.firebaseapp.com",
@@ -251,15 +256,11 @@
             measurementId: "G-WDFNSPS8EX"
         };
         
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const provider = new GoogleAuthProvider();
-        provider.setCustomParameters({ prompt: 'select_account' }); // Vynutí výběr účtu při každém kliknutí
-        
-        const DB_COLLECTION = 'evals_v12'; // Verze tabulky v cloudu
+        let app, auth, db, provider;
 
         // --- 2. DATA A KONFIGURACE ---
+        const DB_COLLECTION = 'evals_v12'; 
+
         const COMPETENCIES_CONFIG = {
             selfRelation: { title: '🌱 VE VZTAHU K SOBĚ', items: ['Vyjadřuješ své myšlenky a pocity přiměřeně situaci.', 'Rozpoznáš vhodné a nevhodné chování a jednáš podle toho.', 'Umím přijmout zpětnou vazbu a dál s ní pracovat.'] },
             othersRelation: { title: '🤝 VE VZTAHU K DRUHÝM', items: ['Dodržuješ stanovená pravidla.', 'Spolupracuješ s ostatními.', 'Dokážeš poskytovat účelnou zpětnou vazbu.', 'Přispíváš k vytváření bezpečného prostředí a atmosféry.'] },
@@ -307,7 +308,7 @@
             { title: 'Při učení', items: [ { name: 'Zodpovědně přistupuješ k učení:', desc: 'Do školy přicházím připravený*á. Mám v pořádku pomůcky, dávám v hodině pozor a snažím se úkoly plnit včas a nejlépe, jak dovedu.' }, { name: 'Vytrváš v práci na obtížných úkolech:', desc: 'Když mi něco nejde hned napoprvé, nevzdávám se. Zkusím hledat řešení a nebojím se požádat o pomoc.' }, { name: 'Čteš s porozuměním:', desc: 'Když si přečtu text nebo zadání úkolu, dokážu vlastními slovy říct, o čem to bylo a co mám vlastně udělat.' }, { name: 'Dokážeš srozumitelně prezentovat výsledky své práce:', desc: 'Umím ostatním ukázat a vysvětlit, co jsem vytvořil*a nebo na co jsem přišel(přišla), aby tomu všichni rozuměli. Můj přednes je dostatečně hlasitý, udržuji oční kontakt, volím vhodná slova a vím, o čem mluvím.' } ] }
         ];
 
-        // --- STAV APLIKACE ---
+        // --- 3. STAVOVÉ PROMĚNNÉ ---
         let currentRole = null; 
         let currentUserInfo = null; 
         let activeClass = "4. A";
@@ -320,29 +321,49 @@
         let saveTimeout = null;
         let unsubscribeCloud = null;
 
-        // --- 3. EXPORTOVANÉ FUNKCE DO WINDOW (aby fungovalo HTML onclick) ---
-        window.loginWithGoogle = function() {
+        // --- 4. FUNKCE APLIKACE ---
+        function loginWithGoogle() {
+            document.getElementById('login-overlay').classList.remove('hidden');
+            
             signInWithPopup(auth, provider).catch((err) => {
-                alert("Přihlášení se nepodařilo. Zkuste to znovu.");
-                console.error(err);
-            });
-        };
+                document.getElementById('login-overlay').classList.add('hidden');
+                
+                // VYLEPŠENÉ CHYBOVÉ HLÁŠKY
+                let errorText = "Chyba přihlášení:\n" + err.message;
+                
+                if (err.code === 'auth/unauthorized-domain') {
+                    errorText = "CHYBA DOMÉNY (Nejčastější problém):\n\n" +
+                                "Vaše adresa z GitHubu není ve Firebase povolena k přihlašování.\n\n" +
+                                "👉 Běžte do Firebase -> sekce Authentication -> záložka Settings -> Authorized domains.\n" +
+                                "👉 Klikněte na Add domain.\n" +
+                                "👉 Přidejte vaši adresu striktně BEZ https:// a BEZ lomítek (např. 'mojeskola.github.io').\n\n" +
+                                "Někdy trvá i 5-10 minut, než si to Google propíše!";
+                } else if (err.code === 'auth/popup-closed-by-user') {
+                    errorText = "Přihlašovací okno bylo zavřeno dříve, než se přihlášení dokončilo. Zkuste to prosím znovu.";
+                } else if (err.code === 'auth/cancelled-popup-request') {
+                    errorText = "Otevřeli jste více přihlašovacích oken najednou. Zkuste obnovit stránku (F5).";
+                }
 
-        window.logout = function() {
+                alert(errorText);
+                console.error("Detailní chyba Firebase:", err);
+            });
+        }
+
+        function logout() {
             signOut(auth).then(() => {
                 if(unsubscribeCloud) unsubscribeCloud();
                 location.reload();
             });
-        };
+        }
 
-        window.populateSetupNames = function() {
+        function populateSetupNames() {
             const c = document.getElementById('ssClassSelect').value;
             const sel = document.getElementById('ssNameSelect');
             sel.innerHTML = '<option value="">-- Vyber své jméno --</option>';
             (CLASSES[c]||[]).forEach(n => sel.add(new Option(n, n)));
-        };
+        }
 
-        window.saveStudentProfile = function() {
+        function saveStudentProfile() {
             const cls = document.getElementById('ssClassSelect').value;
             const nm = document.getElementById('ssNameSelect').value;
             if(!nm) return alert("Musíš vybrat své jméno ze seznamu.");
@@ -353,16 +374,16 @@
             
             document.getElementById('student-setup-screen').classList.add('hidden');
             startStudentApp();
-        };
+        }
 
-        window.showStartupScreen = function() {
+        function showStartupScreen() {
             document.getElementById('startup-screen').classList.remove('hidden');
             document.getElementById('teacher-toolbar').classList.add('hidden');
             document.getElementById('main-app-container').classList.add('hidden');
             document.getElementById('comparison-view-container').classList.add('hidden');
-        };
+        }
 
-        window.loadClassData = function() {
+        function loadClassData() {
             activeClass = document.getElementById('startClass').value;
             activeSemester = document.getElementById('startSemester').value;
             activeYear = document.getElementById('startYear').value;
@@ -372,9 +393,9 @@
             document.getElementById('tb-class-display').textContent = activeClass;
             
             listenToCloudClass(activeClass);
-        };
+        }
 
-        window.teacherStudentChanged = function() {
+        function teacherStudentChanged() {
             activeStudent = document.getElementById('tb-student-select').value;
             if(!activeStudent) {
                 document.getElementById('main-app-container').classList.add('hidden');
@@ -383,93 +404,56 @@
             document.getElementById('main-app-container').classList.remove('hidden');
             renderEditor();
             if (!document.getElementById('comparison-view-container').classList.contains('hidden')) {
-                window.renderComparison();
+                renderComparison();
             }
-        };
+        }
 
-        window.updateBubble = function(section, index, value) {
+        function updateBubble(section, index, value) {
             if(!currentEditingData[section]) currentEditingData[section] = [];
             currentEditingData[section][index] = value;
             renderEditor();
             triggerSave();
-        };
+        }
 
-        window.saveStudentField = function(field, val) {
+        function saveStudentField(field, val) {
             currentEditingData[field] = val;
             triggerSave();
-        };
+        }
         
-        window.saveTeacherField = function(field, val) {
+        function saveTeacherField(field, val) {
             currentEditingData[field] = val;
             document.getElementById('val-summary-read').textContent = val;
             triggerSave();
-        };
+        }
 
-        window.toggleComparisonView = function() {
+        function toggleComparisonView() {
             const editor = document.getElementById('main-app-container');
             const compView = document.getElementById('comparison-view-container');
             if (compView.classList.contains('hidden')) {
                 editor.classList.add('hidden'); 
                 compView.classList.remove('hidden'); 
-                window.renderComparison();
+                renderComparison();
             } else {
                 compView.classList.add('hidden');
                 editor.classList.remove('hidden'); 
             }
-        };
+        }
 
-        // --- 4. AUTH & ROUTING LOGIC ---
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                currentUserInfo = user.email;
-                const teacherEmails = TEACHERS.map(t => t.email.toLowerCase());
-                
-                if (teacherEmails.includes(user.email.toLowerCase())) {
-                    // JE TO UČITEL
-                    currentRole = 'teacher';
-                    const tName = TEACHERS.find(t=>t.email.toLowerCase()===user.email.toLowerCase()).name;
-                    document.getElementById('tb-teacher-name').textContent = tName;
-                    
-                    document.getElementById('login-screen').classList.add('hidden');
-                    
-                    // Naplnění výběru tříd pro učitele
-                    const clsSelect = document.getElementById('startClass');
-                    clsSelect.innerHTML = '';
-                    Object.keys(CLASSES).forEach(c => clsSelect.add(new Option(c, c)));
-                    clsSelect.value = "4. A";
+        function populateDropdowns() {
+            const classSelects = [
+                document.getElementById('ssClassSelect'), 
+                document.getElementById('startClass')
+            ];
+            
+            classSelects.forEach(sel => {
+                if(!sel) return;
+                sel.innerHTML = '';
+                Object.keys(CLASSES).forEach(c => sel.add(new Option(c, c)));
+                sel.value = "4. A";
+            });
 
-                    document.getElementById('startup-screen').classList.remove('hidden');
-                } else {
-                    // JE TO ŽÁK (Kdokoliv jiný z domény)
-                    currentRole = 'student';
-                    document.getElementById('login-screen').classList.add('hidden');
-                    
-                    const savedProfile = localStorage.getItem('student_my_profile');
-                    if (savedProfile) {
-                        const p = JSON.parse(savedProfile);
-                        activeClass = p.className;
-                        activeStudent = p.name;
-                        startStudentApp();
-                    } else {
-                        // Nemá profil, necháme ho vybrat
-                        const sel = document.getElementById('ssClassSelect');
-                        sel.innerHTML = '';
-                        Object.keys(CLASSES).forEach(c => sel.add(new Option(c, c)));
-                        sel.value = "4. A";
-                        window.populateSetupNames();
-                        document.getElementById('student-setup-screen').classList.remove('hidden');
-                    }
-                }
-            } else {
-                // Nepřihlášen -> Ukaž login
-                document.getElementById('login-screen').classList.remove('hidden');
-                document.getElementById('startup-screen').classList.add('hidden');
-                document.getElementById('student-setup-screen').classList.add('hidden');
-                document.getElementById('main-app-container').classList.add('hidden');
-                document.getElementById('teacher-toolbar').classList.add('hidden');
-                document.getElementById('student-toolbar').classList.add('hidden');
-            }
-        });
+            populateSetupNames(); 
+        }
 
         function startStudentApp() {
             document.getElementById('st-student-name').textContent = activeStudent;
@@ -477,13 +461,11 @@
             document.getElementById('student-toolbar').classList.remove('hidden');
             document.getElementById('main-app-container').classList.remove('hidden');
             
-            // Žák má rovnou aktivní třídu a rok napevno
             activeSemester = "I. POLOLETÍ";
             activeYear = "2025/2026";
             listenToCloudClass(activeClass);
         }
 
-        // --- 5. CLOUD DATABÁZE ---
         function listenToCloudClass(cls) {
             if(!db) return;
             if(unsubscribeCloud) unsubscribeCloud();
@@ -491,7 +473,6 @@
             cloudData = {};
             const collRef = collection(db, 'artifacts', 'galaxie_hodnoceni', 'public', 'data', DB_COLLECTION);
             
-            // Pro jednoduchost a splnění Rule 2 stáhneme vše a vyfiltrujeme v paměti
             unsubscribeCloud = onSnapshot(collRef, (snapshot) => {
                 cloudData = {};
                 snapshot.forEach(doc => {
@@ -523,11 +504,9 @@
             clearTimeout(saveTimeout);
             saveTimeout = setTimeout(async () => {
                 try {
-                    // ID dokumentu je unikátní pro Žáka a Autora
                     const docId = `${activeClass}_${activeStudent}_${currentUserInfo}`.replace(/[^a-zA-Z0-9_]/g, '');
                     const ref = doc(db, 'artifacts', 'galaxie_hodnoceni', 'public', 'data', DB_COLLECTION, docId);
                     
-                    // Bezpečnostní pojistka proti přepsání dat jiného žáka omylem
                     currentEditingData.author = currentUserInfo;
                     currentEditingData.className = activeClass;
                     currentEditingData.studentName = activeStudent;
@@ -555,7 +534,7 @@
             if(names.includes(prevSelected)) sel.value = prevSelected;
             else if(names.length > 0) sel.value = names[0];
             
-            window.teacherStudentChanged();
+            teacherStudentChanged();
         }
 
         function getEmptyRecord() {
@@ -586,8 +565,6 @@
             currentEditingData = studentCloud[currentUserInfo] ? JSON.parse(JSON.stringify(studentCloud[currentUserInfo])) : getEmptyRecord();
 
             if (currentRole === 'teacher') {
-                // Žákovská data k prohlížení (hledá záznam, kde autor je sám žák)
-                // Žák se ukládá pod svým emailem, nevíme jaký přesně je, takže vezmeme první záznam, který má authorType === 'student'
                 let studentSelfEval = null;
                 Object.values(studentCloud).forEach(record => {
                     if (record.authorType === 'student') studentSelfEval = record;
@@ -611,7 +588,6 @@
                 document.getElementById('val-summary-read').textContent = currentEditingData.summary || '';
                 
             } else {
-                // Žákovský pohled
                 document.getElementById('student-reflection-area').classList.remove('hidden');
                 document.getElementById('val-success').classList.remove('hidden');
                 document.getElementById('val-goal').classList.remove('hidden');
@@ -667,10 +643,9 @@
             lucide.createIcons();
         }
 
-        window.renderComparison = function() {
+        function renderComparison() {
             const container = document.getElementById('comparisonContent');
             const studentCloud = cloudData[activeStudent] || {};
-            // Filtrujeme jen učitelské záznamy
             const sourceNames = Object.keys(studentCloud).filter(k => studentCloud[k].authorType === 'teacher'); 
 
             if (sourceNames.length === 0) {
@@ -752,7 +727,84 @@
             container.innerHTML = html;
         }
 
-        lucide.createIcons();
+        // --- 5. EXPORT FUNKCÍ PRO HTML BINDING ---
+        window.loginWithGoogle = loginWithGoogle;
+        window.logout = logout;
+        window.populateSetupNames = populateSetupNames;
+        window.saveStudentProfile = saveStudentProfile;
+        window.showStartupScreen = showStartupScreen;
+        window.loadClassData = loadClassData;
+        window.teacherStudentChanged = teacherStudentChanged;
+        window.teacherClassChanged = function() {
+            activeClass = document.getElementById('tb-class-select').value;
+            listenToCloudClass(activeClass);
+        };
+        window.updateBubble = updateBubble;
+        window.saveStudentField = saveStudentField;
+        window.saveTeacherField = saveTeacherField;
+        window.toggleComparisonView = toggleComparisonView;
+
+        // --- 6. INIT ---
+        async function initAll() {
+            lucide.createIcons();
+            populateDropdowns();
+            
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            provider = new GoogleAuthProvider();
+            provider.setCustomParameters({ prompt: 'select_account' }); 
+
+            // Auth Observer
+            onAuthStateChanged(auth, (user) => {
+                // Skrytí loading overlaye, pokud běžel
+                document.getElementById('login-overlay').classList.add('hidden');
+
+                if (user) {
+                    currentUserInfo = user.email;
+                    const teacherEmails = TEACHERS.map(t => t.email.toLowerCase());
+                    
+                    if (teacherEmails.includes(user.email.toLowerCase())) {
+                        currentRole = 'teacher';
+                        const foundTeacher = TEACHERS.find(t=>t.email.toLowerCase()===user.email.toLowerCase());
+                        const tName = foundTeacher ? foundTeacher.name : user.email;
+                        
+                        document.getElementById('tb-teacher-name').textContent = tName;
+                        document.getElementById('login-screen').classList.add('hidden');
+                        
+                        const clsSelect = document.getElementById('startClass');
+                        clsSelect.innerHTML = '';
+                        Object.keys(CLASSES).forEach(c => clsSelect.add(new Option(c, c)));
+                        clsSelect.value = "4. A";
+
+                        document.getElementById('startup-screen').classList.remove('hidden');
+                    } else {
+                        currentRole = 'student';
+                        document.getElementById('login-screen').classList.add('hidden');
+                        
+                        const savedProfile = localStorage.getItem('student_my_profile');
+                        if (savedProfile) {
+                            const p = JSON.parse(savedProfile);
+                            activeClass = p.className;
+                            activeStudent = p.name;
+                            startStudentApp();
+                        } else {
+                            document.getElementById('student-setup-screen').classList.remove('hidden');
+                        }
+                    }
+                } else {
+                    document.getElementById('login-screen').classList.remove('hidden');
+                    document.getElementById('startup-screen').classList.add('hidden');
+                    document.getElementById('student-setup-screen').classList.add('hidden');
+                    document.getElementById('main-app-container').classList.add('hidden');
+                    document.getElementById('teacher-toolbar').classList.add('hidden');
+                    document.getElementById('student-toolbar').classList.add('hidden');
+                }
+            });
+        }
+
+        // Spustit iniciaci
+        initAll();
 
     </script>
 </body>
