@@ -264,13 +264,12 @@
 
     <!-- JAVASCRIPT & FIREBASE MODULE -->
     <script type="module">
-        // Import Firebase funkcí
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- 1. FIREBASE CONFIG ---
-        // Vložen váš klíč a ID z vašich screenshotů
+        // Váš přesný platný klíč a nastavení projektu z Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyDm0v4wviD36KgLr3WUDtkNZ-DPmXFDZbs",
             authDomain: "hodnocenigalaxie.firebaseapp.com",
@@ -544,7 +543,7 @@
             clearTimeout(saveTimeout);
             saveTimeout = setTimeout(async () => {
                 try {
-                    // ID dokumentu se skládá ze třídy, žáka a autora, aby si nikdo nepřepisoval data
+                    // ID dokumentu se skládá ze třídy, žáka a autora
                     const docId = `${activeClass}_${activeStudent}_${currentUserInfo}`.replace(/[^a-zA-Z0-9_]/g, '');
                     const ref = doc(db, 'artifacts', 'galaxie_hodnoceni', 'public', 'data', DB_COLLECTION, docId);
                     
@@ -562,7 +561,7 @@
                     indicator.classList.replace('text-green-500', 'text-red-500');
                     indicator.style.opacity = "1";
                 }
-            }, 1000); // 1 sekunda debounce, aby se neodesílal každý překlep
+            }, 1000); // 1 sekunda debounce
         }
 
         function populateTeacherStudentDropdown() {
@@ -759,15 +758,11 @@
         // --- 5. EXPORT FUNKCÍ PRO HTML ---
         window.loginWithGoogle = loginWithGoogle;
         window.logout = logout;
-        window.selectRole = selectRole;
-        window.resetLogin = resetLogin;
-        window.login = login;
         window.populateSetupNames = populateSetupNames;
         window.saveStudentProfile = saveStudentProfile;
         window.showStartupScreen = showStartupScreen;
         window.loadClassData = loadClassData;
         window.teacherStudentChanged = teacherStudentChanged;
-        window.teacherClassChanged = teacherClassChanged;
         window.updateBubble = updateBubble;
         window.saveStudentField = saveStudentField;
         window.saveTeacherField = saveTeacherField;
@@ -778,12 +773,11 @@
             lucide.createIcons();
             populateDropdowns();
             
-            // Firebase setup
+            // Firebase setup s vašimi platnými údaji
             app = initializeApp(firebaseConfig);
             auth = getAuth(app);
             db = getFirestore(app);
             provider = new GoogleAuthProvider();
-            // provider.setCustomParameters({ prompt: 'select_account' }); Může zlobit v některých prohlížečích
             
             // Persistence zajistí, že učitel se nemusí po F5 hlásit znova
             await setPersistence(auth, browserLocalPersistence);
