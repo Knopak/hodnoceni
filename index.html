@@ -325,13 +325,20 @@
 
         // --- 4. FUNKCE APLIKACE ---
         
-        // ZMĚNA: Použití signInWithRedirect pro absolutní spolehlivost
+        // ZMĚNA: Použití signInWithPopup
         function loginWithGoogle() {
             document.getElementById('login-overlay').classList.remove('hidden');
             
-            signInWithRedirect(auth, provider).catch((err) => {
+            signInWithPopup(auth, provider).catch((err) => {
                 document.getElementById('login-overlay').classList.add('hidden');
-                alert("Nepodařilo se zahájit přihlášení: " + err.message);
+                
+                let errorText = "Chyba přihlášení:\n" + err.message;
+                if (err.code === 'auth/popup-closed-by-user') {
+                    errorText = "Přihlašovací okno bylo zavřeno dříve, než se přihlášení dokončilo. Zkuste to prosím znovu.";
+                } else if (err.code === 'auth/unauthorized-domain') {
+                    errorText = "CHYBA DOMÉNY: Přidejte vaši adresu z GitHubu do Firebase -> Authentication -> Settings -> Authorized domains.";
+                }
+                alert(errorText);
             });
         }
 
@@ -739,17 +746,7 @@
             auth = getAuth(app);
             db = getFirestore(app);
             provider = new GoogleAuthProvider();
-            // provider.setCustomParameters({ prompt: 'select_account' }); Může blokovat redirect v Safari
-
-            // Záchyt chyb z redirectu (když se vrátí z Googlu s chybou)
-            getRedirectResult(auth).catch((err) => {
-                document.getElementById('login-overlay').classList.add('hidden');
-                let errorText = "Chyba při návratu z přihlášení:\n" + err.message;
-                if (err.code === 'auth/unauthorized-domain') {
-                    errorText = "CHYBA DOMÉNY: Vaše adresa z GitHubu není ve Firebase povolena k přihlašování. Běžte do Firebase -> Authentication -> Settings -> Authorized domains a přidejte ji.";
-                }
-                alert(errorText);
-            });
+            provider.setCustomParameters({ prompt: 'select_account' }); 
 
             // Auth Observer
             onAuthStateChanged(auth, (user) => {
