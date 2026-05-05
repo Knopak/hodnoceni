@@ -3,91 +3,276 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hodnocení Galaxie</title>
-    <!-- Tailwind CSS pro moderní vzhled -->
+    <title>Hodnocení GALAXIE - Online Cloud</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        .font-print {
+            font-family: 'Noto Sans', sans-serif;
+        }
+
+        .hidden { display: none !important; }
+        .print-content { display: none; }
+
+        textarea {
+            resize: none;
+            overflow: hidden;
+            transition: height 0.1s ease;
+        }
+
+        /* --- STYLY PRO TISK (CTRL+P) --- */
+        @media print {
+            @page { size: A4; margin: 0; }
+            html, body {
+                background-color: white !important; margin: 0; padding: 0; font-size: 11pt; height: 100%; width: 100%; overflow: hidden !important; 
+            }
+            .no-print, #teacher-toolbar, #student-toolbar, #comparison-view-container, #student-setup-screen, #startup-screen, #login-screen {
+                display: none !important;
+            }
+            .print-content { display: block !important; }
+            .print-flex { display: flex !important; }
+            #print-container {
+                display: flex !important; flex-direction: column; width: 100% !important; min-height: 270mm !important; max-width: none !important; margin: 0 !important; padding: 10mm 15mm 10mm 15mm !important; position: relative; left: 0; top: 0; box-shadow: none !important; background-color: white !important;
+            }
+            #main-content-wrapper { flex-grow: 1; display: flex; flex-direction: column; }
+            #legendContainer { margin-top: auto !important; padding-top: 3mm; page-break-inside: avoid; border-top: 1px solid #e5e7eb; }
+            .print-border-none { border: none !important; box-shadow: none !important; }
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            .break-inside-avoid { break-inside: avoid; }
+            textarea { display: none !important; }
+        }
     </style>
 </head>
-<body class="min-h-screen">
+<body>
 
-    <div id="app" class="max-w-md mx-auto min-h-screen flex flex-col p-4">
-        <!-- Načítací obrazovka -->
-        <div id="loader" class="flex-grow flex items-center justify-center">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+    <!-- 1. LOGIN SCREEN -->
+    <div id="login-screen" class="fixed inset-0 bg-slate-100 z-[100] flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl p-10 max-w-md w-full border border-slate-200 text-center relative overflow-hidden">
+            <div id="login-overlay" class="hidden absolute inset-0 bg-white/90 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                <p class="text-blue-800 font-bold">Zpracovávám přihlášení...</p>
+                <p class="text-slate-500 text-sm mt-2 px-4">Vyčkejte na dokončení ověření u Googlu.</p>
+            </div>
+
+            <div class="w-20 h-20 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-inner">
+                <i data-lucide="cloud" class="w-10 h-10"></i>
+            </div>
+            <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight">GALAXIE Online</h1>
+            <p class="text-slate-500 mt-2 mb-8 font-medium">Pro přístup do systému se přihlaste svým školním e-mailem.</p>
+
+            <button onclick="window.loginWithGoogle()" class="w-full bg-white border-2 border-slate-200 hover:border-blue-500 hover:bg-blue-50 text-slate-700 py-4 rounded-xl font-bold shadow-sm transition-all flex justify-center items-center gap-3 text-lg active:scale-95 group">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-6 h-6" alt="Google">
+                Přihlásit se přes Google
+            </button>
+            <p class="text-[10px] text-slate-400 mt-6 uppercase tracking-widest font-bold text-center">Zabezpečené cloudové úložiště</p>
         </div>
+    </div>
 
-        <!-- Obrazovka pro přihlášení -->
-        <div id="login-screen" class="hidden flex-grow flex flex-col items-center justify-center text-center space-y-6">
-            <div class="bg-white p-8 rounded-3xl shadow-xl w-full border border-slate-100">
-                <div class="w-20 h-20 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <svg class="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.382-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
+    <!-- 2. STUDENT SETUP SCREEN (Poprvé se ptá, kdo ze žáků to je) -->
+    <div id="student-setup-screen" class="hidden fixed inset-0 bg-slate-100 z-[90] flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full border border-slate-200 text-center">
+            <h2 class="text-2xl font-bold text-slate-800 mb-2">Pojďme tě najít</h2>
+            <p class="text-slate-500 mb-6 text-sm">Vidíme tě tu poprvé. Vyber prosím svou třídu a jméno, abychom ti mohli hodnocení správně přiřadit.</p>
+            
+            <div class="space-y-4 text-left">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Tvoje třída</label>
+                    <select id="ssClassSelect" onchange="window.populateSetupNames()" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none font-medium"></select>
                 </div>
-                <h1 class="text-2xl font-bold text-slate-800">Hodnocení Galaxie</h1>
-                <p class="text-slate-500 mt-2">Přihlaste se prosím svým školním Google účtem</p>
-                
-                <button id="btn-login" class="mt-8 w-full bg-white border border-slate-300 text-slate-700 py-3 px-4 rounded-xl font-semibold flex items-center justify-center space-x-3 hover:bg-slate-50 transition-all shadow-sm active:scale-95">
-                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5" alt="Google">
-                    <span>Přihlásit se přes Google</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- Hlavní prostředí po přihlášení -->
-        <div id="main-screen" class="hidden flex-grow space-y-4">
-            <header class="flex justify-between items-center py-2">
-                <div class="flex items-center space-x-3">
-                    <img id="user-photo" class="w-10 h-10 rounded-full border-2 border-white shadow-sm" src="" alt="Avatar">
-                    <div>
-                        <p id="user-name" class="font-semibold text-slate-800 text-sm leading-tight"></p>
-                        <p class="text-xs text-blue-600 font-medium">Učitel Galaxie</p>
-                    </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Tvoje jméno</label>
+                    <select id="ssNameSelect" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none font-medium"></select>
                 </div>
-                <button id="btn-logout" class="p-2 text-slate-400 hover:text-red-500 transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                </button>
-            </header>
-
-            <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-6 text-white shadow-lg">
-                <h2 class="text-lg opacity-80">Dobrý den,</h2>
-                <p class="text-2xl font-bold mt-1">Pojďme dnes hodnotit!</p>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4">
-                <button class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center justify-center space-y-2 active:scale-95 transition-transform">
-                    <div class="w-12 h-12 bg-green-100 text-green-600 rounded-xl flex items-center justify-center">
-                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                    </div>
-                    <span class="text-sm font-semibold text-slate-700">Přidat body</span>
-                </button>
-                <button class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center justify-center space-y-2 active:scale-95 transition-transform">
-                    <div class="w-12 h-12 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center">
-                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                    </div>
-                    <span class="text-sm font-semibold text-slate-700">Seznam tříd</span>
-                </button>
-            </div>
-
-            <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm flex-grow">
-                <h3 class="font-bold text-slate-800 mb-4">Aktuální přehled</h3>
-                <div id="placeholder-content" class="flex flex-col items-center justify-center py-12 text-slate-400 space-y-3">
-                    <svg class="w-12 h-12 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
-                    <p class="text-sm">Zatím nebyla provedena žádná akce.</p>
-                </div>
+                <button onclick="window.saveStudentProfile()" class="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-xl font-bold shadow-md mt-4 transition-colors">Uložit a pokračovat</button>
             </div>
         </div>
     </div>
 
-    <!-- Firebase SDK Moduly -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js";
+    <!-- 3. TEACHER STARTUP SCREEN (Výběr třídy) -->
+    <div id="startup-screen" class="hidden fixed inset-0 bg-slate-100 z-[90] flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full border border-slate-200">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i data-lucide="graduation-cap" class="w-8 h-8"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-slate-800">Učitelský přístup</h1>
+                <p class="text-slate-500 mt-2 text-sm">Vyberte třídu, kterou chcete hodnotit.</p>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Třída</label>
+                    <select id="startClass" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-lg font-semibold"></select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Pololetí</label>
+                    <select id="startSemester" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                        <option value="I. POLOLETÍ" selected>I. POLOLETÍ</option>
+                        <option value="II. POLOLETÍ">II. POLOLETÍ</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Školní rok</label>
+                    <input id="startYear" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" value="2025/2026">
+                </div>
+                
+                <button onclick="window.loadClassData()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all flex justify-center items-center gap-2">
+                    <i data-lucide="folder-open" class="w-5 h-5"></i> Otevřít hodnocení
+                </button>
+            </div>
+        </div>
+    </div>
 
-        // Vaše osobní konfigurace z obrázků
+    <!-- 4. UČITELSKÝ TOOLBAR -->
+    <div id="teacher-toolbar" class="hidden bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm px-4 py-3 no-print">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+            
+            <div class="flex items-center gap-3 flex-1 overflow-x-auto pb-1 sm:pb-0">
+                <button onclick="window.showStartupScreen()" class="bg-blue-50 text-blue-700 font-bold px-3 py-2 rounded-lg text-sm flex items-center gap-2 border border-blue-200 hover:bg-blue-100 transition-colors whitespace-nowrap">
+                    <i data-lucide="users" class="w-4 h-4"></i> <span id="tb-class-display">Třída</span>
+                </button>
+                <div class="w-px h-6 bg-gray-300"></div>
+                <select id="tb-student-select" onchange="window.teacherStudentChanged()" class="pl-2 pr-8 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-[180px] font-bold"></select>
+                <span id="tb-teacher-name" class="ml-2 text-xs font-bold text-gray-400 hidden sm:block">Učitel</span>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <div id="sync-indicator" class="text-green-500 flex items-center gap-1 text-xs font-bold mr-4 opacity-0 transition-opacity whitespace-nowrap">
+                    <i data-lucide="check-circle-2" class="w-4 h-4"></i> Uloženo
+                </div>
+                
+                <button onclick="window.toggleComparisonView()" class="bg-purple-100 text-purple-700 hover:bg-purple-200 px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 border border-purple-200 shadow-sm whitespace-nowrap">
+                    <i data-lucide="layout-grid" class="w-4 h-4"></i> Svodka
+                </button>
+                <div class="w-px h-6 bg-gray-300 mx-1 hidden sm:block"></div>
+                <button onclick="window.print()" class="bg-slate-800 hover:bg-black text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 shadow-md hidden sm:flex">
+                    <i data-lucide="printer" class="w-4 h-4"></i> Tisk
+                </button>
+                <button onclick="window.logout()" class="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors ml-2 border border-transparent hover:border-red-100" title="Odhlásit se"><i data-lucide="log-out" class="w-5 h-5"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. ŽÁKOVSKÝ TOOLBAR -->
+    <div id="student-toolbar" class="hidden bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm px-4 py-3 no-print">
+        <div class="max-w-4xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="bg-orange-100 text-orange-800 font-bold px-4 py-2 rounded-xl text-sm flex items-center gap-2 border border-orange-200">
+                    <i data-lucide="user" class="w-5 h-5"></i> <span id="st-student-name">Žák</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div id="st-sync-indicator" class="text-green-500 flex items-center gap-1 text-xs font-bold opacity-0 transition-opacity">
+                    <i data-lucide="check-circle-2" class="w-4 h-4"></i> Uloženo
+                </div>
+                <button onclick="window.logout()" class="text-slate-500 hover:bg-slate-100 px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors">
+                    Odhlásit <i data-lucide="log-out" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. HLAVNÍ PLÁTNO (Společné pro tisk i editaci) -->
+    <div id="main-app-container" class="hidden max-w-[210mm] mx-auto p-6 md:p-8 bg-white min-h-screen my-8 shadow-xl flex flex-col font-print" id="print-container">
+        
+        <div id="main-content-wrapper" class="flex-grow flex flex-col">
+            
+            <!-- Hlavička dokumentu -->
+            <div class="text-center mb-6 border-b-2 border-slate-100 pb-6 print:pb-2 print:mb-2">
+                <h1 id="doc-title" class="text-3xl sm:text-4xl font-extrabold text-slate-800 mb-4 print:mb-2 tracking-tight">Hodnocení žáka</h1>
+                <div class="inline-block border-[3px] border-[#8b5cf6] px-8 py-1 mb-4 print:mb-2">
+                    <span id="doc-student-name" class="text-2xl sm:text-3xl font-bold text-black block leading-tight">Jméno Žáka</span>
+                </div>
+                <div class="flex justify-between items-center w-full text-sm font-bold text-gray-500 px-4">
+                    <div id="doc-year">Školní rok: -</div>
+                    <div id="doc-class">Třída: -</div>
+                </div>
+            </div>
+
+            <h2 class="text-sm font-bold mt-2 mb-2 text-center text-black uppercase tracking-widest print:mb-1">HODNOTY A POSTOJE</h2>
+
+            <!-- TŘI SLOUPCE SE ŠKÁLAMI (Kompaktní design) -->
+            <div id="sectionsContainer" class="grid grid-cols-1 md:grid-cols-3 gap-3 print:grid-cols-3 print:gap-3">
+                <!-- Javascript renders this -->
+            </div>
+
+            <!-- OTEVŘENÉ OTÁZKY ŽÁKA -->
+            <div id="student-reflection-area" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6 hidden print:mt-4">
+                <div class="rounded-xl border border-yellow-200 p-4 bg-yellow-50/50 print:border-none print:p-0">
+                    <div class="flex items-center gap-2 mb-2 text-yellow-700 font-bold uppercase text-xs tracking-wider print:text-black">
+                        <i data-lucide="trophy" class="w-4 h-4 print:hidden"></i> Co se mi povedlo
+                    </div>
+                    <textarea id="val-success" class="w-full h-24 p-2 text-sm text-slate-700 bg-white rounded-lg border border-yellow-200 outline-none resize-none no-print" placeholder="Napiš sem své úspěchy..." oninput="window.saveStudentField('reflectionSuccess', this.value)"></textarea>
+                    <div id="val-success-read" class="hidden print-content text-sm text-slate-800 p-2 min-h-[60px] whitespace-pre-wrap font-medium"></div>
+                </div>
+                <div class="rounded-xl border border-indigo-200 p-4 bg-indigo-50/50 print:border-none print:p-0">
+                    <div class="flex items-center gap-2 mb-2 text-indigo-700 font-bold uppercase text-xs tracking-wider print:text-black">
+                        <i data-lucide="target" class="w-4 h-4 print:hidden"></i> Můj cíl
+                    </div>
+                    <textarea id="val-goal" class="w-full h-24 p-2 text-sm text-slate-700 bg-white rounded-lg border border-indigo-200 outline-none resize-none no-print" placeholder="Napiš sem svůj cíl..." oninput="window.saveStudentField('reflectionGoal', this.value)"></textarea>
+                    <div id="val-goal-read" class="hidden print-content text-sm text-slate-800 p-2 min-h-[60px] whitespace-pre-wrap font-medium"></div>
+                </div>
+            </div>
+
+            <!-- ZÁVĚREČNÉ SHRNUTÍ UČITELE -->
+            <div id="teacher-summary-area" class="flex-grow bg-white rounded-lg shadow-sm border border-gray-200 p-4 mt-6 hidden flex flex-col print-border-none print:p-0 print:mt-4">
+                <h3 class="font-bold text-sm text-gray-600 mb-2 no-print">Moje závěrečné shrnutí (Učitel):</h3>
+                <textarea id="val-summary" class="flex-grow w-full p-3 border border-gray-300 rounded text-sm no-print focus:ring-2 focus:ring-blue-500 min-h-[150px] bg-blue-50 focus:bg-white" placeholder="Napište shrnutí a doporučení..." oninput="window.saveTeacherField('summary', this.value)"></textarea>
+                <div id="val-summary-read" class="print-content text-justify text-sm leading-snug whitespace-pre-wrap text-gray-800 px-2 flex-grow mt-2"></div>
+            </div>
+            
+        </div> 
+
+        <!-- LEGENDA -->
+        <div id="legendContainer" class="bg-slate-50 rounded p-1.5 mt-4 break-inside-avoid print-border-none print:bg-transparent print:border-t print:border-gray-300 print:mt-2">
+            <div class="flex flex-row items-center justify-center gap-4 print:justify-start">
+                <span class="text-[9px] font-bold text-gray-500 uppercase font-print whitespace-nowrap">Legenda:</span>
+                <div class="flex items-center gap-1.5"><div class="w-[8px] h-[8px] border border-gray-400 bg-[#dbeafe]"></div><span class="text-[8px] text-gray-600 font-print whitespace-nowrap font-medium">Ne / Potřebuji pomoc</span></div>
+                <div class="flex items-center gap-1.5"><div class="w-[8px] h-[8px] border border-gray-400 bg-[#93c5fd]"></div><span class="text-[8px] text-gray-600 font-print whitespace-nowrap font-medium">Spíše ne / S nápovědou</span></div>
+                <div class="flex items-center gap-1.5"><div class="w-[8px] h-[8px] border border-gray-400 bg-[#3b82f6]"></div><span class="text-[8px] text-gray-600 font-print whitespace-nowrap font-medium">Spíše ano / Většinou</span></div>
+                <div class="flex items-center gap-1.5"><div class="w-[8px] h-[8px] border border-gray-400 bg-[#1d4ed8]"></div><span class="text-[8px] text-gray-600 font-print whitespace-nowrap font-medium">Ano / Zvládám sám</span></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 7. SVODKA HODNOCENÍ (Jen pro učitele) -->
+    <div id="comparison-view-container" class="hidden max-w-7xl mx-auto p-4 md:p-8">
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8 border border-purple-100 no-print">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2"><i data-lucide="layout-grid" class="w-6 h-6 text-purple-600"></i>Svodka z cloudu</h2>
+                    <p class="text-gray-500 text-sm mt-1">Srovnání vašich známek s ostatními kolegy. Zobrazuje se aktuální stav sdílené databáze.</p>
+                </div>
+                <button onclick="window.toggleComparisonView()" class="bg-gray-100 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-200 transition-colors font-bold flex items-center gap-2"><i data-lucide="arrow-left" class="w-4 h-4"></i> Zpět</button>
+            </div>
+        </div>
+        <div id="comparisonContent" class="space-y-8"></div>
+    </div>
+
+    <!-- JAVASCRIPT & FIREBASE MODULE -->
+    <script type="module">
+        // Import Firebase funkcí
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- 1. FIREBASE CONFIG ---
+        // Vložen váš klíč a ID z vašich screenshotů
         const firebaseConfig = {
-            apiKey: "AIzaSyDm0v4wvid36KgLr3WUDtkNZ-DPmXFDZbs",
+            apiKey: "AIzaSyDm0v4wviD36KgLr3WUDtkNZ-DPmXFDZbs",
             authDomain: "hodnocenigalaxie.firebaseapp.com",
             projectId: "hodnocenigalaxie",
             storageBucket: "hodnocenigalaxie.firebasestorage.app",
@@ -95,50 +280,570 @@
             appId: "1:803231734039:web:027d443d60869288027f52",
             measurementId: "G-WDFNSPS8EX"
         };
+        
+        let app, auth, db, provider;
 
-        // Inicializace aplikace
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const provider = new GoogleAuthProvider();
+        // --- 2. DATA A KONFIGURACE ---
+        const DB_COLLECTION = 'evals_online_final'; 
 
-        // UI Prvky
-        const ui = {
-            loader: document.getElementById('loader'),
-            login: document.getElementById('login-screen'),
-            main: document.getElementById('main-screen'),
-            name: document.getElementById('user-name'),
-            photo: document.getElementById('user-photo')
+        const COMPETENCIES_CONFIG = {
+            selfRelation: { 
+                title: '🌱 VE VZTAHU K SOBĚ', 
+                items: [
+                    'Vyjadřuješ své myšlenky a pocity přiměřeně situaci.', 
+                    'Rozpoznáš vhodné a nevhodné chování a jednáš podle toho.',
+                    'Umím přijmout zpětnou vazbu a dál s ní pracovat.'
+                ] 
+            },
+            othersRelation: { 
+                title: '🤝 VE VZTAHU K DRUHÝM', 
+                items: [
+                    'Dodržuješ stanovená pravidla.', 
+                    'Spolupracuješ s ostatními.', 
+                    'Dokážeš poskytovat účelnou zpětnou vazbu.', 
+                    'Přispíváš k vytváření bezpečného prostředí a atmosféry.'
+                ] 
+            },
+            learning: { 
+                title: '📚 PŘI UČENÍ', 
+                items: [
+                    'Zodpovědně přistupuješ k učení.', 
+                    'Vytrváš v práci na obtížných úkolech.', 
+                    'Čteš s porozuměním.', 
+                    'Dokážeš srozumitelně prezentovat výsledky své práce.'
+                ] 
+            }
+        };
+        const SCALE_COLORS = ['#dbeafe', '#93c5fd', '#3b82f6', '#1d4ed8']; 
+        const SCALE_TITLES = ['Ne', 'Spíše ne', 'Spíše ano', 'Ano'];
+        
+        // Emaily učitelů s oprávněním (Z vašeho seznamu)
+        const TEACHERS = [
+            { name: "Barbora Bezděková", email: "barbora.bezdekova@skolagalaxie.cz" },
+            { name: "Eva Pancová", email: "eva.pancova@skolagalaxie.cz" },
+            { name: "František Knop", email: "frantisek.knop@skolagalaxie.cz" },
+            { name: "Hana Svobodová", email: "hana.svobodova@skolagalaxie.cz" },
+            { name: "Jana Škrabalová", email: "jana.skrabalova@skolagalaxie.cz" },
+            { name: "Jesse Courtemanche", email: "jesse.courtemanche@skolagalaxie.cz" },
+            { name: "Jitka Žáková", email: "jitka.zakova@skolagalaxie.cz" },
+            { name: "Linda Vyvlečková", email: "linda.vyvleckova@skolagalaxie.cz" },
+            { name: "Lucie Hašlerová", email: "lucie.haslerova@skolagalaxie.cz" },
+            { name: "Lukáš Vrobel", email: "lukas.vrobel@skolagalaxie.cz" },
+            { name: "Martin Kopecký", email: "martin.kopecky@skolagalaxie.cz" },
+            { name: "Michaela Rašková", email: "michaela.raskova@skolagalaxie.cz" },
+            { name: "Olga Orlitová", email: "olga.orlitova@skolagalaxie.cz" },
+            { name: "Ondřej Červenka", email: "ondrej.cervenka@skolagalaxie.cz" },
+            { name: "Pavlína Bittnerová", email: "pavlina.bittnerova@skolagalaxie.cz" },
+            { name: "Škola Galaxie", email: "skola@skolagalaxie.cz" },
+            { name: "Tereza Malířová", email: "tereza.malirova@skolagalaxie.cz" },
+            { name: "Tereza Mattivi", email: "tereza.mattivi@skolagalaxie.cz" }
+        ];
+
+        // Kompletní databáze všech tříd
+        const CLASSES = {
+            "1. A": [],
+            "2. A": ["Matyáš Dorazil", "Greta Eichhorn", "Eliška Fabíková", "Štěpánka Ficková", "Eva Furmánková", "Michal Jínek", "David Kejík", "Štěpán Marek", "Adam Mík", "Sára Ondrejková", "Miroslav Plešek", "Daniel Reinhardt", "Tadeáš Schön", "Ondřej Slezák", "Josef Šnapka", "Rozárie Tomášková", "Maximilian Vicen", "Libor Zdráhal", "Igor Ziman"],
+            "3. A": ["Michaela Burdová", "Sebastian Dulák", "Mia Hanzelková", "Albert Jan Hašler", "Theodor Hok", "Tomáš Hradecký", "Hana Jakůbková", "Valérie Klvaňová", "Lukáš Landa", "Maximilian James Larman", "Daniel Maralík", "Robert Osmančík", "Jakub Panc", "Agáta Staneková", "Ela Šimková", "Vanesa Vahalíková", "Eliška Vašíčková", "Sebastian Josef Vávra", "Petr Zdráhal"],
+            "4. A": ["Sami Brini", "Erika Čeplíková", "Pavel Hlaváček", "Martin Chromek", "Bernard William Jenkins", "Elena Kalinová", "Alica Kolmanová", "Oliver Londin", "Julie Malířová", "Madlen Marková", "Sofie Karolína Martochová", "Julie Orlitová", "Mikuláš Pavlica", "Mia Podžorná", "Barbora Slezáková", "Šimon Zogata"],
+            "5. A": ["Natálie Benešová", "Matěj Církva", "Josef Eichhorn", "Klára Furmánková", "Michaela Chrenková", "Jana Jakabovičová", "Marek Jurák", "Michal Landa", "Anna Maurey", "Erika Mottelová", "Pavel Novák", "Viktorie Plíhalová", "Vanessa Pokludová", "Jan Přáda", "Tomáš Sosík", "Tereza Syrovátková", "Filip Škrabák", "Estelle Vicenová", "Sára Volková"],
+            "6. A": ["Ondřej Češek", "Gary Glogar", "Julie Hašlerová", "Tereza Holišová", "Sára Irglová", "Bára Jančálková", "Štěpán Janiš", "Natálie Javorková", "Kryštof Mikulenka", "Filip Mráz", "Vojtěch Orlita", "Kristýna Pancová", "Vanesa Slámová", "Matteo Strbačka", "Kateřina Syrovátková", "Tereza Ščerbová", "Karolína Šimková", "Jan Škrabák", "Vladimír Táborský"],
+            "7. A": ["Jan Beneš", "Jonáš Hanák", "Daniel Chrustawczuk", "Júlia Jakabovičová", "Tomáš Jedlička", "Leo Kelnar", "Vojtěch Kolman", "Evelina Konopáčová", "Emma Kuzdřálová", "Jan Novák", "Šimon Přáda", "Julie Anna Sklenářová", "Richard Stančík", "Ellen Svojanovská", "Amélie Šajnarová", "Tereza Šustková", "Jan Vrobel", "Benjamin Douglas Youngberg", "Filip Krotil"],
+            "8. A": ["Ema Církvová", "Ema Elaine Courtemanche", "Markéta Čaňová", "Ella Dorazilová", "Kristýna Harrandová", "Anežka Chrenková", "Michal Indrák", "Viktorie Juráková", "Renáta Kocourková", "Nela Kytková", "Kryštof Novotný", "Matěj Plecháček", "Štěpánka Vašíčková"],
+            "9. A": ["Adriana Baršovská", "Jakub Drgáč", "Ondřej Fojtík", "Vojtěch Janiš", "Matyáš Javorka", "Světlana Kaňová", "Alice Kavanová", "Jan Klein", "Valentina Konopáčová", "Vít Košárek", "Marco Maietta", "Tomáš Pollak", "Ella Synková", "Martin Šnapka"]
         };
 
-        // Sledování stavu uživatele
-        onAuthStateChanged(auth, (user) => {
-            ui.loader.classList.add('hidden');
-            if (user) {
-                ui.name.textContent = user.displayName;
-                ui.photo.src = user.photoURL || 'https://via.placeholder.com/40';
-                ui.login.classList.add('hidden');
-                ui.main.classList.remove('hidden');
-            } else {
-                ui.login.classList.remove('hidden');
-                ui.main.classList.add('hidden');
-            }
-        });
+        // --- 3. STAVOVÉ PROMĚNNÉ ---
+        let currentRole = null; 
+        let currentUserInfo = null; 
+        let activeClass = "4. A";
+        let activeStudent = null; 
+        let activeSemester = "I. POLOLETÍ";
+        let activeYear = "2025/2026";
+        
+        let cloudData = {}; 
+        let currentEditingData = null; 
+        let saveTimeout = null;
+        let unsubscribeCloud = null;
 
-        // Obsluha tlačítek
-        document.getElementById('btn-login').onclick = async () => {
-            try {
-                await signInWithPopup(auth, provider);
-            } catch (error) {
-                console.error("Login Error:", error);
-                if (error.code === 'auth/popup-blocked') {
-                    alert("Vyskakovací okno bylo zablokováno. Prosím, povolte vyskakovací okna pro tuto stránku.");
-                } else {
-                    alert("Nepodařilo se přihlásit: " + error.message);
+        // --- 4. FUNKCE APLIKACE ---
+        
+        // Přihlášení přes Google Popup
+        function loginWithGoogle() {
+            document.getElementById('login-overlay').classList.remove('hidden');
+            
+            signInWithPopup(auth, provider).catch((err) => {
+                document.getElementById('login-overlay').classList.add('hidden');
+                console.error("Login Error:", err);
+                
+                let errorText = "Chyba přihlášení:\n" + err.message;
+                if (err.code === 'auth/popup-closed-by-user') {
+                    errorText = "Přihlašovací okno bylo zavřeno dříve, než se přihlášení dokončilo. Zkuste to prosím znovu.";
+                } else if (err.code === 'auth/unauthorized-domain') {
+                    errorText = "CHYBA DOMÉNY: Google blokuje tuto adresu.\nZkontrolujte, zda jste v Google Cloud přidali do Authorized redirect URIs adresu: https://hodnocenigalaxie.firebaseapp.com/__/auth/handler";
+                } else if (err.code === 'auth/popup-blocked') {
+                    errorText = "Prohlížeč zablokoval vyskakovací okno s přihlášením. Povolte jej v liště nahoře.";
                 }
-            }
-        };
+                alert(errorText);
+            });
+        }
 
-        document.getElementById('btn-logout').onclick = () => signOut(auth);
+        function logout() {
+            signOut(auth).then(() => {
+                if(unsubscribeCloud) unsubscribeCloud();
+                location.reload();
+            });
+        }
+
+        // Pomocná fce pro žákovský setup
+        function populateSetupNames() {
+            const c = document.getElementById('ssClassSelect').value;
+            const sel = document.getElementById('ssNameSelect');
+            sel.innerHTML = '<option value="">-- Vyber své jméno --</option>';
+            (CLASSES[c]||[]).forEach(n => sel.add(new Option(n, n)));
+        }
+
+        function saveStudentProfile() {
+            const cls = document.getElementById('ssClassSelect').value;
+            const nm = document.getElementById('ssNameSelect').value;
+            if(!nm) return alert("Musíš vybrat své jméno ze seznamu.");
+            
+            activeClass = cls;
+            activeStudent = nm;
+            // Uložit do prohlížeče, ať se žák nemusí ptát příště znova
+            localStorage.setItem('student_my_profile', JSON.stringify({className: cls, name: nm}));
+            
+            document.getElementById('student-setup-screen').classList.add('hidden');
+            startStudentApp();
+        }
+
+        function showStartupScreen() {
+            document.getElementById('startup-screen').classList.remove('hidden');
+            document.getElementById('teacher-toolbar').classList.add('hidden');
+            document.getElementById('main-app-container').classList.add('hidden');
+            document.getElementById('comparison-view-container').classList.add('hidden');
+        }
+
+        function loadClassData() {
+            activeClass = document.getElementById('startClass').value;
+            activeSemester = document.getElementById('startSemester').value;
+            activeYear = document.getElementById('startYear').value;
+
+            document.getElementById('startup-screen').classList.add('hidden');
+            document.getElementById('teacher-toolbar').classList.remove('hidden');
+            document.getElementById('tb-class-display').textContent = activeClass;
+            
+            listenToCloudClass(activeClass);
+        }
+
+        function teacherStudentChanged() {
+            activeStudent = document.getElementById('tb-student-select').value;
+            if(!activeStudent) {
+                document.getElementById('main-app-container').classList.add('hidden');
+                return;
+            }
+            document.getElementById('main-app-container').classList.remove('hidden');
+            renderEditor();
+            if (!document.getElementById('comparison-view-container').classList.contains('hidden')) {
+                renderComparison();
+            }
+        }
+
+        // --- ZÁPIS HODNOT A UKLÁDÁNÍ DO CLOUDU ---
+        function updateBubble(section, index, value) {
+            if(!currentEditingData[section]) currentEditingData[section] = { competencies: [] };
+            if(!currentEditingData[section].competencies) currentEditingData[section].competencies = [];
+            
+            currentEditingData[section].competencies[index] = value;
+            renderEditor();
+            triggerSave();
+        }
+
+        function saveStudentField(field, val) {
+            currentEditingData[field] = val;
+            triggerSave();
+        }
+        
+        function saveTeacherField(field, val) {
+            currentEditingData[field] = val;
+            document.getElementById('val-summary-read').textContent = val;
+            triggerSave();
+        }
+
+        // Přepínač Svodka
+        function toggleComparisonView() {
+            const editor = document.getElementById('main-app-container');
+            const compView = document.getElementById('comparison-view-container');
+            if (compView.classList.contains('hidden')) {
+                editor.classList.add('hidden'); 
+                compView.classList.remove('hidden'); 
+                renderComparison();
+            } else {
+                compView.classList.add('hidden');
+                editor.classList.remove('hidden'); 
+            }
+        }
+
+        function populateDropdowns() {
+            const classSelects = [document.getElementById('ssClassSelect'), document.getElementById('startClass')];
+            classSelects.forEach(sel => {
+                if(!sel) return;
+                sel.innerHTML = '';
+                Object.keys(CLASSES).forEach(c => sel.add(new Option(c, c)));
+                sel.value = "4. A";
+            });
+            populateSetupNames(); 
+        }
+
+        function startStudentApp() {
+            document.getElementById('st-student-name').textContent = activeStudent;
+            document.getElementById('doc-title').textContent = "Moje sebehodnocení";
+            document.getElementById('student-toolbar').classList.remove('hidden');
+            document.getElementById('main-app-container').classList.remove('hidden');
+            
+            activeSemester = "I. POLOLETÍ";
+            activeYear = "2025/2026";
+            listenToCloudClass(activeClass);
+        }
+
+        // --- FIREBASE SYNC ---
+        function listenToCloudClass(cls) {
+            if(!db) return;
+            if(unsubscribeCloud) unsubscribeCloud();
+            
+            cloudData = {};
+            const collRef = collection(db, 'artifacts', 'galaxie_hodnoceni', 'public', 'data', DB_COLLECTION);
+            
+            unsubscribeCloud = onSnapshot(collRef, (snapshot) => {
+                cloudData = {};
+                snapshot.forEach(doc => {
+                    const d = doc.data();
+                    if(d.className === cls) {
+                        if(!cloudData[d.studentName]) cloudData[d.studentName] = {};
+                        cloudData[d.studentName][d.author] = d;
+                    }
+                });
+                
+                if (currentRole === 'teacher') {
+                    populateTeacherStudentDropdown();
+                } else {
+                    renderEditor();
+                }
+            }, (error) => {
+                console.error("Snapshot error:", error);
+            });
+        }
+
+        function triggerSave() {
+            if(!db) return;
+            const indicator = document.getElementById(currentRole === 'teacher' ? 'sync-indicator' : 'st-sync-indicator');
+            indicator.style.opacity = "0.5";
+            indicator.textContent = "Ukládám...";
+            indicator.classList.remove('text-red-500');
+            indicator.classList.add('text-green-500');
+            
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(async () => {
+                try {
+                    // ID dokumentu se skládá ze třídy, žáka a autora, aby si nikdo nepřepisoval data
+                    const docId = `${activeClass}_${activeStudent}_${currentUserInfo}`.replace(/[^a-zA-Z0-9_]/g, '');
+                    const ref = doc(db, 'artifacts', 'galaxie_hodnoceni', 'public', 'data', DB_COLLECTION, docId);
+                    
+                    currentEditingData.author = currentUserInfo;
+                    currentEditingData.className = activeClass;
+                    currentEditingData.studentName = activeStudent;
+                    
+                    await setDoc(ref, currentEditingData);
+                    indicator.textContent = "Uloženo";
+                    indicator.style.opacity = "1";
+                    setTimeout(() => indicator.style.opacity = "0", 3000);
+                } catch(e) {
+                    console.error("Save failed:", e);
+                    indicator.textContent = "Chyba uložení! Zkontrolujte internet.";
+                    indicator.classList.replace('text-green-500', 'text-red-500');
+                    indicator.style.opacity = "1";
+                }
+            }, 1000); // 1 sekunda debounce, aby se neodesílal každý překlep
+        }
+
+        function populateTeacherStudentDropdown() {
+            const sel = document.getElementById('tb-student-select');
+            const prevSelected = sel.value;
+            sel.innerHTML = '';
+            const names = CLASSES[activeClass] || [];
+            names.forEach(n => sel.add(new Option(n, n)));
+            
+            if(names.includes(prevSelected)) sel.value = prevSelected;
+            else if(names.length > 0) sel.value = names[0];
+            
+            teacherStudentChanged();
+        }
+
+        // Tvorba prázdného datového objektu
+        function getEmptyRecord() {
+            return {
+                className: activeClass,
+                studentName: activeStudent,
+                schoolYear: activeYear,
+                semester: activeSemester,
+                author: currentUserInfo,
+                authorType: currentRole,
+                selfRelation: { competencies: [null, null, null] },
+                othersRelation: { competencies: [null, null, null, null] },
+                learning: { competencies: [null, null, null, null] },
+                summary: "",
+                reflectionSuccess: "",
+                reflectionGoal: ""
+            };
+        }
+
+        // Vykreslení celého plátna
+        function renderEditor() {
+            if(!activeStudent) return;
+            
+            document.getElementById('doc-student-name').textContent = activeStudent;
+            document.getElementById('doc-class').textContent = `Třída: ${activeClass}`;
+            document.getElementById('doc-year').textContent = `Školní rok: ${activeYear} - ${activeSemester}`;
+
+            const studentCloud = cloudData[activeStudent] || {};
+            // Pokud záznam už existuje v cloudu pod mým e-mailem, zkopíruju ho. Jinak vyrobím prázdný.
+            currentEditingData = studentCloud[currentUserInfo] ? JSON.parse(JSON.stringify(studentCloud[currentUserInfo])) : getEmptyRecord();
+
+            if (currentRole === 'teacher') {
+                // Učitel vidí sebereflexi žáka pouze pro čtení (pokud ji žák vyplnil)
+                let studentSelfEval = null;
+                Object.values(studentCloud).forEach(record => {
+                    if (record.authorType === 'student') studentSelfEval = record;
+                });
+
+                if (studentSelfEval && (studentSelfEval.reflectionSuccess || studentSelfEval.reflectionGoal)) {
+                    document.getElementById('student-reflection-area').classList.remove('hidden');
+                    document.getElementById('val-success').classList.add('hidden');
+                    document.getElementById('val-goal').classList.add('hidden');
+                    document.getElementById('val-success-read').classList.remove('hidden');
+                    document.getElementById('val-goal-read').classList.remove('hidden');
+                    
+                    document.getElementById('val-success-read').textContent = studentSelfEval.reflectionSuccess || 'Nevyplněno.';
+                    document.getElementById('val-goal-read').textContent = studentSelfEval.reflectionGoal || 'Nevyplněno.';
+                } else {
+                    document.getElementById('student-reflection-area').classList.add('hidden');
+                }
+                
+                document.getElementById('teacher-summary-area').classList.remove('hidden');
+                document.getElementById('val-summary').value = currentEditingData.summary || '';
+                document.getElementById('val-summary-read').textContent = currentEditingData.summary || '';
+                
+            } else {
+                // Žák edituje obě reflexe
+                document.getElementById('student-reflection-area').classList.remove('hidden');
+                document.getElementById('val-success').classList.remove('hidden');
+                document.getElementById('val-goal').classList.remove('hidden');
+                document.getElementById('val-success-read').classList.add('hidden');
+                document.getElementById('val-goal-read').classList.add('hidden');
+                
+                document.getElementById('val-success').value = currentEditingData.reflectionSuccess || '';
+                document.getElementById('val-goal').value = currentEditingData.reflectionGoal || '';
+            }
+
+            // Vykreslení bublin (Škály)
+            const container = document.getElementById('sectionsContainer');
+            container.innerHTML = '';
+            
+            ['selfRelation', 'othersRelation', 'learning'].forEach(key => {
+                const conf = COMPETENCIES_CONFIG[key]; 
+                const dataObj = currentEditingData[key] || { competencies: [] };
+                let rows = '';
+                
+                conf.items.forEach((label, idx) => {
+                    const myVal = dataObj.competencies ? dataObj.competencies[idx] : null;
+                    let btns = '', printSquares = '';
+                    
+                    for(let i=0; i<4; i++) {
+                        const isSelected = myVal === i;
+                        const color = isSelected ? SCALE_COLORS[i] : '#f3f4f6';
+                        const shadowClass = isSelected ? 'scale-110 shadow-md border-slate-600 z-10' : 'border-slate-200 shadow-sm opacity-60 hover:opacity-100 hover:scale-110';
+                        
+                        // Tlačítka pro klikání
+                        btns += `<button onclick="window.updateBubble('${key}', ${idx}, ${i})" class="w-[14px] h-[14px] sm:w-[18px] sm:h-[18px] border rounded-[2px] transition-all relative ${shadowClass}" style="background-color: ${color}" title="${SCALE_TITLES[i]}"></button>`;
+                        
+                        // Čtverečky pro tisk
+                        const printBg = isSelected ? SCALE_COLORS[i] : '#ffffff';
+                        const printBorder = isSelected ? '#000000' : '#d1d5db';
+                        printSquares += `<div class="w-[8px] h-[8px] border rounded-[1px]" style="background-color: ${printBg}; border-color: ${printBorder}; opacity: ${isSelected ? '1' : '0.4'};"></div>`;
+                    }
+                    rows += `
+                    <div class="flex flex-col py-1.5 border-b border-slate-100 last:border-0 break-inside-avoid print:border-slate-300 print:py-1">
+                        <span class="text-[11px] leading-tight font-print text-slate-800 mb-1 print:text-[8pt] font-medium">${label}</span>
+                        <div class="flex gap-2.5 no-print items-center">${btns}</div>
+                        <div class="hidden print-content print-flex gap-2.5 items-center">${printSquares}</div>
+                    </div>`;
+                });
+                
+                const borderColor = key==='selfRelation'?'green':(key==='othersRelation'?'blue':'orange');
+                
+                const html = `
+                <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-4 break-inside-avoid print-border-none print:p-0">
+                    <h2 class="text-[11px] font-bold mb-2 text-blue-900 border-b-2 border-blue-100 pb-2 text-center font-print uppercase tracking-wide flex items-center justify-center">${conf.title}</h2>
+                    <div class="space-y-1">${rows}</div>
+                </div>`;
+                container.insertAdjacentHTML('beforeend', html);
+            });
+            
+            lucide.createIcons();
+        }
+
+        // --- SVODKA (Jen pro učitele) ---
+        function renderComparison() {
+            const container = document.getElementById('comparisonContent');
+            const studentCloud = cloudData[activeStudent] || {};
+            // Filtrujeme jen učitelské záznamy
+            const sourceNames = Object.keys(studentCloud).filter(k => studentCloud[k].authorType === 'teacher'); 
+
+            if (sourceNames.length === 0) {
+                container.innerHTML = `<div class="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center text-blue-800 font-bold">Zatím neexistují žádná učitelská hodnocení pro tohoto žáka.</div>`;
+                return;
+            }
+
+            let html = `<div class="bg-white rounded-xl shadow border border-slate-200 overflow-hidden"><div class="bg-purple-50 p-4 border-b border-purple-100 flex justify-between items-center"><h3 class="text-lg font-bold text-purple-900">${activeStudent} - Svodka z Cloudu</h3></div><div class="overflow-x-auto"><table class="w-full text-sm text-left"><thead class="text-xs text-slate-500 uppercase bg-slate-50 border-b"><tr><th class="px-4 py-3 w-1/4">Kompetence</th><th class="px-4 py-3 text-center border-l border-slate-300 bg-blue-50 font-bold w-[120px]">PRŮMĚR TŘÍDY</th>`;
+            
+            sourceNames.forEach(src => {
+                const name = TEACHERS.find(t=>t.email.toLowerCase()===src.toLowerCase())?.name || src;
+                html += `<th class="px-4 py-3 text-center border-l border-slate-200 min-w-[120px]">${name}</th>`;
+            });
+            html += `</tr></thead><tbody>`;
+
+            ['selfRelation', 'othersRelation', 'learning'].forEach(sectionKey => {
+                const conf = COMPETENCIES_CONFIG[sectionKey];
+                html += `<tr class="bg-slate-50"><td colspan="${sourceNames.length + 2}" class="px-4 py-2 font-bold text-slate-700 border-t border-slate-200">${conf.title}</td></tr>`;
+                
+                conf.items.forEach((label, idx) => {
+                    html += `<tr class="bg-white hover:bg-slate-50 border-b border-slate-100"><td class="px-4 py-2 font-medium text-slate-900">${label}</td>`;
+                    
+                    let sum = 0; let count = 0;
+                    sourceNames.forEach(src => {
+                        const val = studentCloud[src][sectionKey]?.competencies?.[idx];
+                        if(val !== undefined && val !== null) { sum += val; count++; }
+                    });
+                    
+                    const avgVal = count > 0 ? Math.round(sum / count) : null;
+                    
+                    let avgSquares = '<div class="flex gap-1 justify-center">';
+                    for(let i=0; i<4; i++) {
+                        const isSelected = avgVal === i;
+                        const color = isSelected ? SCALE_COLORS[i] : '#e2e8f0';
+                        const border = isSelected ? 'border-slate-800' : 'border-transparent'; 
+                        avgSquares += `<div class="w-3 h-3 rounded-[2px] border ${border}" style="background-color: ${color}; opacity: ${isSelected ? '1' : '0.3'}"></div>`;
+                    }
+                    html += `<td class="px-4 py-2 text-center border-l border-slate-300 bg-blue-50">${avgSquares}</div></td>`;
+                    
+                    sourceNames.forEach(src => {
+                        const val = studentCloud[src][sectionKey]?.competencies?.[idx];
+                        let cellContent = '<span class="text-slate-300">-</span>';
+                        if (val !== undefined && val !== null) { 
+                            let squares = '<div class="flex gap-1 justify-center">';
+                            for(let i=0; i<4; i++) {
+                                const isSelected = val === i;
+                                const color = isSelected ? SCALE_COLORS[i] : '#e2e8f0';
+                                squares += `<div class="w-2.5 h-2.5 rounded-[1px]" style="background-color: ${color}; opacity: ${isSelected ? '1' : '0.3'}"></div>`;
+                            }
+                            cellContent = squares + '</div>';
+                        }
+                        html += `<td class="px-4 py-2 text-center border-l border-slate-100">${cellContent}</td>`;
+                    });
+                    html += `</tr>`;
+                });
+            });
+            html += `</tbody></table></div></div>`;
+            container.innerHTML = html;
+        }
+
+        // --- 5. EXPORT FUNKCÍ PRO HTML ---
+        window.loginWithGoogle = loginWithGoogle;
+        window.logout = logout;
+        window.selectRole = selectRole;
+        window.resetLogin = resetLogin;
+        window.login = login;
+        window.populateSetupNames = populateSetupNames;
+        window.saveStudentProfile = saveStudentProfile;
+        window.showStartupScreen = showStartupScreen;
+        window.loadClassData = loadClassData;
+        window.teacherStudentChanged = teacherStudentChanged;
+        window.teacherClassChanged = teacherClassChanged;
+        window.updateBubble = updateBubble;
+        window.saveStudentField = saveStudentField;
+        window.saveTeacherField = saveTeacherField;
+        window.toggleComparisonView = toggleComparisonView;
+
+        // --- 6. INICIALIZACE APLIKACE A FIREBASE ---
+        async function initAll() {
+            lucide.createIcons();
+            populateDropdowns();
+            
+            // Firebase setup
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            provider = new GoogleAuthProvider();
+            // provider.setCustomParameters({ prompt: 'select_account' }); Může zlobit v některých prohlížečích
+            
+            // Persistence zajistí, že učitel se nemusí po F5 hlásit znova
+            await setPersistence(auth, browserLocalPersistence);
+
+            // Auth Observer sleduje, zda je uživatel připojen k Googlu
+            onAuthStateChanged(auth, (user) => {
+                document.getElementById('login-overlay').classList.add('hidden');
+
+                if (user) {
+                    const userEmail = (user.email || "").toLowerCase();
+                    if(!userEmail) return alert("Váš Google účet neposkytl e-mailovou adresu. Nelze se přihlásit.");
+
+                    currentUserInfo = userEmail;
+                    const teacherEmails = TEACHERS.map(t => t.email.toLowerCase());
+                    
+                    if (teacherEmails.includes(userEmail)) {
+                        // JSEM UČITEL
+                        currentRole = 'teacher';
+                        const foundTeacher = TEACHERS.find(t=>t.email.toLowerCase()===userEmail);
+                        const tName = foundTeacher ? foundTeacher.name : userEmail;
+                        
+                        document.getElementById('tb-teacher-name').textContent = tName;
+                        document.getElementById('login-screen').classList.add('hidden');
+                        
+                        const clsSelect = document.getElementById('startClass');
+                        clsSelect.innerHTML = '';
+                        Object.keys(CLASSES).forEach(c => clsSelect.add(new Option(c, c)));
+                        clsSelect.value = "4. A";
+
+                        document.getElementById('startup-screen').classList.remove('hidden');
+                    } else {
+                        // JSEM ŽÁK
+                        currentRole = 'student';
+                        document.getElementById('login-screen').classList.add('hidden');
+                        
+                        const savedProfile = localStorage.getItem('student_my_profile');
+                        if (savedProfile) {
+                            const p = JSON.parse(savedProfile);
+                            activeClass = p.className;
+                            activeStudent = p.name;
+                            startStudentApp();
+                        } else {
+                            document.getElementById('student-setup-screen').classList.remove('hidden');
+                        }
+                    }
+                } else {
+                    // ODHLÁŠEN
+                    document.getElementById('login-screen').classList.remove('hidden');
+                    document.getElementById('startup-screen').classList.add('hidden');
+                    document.getElementById('student-setup-screen').classList.add('hidden');
+                    document.getElementById('main-app-container').classList.add('hidden');
+                    document.getElementById('teacher-toolbar').classList.add('hidden');
+                    document.getElementById('student-toolbar').classList.add('hidden');
+                }
+            });
+        }
+
+        // Spuštění
+        initAll();
+
     </script>
 </body>
 </html>
