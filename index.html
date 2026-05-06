@@ -45,7 +45,7 @@
 
     <div id="auth-screen" class="min-h-screen flex flex-col items-center justify-center p-4">
         <div class="bg-white p-8 rounded-xl shadow-lg text-center max-w-md w-full border-t-4 border-blue-600">
-            <img src="https://raw.githubusercontent.com/knopak/hodnoceni/main/logo.jpg" alt="ZŠ Galaxie" class="mx-auto h-24 mb-6">
+            <img src="https://github.com/Knopak/hodnoceni/blob/main/logo.jpg?raw=true" alt="ZŠ Galaxie" class="mx-auto h-24 mb-6">
             <h1 class="text-3xl font-bold mb-2 text-blue-900">ZŠ Galaxie</h1>
             <button onclick="loginWithGoogle()" class="w-full mt-6 bg-blue-600 text-white font-bold px-6 py-3 rounded-lg flex items-center justify-center gap-3 hover:bg-blue-700 shadow-md">
                 Přihlásit se školním účtem Google
@@ -81,7 +81,7 @@
 
         <div id="print-container" class="max-w-[210mm] mx-auto p-8 bg-white my-8 shadow-md flex flex-col hidden">
             <div class="flex justify-center mb-6">
-                <img src="https://raw.githubusercontent.com/knopak/hodnoceni/main/logo.jpg" alt="ZŠ Galaxie" class="h-16 object-contain" onerror="this.src='https://via.placeholder.com/200x80?text=ZŠ+GALAXIE'">
+                <img src="https://github.com/Knopak/hodnoceni/blob/main/logo.jpg?raw=true" alt="ZŠ Galaxie" class="h-16 object-contain">
             </div>
             <div class="text-center mb-6">
                 <div class="inline-block border-[3px] border-blue-600 px-10 py-1 mb-2">
@@ -110,22 +110,13 @@
         <div id="page-2-container" class="max-w-[210mm] mx-auto p-8 bg-white my-8 shadow-md flex flex-col hidden">
             <h2 class="text-xl font-bold mb-6 text-center text-blue-900 uppercase tracking-wide border-b-2 border-blue-900 pb-2">Sebehodnocení žáka</h2>
             
-            <div id="studentSectionsContainer" class="space-y-8"></div>
+            <div id="studentSectionsContainer" class="space-y-6"></div>
 
             <div class="mt-auto pt-8">
                 <div class="grid grid-cols-3 gap-6 text-[9px] text-gray-500 border-t border-gray-200 pt-4 font-print italic">
-                    <div>
-                        <span class="font-bold uppercase text-gray-700 block mb-1">Ve vztahu k sobě:</span>
-                        Myšlenky a pocity, chování v situacích, práce se zpětnou vazbou.
-                    </div>
-                    <div>
-                        <span class="font-bold uppercase text-gray-700 block mb-1">Ve vztahu k druhým:</span>
-                        Pravidla, spolupráce, pomoc ostatním, bezpečné prostředí.
-                    </div>
-                    <div>
-                        <span class="font-bold uppercase text-gray-700 block mb-1">Při učení:</span>
-                        Zodpovědnost, vytrvalost, porozumění textu, prezentace práce.
-                    </div>
+                    <div><span class="font-bold uppercase text-gray-700 block mb-1">Ve vztahu k sobě:</span>Myšlenky a pocity, chování v situacích, práce se zpětnou vazbou.</div>
+                    <div><span class="font-bold uppercase text-gray-700 block mb-1">Ve vztahu k druhým:</span>Pravidla, spolupráce, pomoc ostatním, bezpečné prostředí.</div>
+                    <div><span class="font-bold uppercase text-gray-700 block mb-1">Při učení:</span>Zodpovědnost, vytrvalost, porozumění textu, prezentace práce.</div>
                 </div>
             </div>
         </div>
@@ -148,7 +139,6 @@
         const auth = firebase.auth(), db = firebase.firestore();
 
         const TEACHERS = { "frantisek.knop@skolagalaxie.cz": "9. A", "eva.pancova@skolagalaxie.cz": "7. A", "jitka.zakova@skolagalaxie.cz": "1. A", "linda.vyvleckova@skolagalaxie.cz": "4. A", "lucie.haslerova@skolagalaxie.cz": "8. A", "michaela.raskova@skolagalaxie.cz": "6. A", "ondrej.cervenka@skolagalaxie.cz": "3. A", "pavlina.bittnerova@skolagalaxie.cz": "4. A", "tereza.malirova@skolagalaxie.cz": "2. A", "nastenka@skolagalaxie.cz": "" };
-        
         const STUDENTS = {
             "antonin.anlauf@skolagalaxie.cz": { name: "Antonín Jaromír Anlauf", class: "1. A" },
             "emma.burgetova@skolagalaxie.cz": { name: "Emma Burgetová", class: "1. A" },
