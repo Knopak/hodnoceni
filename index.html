@@ -22,10 +22,10 @@
         .hidden { display: none !important; }
         .print-content { display: none; }
         textarea { resize: none; overflow: hidden; transition: height 0.1s ease; }
-        textarea:disabled { background-color: #f3f4f6; color: #6b7280; cursor: not-allowed; }
+        textarea:disabled { background-color: #f3f4f6; color: #6b7280; cursor: not-allowed; border-color: #e5e7eb; }
 
-        .scale-btn { transition: all 0.2s; }
-        .scale-btn.active { transform: scale(1.15); box-shadow: 0 0 5px rgba(0,0,0,0.3); border-color: #1e3a8a; }
+        .scale-btn { transition: all 0.2s; word-wrap: break-word; }
+        .scale-btn:active { transform: scale(0.95); }
 
         @media print {
             @page { size: A4; margin: 0; }
@@ -41,10 +41,6 @@
             .break-inside-avoid { break-inside: avoid; }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
         }
-
-        /* Loading spinner */
-        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #3b82f6; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -95,7 +91,7 @@
                     <button onclick="saveData()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 shadow-md transition-colors">
                         <i data-lucide="save" class="w-4 h-4"></i> Uložit
                     </button>
-                    <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 shadow-md transition-colors">
+                    <button id="printBtn" onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 shadow-md transition-colors">
                         <i data-lucide="printer" class="w-4 h-4"></i> Tisk
                     </button>
                     <button onclick="auth.signOut()" class="bg-red-100 text-red-600 hover:bg-red-200 px-3 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors ml-2">
@@ -139,53 +135,43 @@
             </div>
         </div>
 
-        <!-- STRANA 2: LEGENDA A SEBEHODNOCENÍ ŽÁKA -->
+        <!-- STRANA 2: ŽÁK (SEBEHODNOCENÍ) NEBO UČITEL (KOMPAKTNÍ LEGENDA + NÁHLED) -->
         <div id="page-2-container" class="max-w-[210mm] mx-auto p-6 bg-white my-8 shadow-md flex flex-col hidden">
             
-            <div class="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-6 print-border-none print:bg-transparent">
-                <h2 class="text-xl font-bold mb-4 text-center text-blue-900 font-print uppercase">Legenda a Sebehodnocení</h2>
-                
-                <div class="grid grid-cols-1 gap-6 text-sm font-print">
-                    
-                    <!-- Vztah k sobě -->
-                    <div>
-                        <h3 class="font-bold text-lg mb-2 border-b border-gray-300 pb-1">Ve vztahu k sobě</h3>
-                        <ul class="space-y-2 list-disc pl-5">
-                            <li><strong>Vyjadřuješ své myšlenky a pocity přiměřeně situaci:</strong> Umím říct, co si myslím nebo jak se cítím. Vím, kdy je čas na vtipkování a kdy je potřeba mluvit vážně.</li>
-                            <li><strong>Rozpoznáš vhodné a nevhodné chování a jednáš podle toho:</strong> Poznám, co se v danou chvíli sluší a co ne, jak v hodině, tak i o přestávce. Když mě někdo provokuje, dokážu se ovládnout.</li>
-                            <li><strong>Umím přijmout zpětnou vazbu a dál s ní pracovat:</strong> Když mi učitel nebo spolužák řekne, co dělám dobře a co mi nejde, neurazím se. Místo toho se zamyslím.</li>
-                        </ul>
-                    </div>
-
-                    <!-- Vztah k druhým -->
-                    <div>
-                        <h3 class="font-bold text-lg mb-2 border-b border-gray-300 pb-1">Ve vztahu k druhým</h3>
-                        <ul class="space-y-2 list-disc pl-5">
-                            <li><strong>Dodržuješ stanovená pravidla:</strong> Respektuji pravidla třídy a školy. Nikdo mě nemusí napomínat.</li>
-                            <li><strong>Spolupracuješ s ostatními:</strong> Dokážu se domluvit na společném postupu. V týmu neshazuji práci ostatních, ale pomáhám.</li>
-                            <li><strong>Dokážeš poskytovat účelnou zpětnou vazbu:</strong> Umím spolužáka konkrétně ocenit, dát mu radu či doporučení.</li>
-                            <li><strong>Přispíváš k vytváření bezpečného prostředí a atmosféry:</strong> Ostatní se v mé přítomnosti cítí dobře a beze strachu. Nikoho neshazuji.</li>
-                        </ul>
-                    </div>
-
-                    <!-- Při učení -->
-                    <div>
-                        <h3 class="font-bold text-lg mb-2 border-b border-gray-300 pb-1">Při učení</h3>
-                        <ul class="space-y-2 list-disc pl-5">
-                            <li><strong>Zodpovědně přistupuješ k učení:</strong> Do školy přicházím připravený*á. Mám v pořádku pomůcky, dávám v hodině pozor.</li>
-                            <li><strong>Vytrváš v práci na obtížných úkolech:</strong> Když mi něco nejde hned napoprvé, nevzdávám se. Hledám řešení.</li>
-                            <li><strong>Čteš s porozuměním:</strong> Když si přečtu text, dokážu říct, o čem byl a co mám udělat.</li>
-                            <li><strong>Dokážeš srozumitelně prezentovat výsledky:</strong> Umím ostatním ukázat a vysvětlit svou práci. Mluvím nahlas, udržuji oční kontakt.</li>
-                        </ul>
-                    </div>
+            <h2 class="text-xl font-bold mb-4 text-center text-blue-900 font-print uppercase" id="page2-title">Sebehodnocení žáka</h2>
+            
+            <!-- Kompaktní legenda pouze pro tisk/učitele -->
+            <div id="compact-legend" class="grid grid-cols-1 md:grid-cols-3 gap-4 text-[10px] leading-tight font-print mb-6 bg-gray-50 p-4 border border-gray-200 rounded-lg print:bg-transparent print:border-none print:p-0 print:mb-4">
+                <div>
+                    <h3 class="font-bold border-b border-gray-300 pb-1 mb-1">Ve vztahu k sobě</h3>
+                    <ul class="list-disc pl-3 space-y-1 text-gray-700">
+                        <li><strong>Vyjadřuješ myšlenky:</strong> Vím, kdy vtipkovat a kdy mluvit vážně.</li>
+                        <li><strong>Rozpoznáš chování:</strong> Poznám, co se sluší. Ovládnu se při provokaci.</li>
+                        <li><strong>Zpětná vazba:</strong> Neurazím se, zamyslím se nad radami.</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold border-b border-gray-300 pb-1 mb-1">Ve vztahu k druhým</h3>
+                    <ul class="list-disc pl-3 space-y-1 text-gray-700">
+                        <li><strong>Pravidla:</strong> Respektuji dohodnuté, nemusí mě napomínat.</li>
+                        <li><strong>Spolupráce:</strong> Domluvím se, neshazuji ostatní, pomáhám.</li>
+                        <li><strong>Zpětná vazba druhým:</strong> Umím ocenit a poradit.</li>
+                        <li><strong>Bezpečné prostředí:</strong> Ostatní se se mnou cítí dobře, nevyčleňuji.</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold border-b border-gray-300 pb-1 mb-1">Při učení</h3>
+                    <ul class="list-disc pl-3 space-y-1 text-gray-700">
+                        <li><strong>Zodpovědnost:</strong> Chodím připravený, mám pomůcky, dávám pozor.</li>
+                        <li><strong>Vytrvalost:</strong> Nevzdávám se hned, hledám řešení, řeknu si o pomoc.</li>
+                        <li><strong>Čtení:</strong> Dokážu vlastními slovy říct, co jsem četl a co mám dělat.</li>
+                        <li><strong>Prezentace:</strong> Umím vysvětlit svou práci. Mluvím nahlas, oční kontakt.</li>
+                    </ul>
                 </div>
             </div>
 
-            <!-- Interaktivní část sebehodnocení žáka -->
-            <div class="mt-4">
-                <h3 class="text-lg font-bold mb-4 text-center text-blue-900 no-print">Moje hodnocení a vysvětlení (vyplňuje žák)</h3>
-                <div id="studentSectionsContainer" class="space-y-6"></div>
-            </div>
+            <!-- Interaktivní část sebehodnocení -->
+            <div id="studentSectionsContainer" class="space-y-6"></div>
 
         </div>
 
@@ -221,7 +207,7 @@
             "ondrej.cervenka@skolagalaxie.cz": "3. A",
             "pavlina.bittnerova@skolagalaxie.cz": "4. A",
             "tereza.malirova@skolagalaxie.cz": "2. A",
-            "nastenka@skolagalaxie.cz": "" // Testovací netřídní učitel
+            "nastenka@skolagalaxie.cz": "" 
         };
 
         const STUDENTS = {
@@ -387,28 +373,29 @@
             "tomas.pollak@skolagalaxie.cz": { name: "Tomáš Pollak", class: "9. A" },
             "ella.synkova@skolagalaxie.cz": { name: "Ella Synková", class: "9. A" },
             "martin.snapka@skolagalaxie.cz": { name: "Martin Šnapka", class: "9. A" },
-            "print@skolagalaxie.cz": { name: "Testovací Žák (Print)", class: "Testovací" } // Testovací žák
+            "print@skolagalaxie.cz": { name: "Testovací Žák (Print)", class: "Testovací" }
         };
 
         const COMPETENCIES = [
-            { id: "s1", cat: "Ve vztahu k sobě", text: "Vyjadřuješ své myšlenky a pocity přiměřeně situaci." },
-            { id: "s2", cat: "Ve vztahu k sobě", text: "Rozpoznáš vhodné a nevhodné chování a jednáš podle toho." },
-            { id: "s3", cat: "Ve vztahu k sobě", text: "Umím přijmout zpětnou vazbu a dál s ní pracovat." },
-            { id: "o1", cat: "Ve vztahu k druhým", text: "Dodržuješ stanovená pravidla." },
-            { id: "o2", cat: "Ve vztahu k druhým", text: "Spolupracuješ s ostatními." },
-            { id: "o3", cat: "Ve vztahu k druhým", text: "Dokážeš poskytovat účelnou zpětnou vazbu." },
-            { id: "o4", cat: "Ve vztahu k druhým", text: "Přispíváš k vytváření bezpečného prostředí a atmosféry." },
-            { id: "l1", cat: "Při učení", text: "Zodpovědně přistupuješ k učení." },
-            { id: "l2", cat: "Při učení", text: "Vytrváš v práci na obtížných úkolech." },
-            { id: "l3", cat: "Při učení", text: "Čteš s porozuměním." },
-            { id: "l4", cat: "Při učení", text: "Dokážeš srozumitelně prezentovat výsledky své práce." }
+            { id: "s1", cat: "Ve vztahu k sobě", text: "Vyjadřuješ své myšlenky a pocity přiměřeně situaci.", desc: "Umím říct, co si myslím nebo jak se cítím. Vím, kdy je čas na vtipkování a kdy je potřeba mluvit vážně." },
+            { id: "s2", cat: "Ve vztahu k sobě", text: "Rozpoznáš vhodné a nevhodné chování a jednáš podle toho.", desc: "Poznám, co se v danou chvíli sluší a co ne, jak v hodině, tak i o přestávce. Když mě někdo provokuje, dokážu se ovládnout." },
+            { id: "s3", cat: "Ve vztahu k sobě", text: "Umím přijmout zpětnou vazbu a dál s ní pracovat.", desc: "Když mi učitel nebo spolužák řekne, co dělám dobře a co mi nejde, neurazím se. Místo toho se zamyslím." },
+            { id: "o1", cat: "Ve vztahu k druhým", text: "Dodržuješ stanovená pravidla.", desc: "Respektuji pravidla třídy a školy. Nikdo mě nemusí napomínat." },
+            { id: "o2", cat: "Ve vztahu k druhým", text: "Spolupracuješ s ostatními.", desc: "Dokážu se domluvit na společném postupu. V týmu neshazuji práci ostatních, ale pomáhám." },
+            { id: "o3", cat: "Ve vztahu k druhým", text: "Dokážeš poskytovat účelnou zpětnou vazbu.", desc: "Umím spolužáka konkrétně ocenit, dát mu radu či doporučení." },
+            { id: "o4", cat: "Ve vztahu k druhým", text: "Přispíváš k vytváření bezpečného prostředí a atmosféry.", desc: "Ostatní se v mé přítomnosti cítí dobře a beze strachu. Nikoho neshazuji." },
+            { id: "l1", cat: "Při učení", text: "Zodpovědně přistupuješ k učení.", desc: "Do školy přicházím připravený*á. Mám v pořádku pomůcky, dávám v hodině pozor." },
+            { id: "l2", cat: "Při učení", text: "Vytrváš v práci na obtížných úkolech.", desc: "Když mi něco nejde hned napoprvé, nevzdávám se. Hledám řešení." },
+            { id: "l3", cat: "Při učení", text: "Čteš s porozuměním.", desc: "Když si přečtu text, dokážu říct, o čem byl a co mám udělat." },
+            { id: "l4", cat: "Při učení", text: "Dokážeš srozumitelně prezentovat výsledky své práce.", desc: "Umím ostatním ukázat a vysvětlit svou práci. Mluvím nahlas, udržuji oční kontakt." }
         ];
 
-        const SCALE_COLORS = ['#dbeafe', '#93c5fd', '#3b82f6', '#1d4ed8']; 
-        const SCALE_TITLES = ['Ne', 'Spíše ne', 'Spíše ano', 'Ano'];
+        const SCALE_LABELS = ['Ne', 'Spíše ne', 'Spíše ano', 'Ano'];
+        const ACTIVE_COLOR = '#1d4ed8'; // Tmavě modrá (blue-700)
+        const INACTIVE_COLOR = '#f3f4f6'; // Šedá
 
         let currentUser = null;
-        let userRole = null; // 'teacher', 'student'
+        let userRole = null; 
         let isClassTeacher = false;
         let currentTargetEmail = null;
         let dbData = { teacherScales: {}, studentScales: {}, studentComments: {}, topNote: "", bottomNote: "" };
@@ -424,7 +411,7 @@
                 document.getElementById('auth-screen').classList.add('hidden');
                 document.getElementById('app-screen').classList.remove('hidden');
 
-                if (TEACHERS[email] !== undefined) { // Check for undefined, as empty string is falsy
+                if (TEACHERS[email] !== undefined) { 
                     userRole = 'teacher';
                     setupTeacherUI();
                 } else if (STUDENTS[email]) {
@@ -450,6 +437,7 @@
         function setupTeacherUI() {
             document.getElementById('controls-container').classList.remove('hidden');
             document.getElementById('student-notice').classList.add('hidden');
+            document.getElementById('printBtn').classList.remove('hidden');
             
             const classes = [...new Set(Object.values(STUDENTS).map(s => s.class))].sort();
             const classSelect = document.getElementById('classSelect');
@@ -479,7 +467,8 @@
         function setupStudentUI(email) {
             document.getElementById('controls-container').classList.add('hidden');
             document.getElementById('student-notice').classList.remove('hidden');
-            document.getElementById('studentSelect').value = email; // Fake selection
+            document.getElementById('printBtn').classList.add('hidden'); // Žák nepotřebuje tlačítko tisk
+            document.getElementById('studentSelect').value = email; 
             currentTargetEmail = email;
             loadStudentData(email);
         }
@@ -492,7 +481,6 @@
             currentTargetEmail = email;
             const studentInfo = STUDENTS[email];
             
-            // Nastavení práv třídního
             if (userRole === 'teacher' && TEACHERS[currentUser.email.toLowerCase()] === studentInfo.class) {
                 isClassTeacher = true;
             } else {
@@ -502,7 +490,6 @@
             document.getElementById('studentNameDisplay').textContent = studentInfo.name;
             document.getElementById('classNameDisplay').textContent = "Třída: " + studentInfo.class;
             
-            // Default data reset
             dbData = { teacherScales: {}, studentScales: {}, studentComments: {}, topNote: "", bottomNote: "" };
             
             try {
@@ -515,16 +502,19 @@
 
         // --- VYKRESLENÍ FORMULÁŘŮ ---
         function renderForms() {
-            // Pokud je to žák, vůbec mu nevykresluj první stranu! Učitelům nech obě.
+            // Žák nevidí první stranu učitelů a nevidí nahoře kompaktní legendu
             if (userRole === 'student') {
                 document.getElementById('print-container').classList.add('hidden');
+                document.getElementById('compact-legend').classList.add('hidden');
+                document.getElementById('page2-title').textContent = "Moje sebehodnocení a vysvětlení";
             } else {
                 document.getElementById('print-container').classList.remove('hidden');
+                document.getElementById('compact-legend').classList.remove('hidden');
+                document.getElementById('page2-title').textContent = "Sebehodnocení žáka (Strana 2)";
             }
             
             document.getElementById('page-2-container').classList.remove('hidden');
 
-            // 1. Textová pole
             const topNoteEl = document.getElementById('schoolYearNoteInput');
             const bottomNoteEl = document.getElementById('summaryInput');
             
@@ -533,22 +523,15 @@
             document.getElementById('schoolYearNoteDisplay').textContent = dbData.topNote || "";
             document.getElementById('summaryDisplay').textContent = dbData.bottomNote || "";
 
-            // Oprávnění pro textová pole
-            if (userRole === 'student') {
-                topNoteEl.disabled = true;
-                bottomNoteEl.disabled = true;
-            } else {
-                topNoteEl.disabled = !isClassTeacher; // Jen třídní může horní pole
-                bottomNoteEl.disabled = false; // Všichni učitelé mohou spodní
+            if (userRole === 'teacher') {
+                topNoteEl.disabled = !isClassTeacher; 
+                bottomNoteEl.disabled = false; 
             }
 
             autoResize(topNoteEl);
             autoResize(bottomNoteEl);
 
-            // 2. Vykreslení učitelských škál (Strana 1)
             renderTeacherScales();
-
-            // 3. Vykreslení žákovských škál a komentářů (Strana 2)
             renderStudentScales();
         }
 
@@ -568,18 +551,23 @@
                     let btns = '', printSquares = '';
                     
                     for(let i=0; i<4; i++) {
-                        const active = val === i;
-                        const color = active ? SCALE_COLORS[i] : '#f3f4f6';
-                        const extraClass = active ? 'active border-gray-600' : 'border-gray-300';
-                        const pointer = userRole === 'teacher' ? 'cursor-pointer hover:bg-blue-100' : 'cursor-not-allowed opacity-60';
+                        // Vykreslení kumulativně jako progress bar
+                        const active = val !== undefined && val >= i;
+                        const isCurrent = val === i;
+                        const bgColor = active ? ACTIVE_COLOR : INACTIVE_COLOR;
+                        const textColor = active ? '#ffffff' : '#4b5563';
+                        const pointer = userRole === 'teacher' ? 'cursor-pointer hover:opacity-80' : 'cursor-not-allowed opacity-60';
                         
-                        btns += `<button onclick="setTeacherScale('${q.id}', ${i})" class="scale-btn w-[18px] h-[18px] border rounded-[3px] ${extraClass} ${pointer}" style="background-color: ${color}" title="${SCALE_TITLES[i]}" ${userRole === 'student' ? 'disabled' : ''}></button>`;
-                        printSquares += `<div class="w-[10px] h-[10px] border rounded-[2px]" style="background-color: ${color}; border-color: #9ca3af;"></div>`;
+                        // Online tlačítka
+                        btns += `<button onclick="setTeacherScale('${q.id}', ${i})" class="scale-btn text-[9px] px-0.5 py-1 leading-tight text-center border border-gray-300 rounded ${pointer}" style="background-color: ${bgColor}; color: ${textColor};" ${userRole === 'student' ? 'disabled' : ''}>${SCALE_LABELS[i]}</button>`;
+                        
+                        // Tiskové čtverečky
+                        printSquares += `<div class="w-[10px] h-[10px] border rounded-[2px]" style="background-color: ${bgColor}; border-color: #9ca3af;"></div>`;
                     }
 
                     html += `<div class="flex flex-col py-1 border-b border-gray-50 last:border-0 break-inside-avoid print:py-1">
                                 <span class="text-[11px] leading-tight font-print text-gray-800 mb-1 print:text-[9pt] font-medium">${q.text}</span>
-                                <div class="flex gap-3 no-print">${btns}</div>
+                                <div class="grid grid-cols-4 gap-1 no-print">${btns}</div>
                                 <div class="hidden print-content print-flex gap-3 items-center">${printSquares}</div>
                              </div>`;
                 });
@@ -593,30 +581,45 @@
             const container = document.getElementById('studentSectionsContainer');
             container.innerHTML = '';
             
-            COMPETENCIES.forEach(q => {
-                const val = dbData.studentScales[q.id];
-                const comment = dbData.studentComments[q.id] || "";
-                let btns = '';
-                
-                for(let i=0; i<4; i++) {
-                    const active = val === i;
-                    const color = active ? SCALE_COLORS[i] : '#f3f4f6';
-                    const extraClass = active ? 'active border-gray-600' : 'border-gray-300';
-                    const pointer = userRole === 'student' ? 'cursor-pointer hover:bg-blue-100' : 'cursor-not-allowed opacity-60';
-                    
-                    btns += `<button onclick="setStudentScale('${q.id}', ${i})" class="scale-btn w-6 h-6 border rounded-[4px] ${extraClass} ${pointer}" style="background-color: ${color}" title="${SCALE_TITLES[i]}" ${userRole === 'teacher' ? 'disabled' : ''}></button>`;
-                }
+            const categories = [...new Set(COMPETENCIES.map(c => c.cat))];
 
-                container.innerHTML += `
-                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 break-inside-avoid print:bg-transparent print:border-b print:border-x-0 print:border-t-0 print:rounded-none print:p-2">
-                        <div class="font-bold text-sm text-gray-800 mb-2 font-print">${q.text}</div>
-                        <div class="flex items-center gap-4 mb-3 no-print">
-                            <span class="text-xs text-gray-500 font-bold uppercase w-12 text-right">Škála:</span>
-                            <div class="flex gap-3">${btns}</div>
+            categories.forEach(cat => {
+                let catHtml = `<div class="mb-8 break-inside-avoid print:mb-4">
+                                <h3 class="text-lg font-bold text-blue-900 border-b border-blue-200 pb-1 mb-4 print:text-base print:mb-2">${cat}</h3>
+                                <div class="space-y-4 print:space-y-2">`;
+                
+                COMPETENCIES.filter(c => c.cat === cat).forEach(q => {
+                    const val = dbData.studentScales[q.id];
+                    const comment = dbData.studentComments[q.id] || "";
+                    let btns = '', printSquares = '';
+                    
+                    for(let i=0; i<4; i++) {
+                        const active = val !== undefined && val >= i;
+                        const bgColor = active ? ACTIVE_COLOR : INACTIVE_COLOR;
+                        const textColor = active ? '#ffffff' : '#4b5563';
+                        const pointer = userRole === 'student' ? 'cursor-pointer hover:opacity-80' : 'cursor-not-allowed opacity-60';
+                        
+                        btns += `<button onclick="setStudentScale('${q.id}', ${i})" class="scale-btn text-xs font-medium py-1.5 px-2 border border-gray-300 rounded ${pointer}" style="background-color: ${bgColor}; color: ${textColor};" ${userRole === 'teacher' ? 'disabled' : ''}>${SCALE_LABELS[i]}</button>`;
+                        
+                        printSquares += `<div class="flex items-center gap-1"><div class="w-[10px] h-[10px] border rounded-[2px]" style="background-color: ${bgColor}; border-color: #9ca3af;"></div><span class="text-[8px] text-gray-600">${SCALE_LABELS[i]}</span></div>`;
+                    }
+
+                    catHtml += `
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 print:bg-transparent print:border-b print:border-x-0 print:border-t-0 print:rounded-none print:p-2">
+                            <div class="font-bold text-sm text-gray-800 font-print">${q.text}</div>
+                            <!-- LEGENDA JE ZDE (popis pod otázkou) -->
+                            <div class="text-xs text-gray-500 italic mb-3 font-print">${q.desc}</div>
+                            
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3 no-print">${btns}</div>
+                            <div class="hidden print-content print-flex gap-4 mb-2">${printSquares}</div>
+                            
+                            <textarea id="comment-${q.id}" class="w-full p-2 border border-gray-300 rounded text-sm bg-white focus:ring-2 focus:ring-blue-500 font-print print:border-dashed print:bg-transparent" placeholder="Moje vysvětlení (proč jsem se takto ohodnotil/a)..." rows="2" oninput="autoResize(this); dbData.studentComments['${q.id}'] = this.value;" ${userRole === 'teacher' ? 'disabled' : ''}>${comment}</textarea>
                         </div>
-                        <textarea id="comment-${q.id}" class="w-full p-2 border border-gray-300 rounded text-sm bg-white focus:ring-2 focus:ring-blue-500 font-print" placeholder="Moje vysvětlení (proč jsem se takto ohodnotil/a)..." rows="2" oninput="autoResize(this); dbData.studentComments['${q.id}'] = this.value;" ${userRole === 'teacher' ? 'disabled' : ''}>${comment}</textarea>
-                    </div>
-                `;
+                    `;
+                });
+                
+                catHtml += `</div></div>`;
+                container.innerHTML += catHtml;
             });
         }
 
@@ -630,7 +633,7 @@
         function setStudentScale(qId, val) {
             if (userRole !== 'student') return;
             dbData.studentScales[qId] = val;
-            renderStudentScales(); // Překreslí jen žákovskou část
+            renderStudentScales(); 
         }
 
         function autoResize(el) {
@@ -642,7 +645,6 @@
         async function saveData() {
             if (!currentTargetEmail) return;
 
-            // Zápis textových polí (pokud na ně mám práva)
             if (userRole === 'teacher') {
                 dbData.bottomNote = document.getElementById('summaryInput').value;
                 if (isClassTeacher) {
@@ -651,7 +653,6 @@
             }
 
             try {
-                // Připravíme data na odeslání (Merge zabrání přepsání cizí části, pokud ukládáme jen my)
                 const payload = { lastUpdated: new Date() };
                 
                 if (userRole === 'teacher') {
@@ -665,7 +666,6 @@
 
                 await db.collection('evaluations').doc(currentTargetEmail).set(payload, { merge: true });
                 
-                // Zobrazit potvrzení
                 const toast = document.getElementById('toast');
                 toast.style.transform = 'translateY(0)';
                 toast.style.opacity = '1';
@@ -674,7 +674,6 @@
                     toast.style.opacity = '0';
                 }, 3000);
 
-                // Propsání zobrazení na první tiskové stránce
                 document.getElementById('schoolYearNoteDisplay').textContent = dbData.topNote;
                 document.getElementById('summaryDisplay').textContent = dbData.bottomNote;
 
