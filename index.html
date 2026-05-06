@@ -66,6 +66,9 @@
                     <button onclick="saveData()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center gap-2 shadow-md transition-colors">
                         <i data-lucide="save" class="w-4 h-4"></i> Uložit
                     </button>
+                    <button id="svodkaBtn" onclick="openSvodka()" class="hidden bg-violet-600 hover:bg-violet-700 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center gap-2 shadow-md transition-colors">
+                        <i data-lucide="table-2" class="w-4 h-4"></i> Svodka
+                    </button>
                     <button id="printBtn" onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center gap-2 shadow-md transition-colors">
                         <i data-lucide="printer" class="w-4 h-4"></i> Tisk
                     </button>
@@ -175,6 +178,24 @@
         </div>
     </div>
 
+    <!-- SVODKA MODAL -->
+    <div id="svodka-modal" class="hidden fixed inset-0 bg-black/50 z-[200] flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-6xl w-full max-h-[90vh] flex flex-col">
+            <div class="flex items-center justify-between px-6 py-4 border-b">
+                <div>
+                    <h2 class="text-xl font-black text-violet-900">Svodka hodnocení</h2>
+                    <p id="svodka-student-name" class="text-sm text-slate-500 font-medium mt-0.5"></p>
+                </div>
+                <button onclick="closeSvodka()" class="text-slate-400 hover:text-red-500 transition-colors">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <div class="overflow-auto flex-1 p-4">
+                <div id="svodka-content"></div>
+            </div>
+        </div>
+    </div>
+
     <div id="toast" class="fixed bottom-6 right-6 bg-emerald-600 text-white px-8 py-4 rounded-2xl shadow-2xl font-bold transform translate-y-24 opacity-0 transition-all duration-500 z-[100] flex items-center gap-3">
         <i data-lucide="check-circle-2"></i> Úspěšně uloženo
     </div>
@@ -211,6 +232,28 @@
             "skola@skolagalaxie.cz": "",
             "tereza.malirova@skolagalaxie.cz": "2. A",
             "nastenka@skolagalaxie.cz": ""
+        };
+
+        // Přezdívky učitelů pro svodku
+        const TEACHER_NICKNAMES = {
+            "barbora.bezdekova@skolagalaxie.cz": "Bára",
+            "eva.pancova@skolagalaxie.cz": "Eva",
+            "frantisek.knop@skolagalaxie.cz": "František",
+            "hana.svobodova@skolagalaxie.cz": "Hana",
+            "jana.skrabalova@skolagalaxie.cz": "Jana",
+            "jesse.courtemanche@skolagalaxie.cz": "Jesse",
+            "jitka.zakova@skolagalaxie.cz": "Jitka",
+            "linda.vyvleckova@skolagalaxie.cz": "Linda",
+            "lucie.haslerova@skolagalaxie.cz": "Lucie",
+            "lukas.vrobel@skolagalaxie.cz": "Lukáš",
+            "martin.kopecky@skolagalaxie.cz": "Martin",
+            "michaela.raskova@skolagalaxie.cz": "Míša",
+            "olga.orlitova@skolagalaxie.cz": "Olga",
+            "ondrej.cervenka@skolagalaxie.cz": "Ondřej",
+            "pavlina.bittnerova@skolagalaxie.cz": "Pavlína",
+            "skola@skolagalaxie.cz": "Škola",
+            "tereza.malirova@skolagalaxie.cz": "Tereza",
+            "nastenka@skolagalaxie.cz": "Nastja"
         };
 
         const STUDENTS = {
@@ -490,16 +533,42 @@
             }
 
             renderStudentScales();
+
+            // Svodka tlačítko jen pro učitele když je vybrán žák
+            const svodkaBtn = document.getElementById('svodkaBtn');
+            if (svodkaBtn) svodkaBtn.classList.toggle('hidden', userRole !== 'teacher');
+        }
+
+        // Spočítá průměr ze všech per-teacher škál a vrátí objekt {id: zaokrouhlenaHodnota}
+        function computeAveragedScales(data) {
+            const teacherKeys = Object.keys(data).filter(k => k.startsWith('teacherScales_'));
+            if (teacherKeys.length === 0) return data.teacherScales || {};
+            const sums = {}, counts = {};
+            teacherKeys.forEach(key => {
+                const scales = data[key] || {};
+                Object.entries(scales).forEach(([id, val]) => {
+                    if (val !== undefined && val !== null) {
+                        sums[id] = (sums[id] || 0) + val;
+                        counts[id] = (counts[id] || 0) + 1;
+                    }
+                });
+            });
+            const avg = {};
+            Object.keys(sums).forEach(id => {
+                avg[id] = Math.round(sums[id] / counts[id]);
+            });
+            return avg;
         }
 
         function renderTeacherScales() {
             const container = document.getElementById('teacherSectionsContainer');
             container.innerHTML = '';
+            const avgScales = computeAveragedScales(dbData);
             const cats = [...new Set(COMPETENCIES.map(c => c.cat))];
             cats.forEach(cat => {
                 let h = `<div class="bg-white border rounded p-3"><h3 class="text-[10px] font-black text-center border-b mb-3 uppercase tracking-wider text-blue-900">${cat}</h3>`;
                 COMPETENCIES.filter(c => c.cat === cat).forEach(q => {
-                    const val = dbData.teacherScales[q.id];
+                    const val = avgScales[q.id];
                     let btns = '', sqs = '';
                     for (let i = 0; i < 4; i++) {
                         const act = val === i;
@@ -551,7 +620,15 @@
         }
 
         function setTeacherScale(id, v) {
-            if (userRole === 'teacher') { dbData.teacherScales[id] = v; renderTeacherScales(); }
+            if (userRole === 'teacher') {
+                const myEmail = auth.currentUser.email.toLowerCase();
+                const key = 'teacherScales_' + myEmail;
+                if (!dbData[key]) dbData[key] = {};
+                dbData[key][id] = v;
+                // Přepočítat průměr a uložit do sdíleného teacherScales
+                dbData.teacherScales = computeAveragedScales(dbData);
+                renderTeacherScales();
+            }
         }
 
         function setStudentScale(id, v) {
@@ -563,6 +640,108 @@
             el.style.height = el.scrollHeight + 'px';
         }
 
+        function closeSvodka() {
+            document.getElementById('svodka-modal').classList.add('hidden');
+        }
+
+        async function openSvodka() {
+            if (!currentTargetEmail) return;
+            const studentInfo = STUDENTS[currentTargetEmail];
+            document.getElementById('svodka-student-name').textContent = studentInfo.name + ' – ' + studentInfo.class;
+
+            // Načíst čerstvá data z Firestore
+            const doc = await db.collection('evaluations').doc(currentTargetEmail).get();
+            const data = doc.exists ? doc.data() : {};
+
+            // Zjistit, kteří učitelé mají data (per-teacher klíče)
+            const teacherKeys = Object.keys(data).filter(k => k.startsWith('teacherScales_'));
+            const teacherEmails = teacherKeys.map(k => k.replace('teacherScales_', ''));
+
+            // Přidat "Aktuální (výsledek)" jako první sloupec ze sdíleného teacherScales
+            const hasShared = data.teacherScales && Object.keys(data.teacherScales).length > 0;
+
+            const cats = [...new Set(COMPETENCIES.map(c => c.cat))];
+            const CAT_ICONS = {
+                'Ve vztahu k sobě': '🌱',
+                'Ve vztahu k druhým': '🤝',
+                'Při učení': '📚'
+            };
+            const SCALE_COLORS = ['#ef4444','#f97316','#3b82f6','#22c55e'];
+            const SCALE_SHORT = ['Ne','Sp.ne','Sp.ano','Ano'];
+
+            function scaleBoxes(val) {
+                let html = '<div class="flex gap-0.5 justify-center">';
+                for (let i = 0; i < 4; i++) {
+                    const filled = val !== undefined && val !== null && i <= val;
+                    const active = val === i;
+                    html += `<div style="width:12px;height:12px;border-radius:2px;border:1px solid #cbd5e1;background:${filled ? SCALE_COLORS[val] : '#f1f5f9'};opacity:${filled ? 1 : 0.4}"></div>`;
+                }
+                html += '</div>';
+                if (val !== undefined && val !== null) {
+                    html += `<div style="font-size:9px;color:#64748b;text-align:center;margin-top:1px">${SCALE_SHORT[val]}</div>`;
+                }
+                return html;
+            }
+
+            // Sloupce: Aktuální + per-teacher
+            const columns = [];
+            if (hasShared) columns.push({ label: 'Aktuální<br>(výsledek)', scales: data.teacherScales, isResult: true });
+            teacherEmails.forEach(email => {
+                const nick = TEACHER_NICKNAMES[email] || email.split('.')[0];
+                columns.push({ label: nick, scales: data[`teacherScales_${email}`] || {}, isResult: false });
+            });
+
+            if (columns.length === 0) {
+                document.getElementById('svodka-content').innerHTML = '<p class="text-slate-400 text-center py-12">Zatím žádné hodnocení od učitelů.</p>';
+                document.getElementById('svodka-modal').classList.remove('hidden');
+                lucide.createIcons();
+                return;
+            }
+
+            let html = '<table class="w-full text-xs border-collapse">';
+            // Header
+            html += '<thead><tr>';
+            html += '<th class="text-left py-2 px-3 text-slate-500 uppercase text-[10px] tracking-wide font-bold border-b-2 border-slate-200 w-48">Kompetence</th>';
+            columns.forEach(col => {
+                const bg = col.isResult ? 'bg-violet-50' : 'bg-slate-50';
+                const fw = col.isResult ? 'font-black text-violet-800' : 'font-bold text-slate-600';
+                html += `<th class="py-2 px-2 text-center border-b-2 border-slate-200 ${bg} ${fw} text-[10px] uppercase tracking-wide min-w-[70px]">${col.label}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+
+            cats.forEach(cat => {
+                const icon = CAT_ICONS[cat] || '';
+                html += `<tr><td colspan="${columns.length + 1}" class="py-2 px-3 font-black text-[11px] uppercase tracking-wider text-slate-700 bg-slate-50 border-t border-slate-200">${icon} ${cat}</td></tr>`;
+                COMPETENCIES.filter(c => c.cat === cat).forEach((q, qi) => {
+                    const rowBg = qi % 2 === 0 ? '' : 'bg-slate-50/50';
+                    html += `<tr class="${rowBg}">`;
+                    html += `<td class="py-2 px-3 text-slate-700 font-medium leading-tight border-b border-slate-100">${q.text}</td>`;
+                    columns.forEach(col => {
+                        const val = col.scales[q.id];
+                        const bg = col.isResult ? 'bg-violet-50/50' : '';
+                        // Highlight pokud výrazně vyčnívá (rozdíl ≥ 2 oproti průměru ostatních)
+                        let highlight = '';
+                        if (!col.isResult && columns.length > 2) {
+                            const others = columns.filter(c => !c.isResult && c !== col).map(c => c.scales[q.id]).filter(v => v !== undefined);
+                            if (others.length > 0 && val !== undefined) {
+                                const avg = others.reduce((a,b) => a+b, 0) / others.length;
+                                if (Math.abs(val - avg) >= 1.5) highlight = 'ring-2 ring-orange-400 rounded';
+                            }
+                        }
+                        html += `<td class="py-2 px-2 text-center border-b border-slate-100 ${bg}"><div class="${highlight}">${val !== undefined ? scaleBoxes(val) : '<span class="text-slate-300">–</span>'}</div></td>`;
+                    });
+                    html += '</tr>';
+                });
+            });
+
+            html += '</tbody></table>';
+            html += '<p class="text-[10px] text-slate-400 mt-3 px-1">* Orámované buňky značí odchylku ≥ 1,5 bodu od průměru ostatních učitelů.</p>';
+
+            document.getElementById('svodka-content').innerHTML = html;
+            document.getElementById('svodka-modal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
         async function saveData() {
             if (!currentTargetEmail) return;
             if (userRole === 'teacher') {
@@ -570,6 +749,8 @@
                 if (isClassTeacher) dbData.topNote = document.getElementById('schoolYearNoteInput').value;
                 document.getElementById('schoolYearNoteDisplay').textContent = dbData.topNote || "";
                 document.getElementById('summaryDisplay').textContent = dbData.bottomNote || "";
+                // Vždy přepočítat průměr před uložením
+                dbData.teacherScales = computeAveragedScales(dbData);
             }
             await db.collection('evaluations').doc(currentTargetEmail).set(dbData, { merge: true });
             const t = document.getElementById('toast');
