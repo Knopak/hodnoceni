@@ -408,30 +408,30 @@
 
         function renderForms(name) {
             const isStudent = userRole === 'student';
+
+            // Strana 1 je jen pro učitele
             document.getElementById('print-container').classList.toggle('hidden', isStudent);
+            // Strana 2 vždy viditelná
             document.getElementById('page-2-container').classList.remove('hidden');
 
-            // OPRAVA: element page2-title nyní existuje v HTML
+            // Nadpis na straně 2
             document.getElementById('page2-title').innerHTML = isStudent
                 ? `Moje sebehodnocení<br><span class="text-xl text-black font-black mt-2 inline-block">${name}</span>`
                 : `Sebehodnocení žáka<br><span class="text-xl text-black font-black mt-2 inline-block">${name}</span>`;
 
-            document.getElementById('schoolYearNoteInput').value = dbData.topNote || "";
-            document.getElementById('summaryInput').value = dbData.bottomNote || "";
-            document.getElementById('schoolYearNoteDisplay').textContent = dbData.topNote || "";
-            document.getElementById('summaryDisplay').textContent = dbData.bottomNote || "";
-
-            if (userRole === 'teacher') {
+            // Pole na straně 1 měníme jen pokud je učitel (pro studenta jsou skrytá)
+            if (!isStudent) {
+                document.getElementById('schoolYearNoteInput').value = dbData.topNote || "";
+                document.getElementById('summaryInput').value = dbData.bottomNote || "";
+                document.getElementById('schoolYearNoteDisplay').textContent = dbData.topNote || "";
+                document.getElementById('summaryDisplay').textContent = dbData.bottomNote || "";
                 document.getElementById('schoolYearNoteInput').disabled = !isClassTeacher;
                 document.getElementById('summaryInput').disabled = false;
-            } else {
-                document.getElementById('schoolYearNoteInput').disabled = true;
-                document.getElementById('summaryInput').disabled = true;
+                autoResize(document.getElementById('schoolYearNoteInput'));
+                autoResize(document.getElementById('summaryInput'));
+                renderTeacherScales();
             }
 
-            autoResize(document.getElementById('schoolYearNoteInput'));
-            autoResize(document.getElementById('summaryInput'));
-            renderTeacherScales();
             renderStudentScales();
         }
 
@@ -511,14 +511,14 @@
             if (userRole === 'teacher') {
                 dbData.bottomNote = document.getElementById('summaryInput').value;
                 if (isClassTeacher) dbData.topNote = document.getElementById('schoolYearNoteInput').value;
+                document.getElementById('schoolYearNoteDisplay').textContent = dbData.topNote || "";
+                document.getElementById('summaryDisplay').textContent = dbData.bottomNote || "";
             }
             await db.collection('evaluations').doc(currentTargetEmail).set(dbData, { merge: true });
             const t = document.getElementById('toast');
             t.style.transform = 'translateY(0)';
             t.style.opacity = '1';
             setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(24px)'; }, 2000);
-            document.getElementById('schoolYearNoteDisplay').textContent = dbData.topNote;
-            document.getElementById('summaryDisplay').textContent = dbData.bottomNote;
         }
     </script>
 </body>
