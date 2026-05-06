@@ -7,58 +7,89 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #2c3e50; --accent: #3498db; --bg: #f4f7f6; --white: #ffffff; --text: #333; }
-        body { font-family: 'Montserrat', sans-serif; background-color: var(--bg); margin: 0; color: var(--text); line-height: 1.6; }
-        .no-print { padding: 20px; background: #fff; border-bottom: 1px solid #ddd; }
-        .container { max-width: 900px; margin: 20px auto; background: var(--white); padding: 40px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-radius: 8px; }
-        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary); padding-bottom: 20px; margin-bottom: 30px; }
-        .logo { max-height: 70px; }
+        :root { --primary: #1e3a8a; --accent: #2563eb; --bg: #f3f4f6; --white: #ffffff; --text: #1f2937; }
+        body { font-family: 'Montserrat', sans-serif; background-color: var(--bg); margin: 0; color: var(--text); line-height: 1.5; }
+        .no-print { padding: 15px 20px; background: #fff; border-bottom: 1px solid #e5e7eb; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .container { max-width: 950px; margin: 30px auto; background: var(--white); padding: 50px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border-radius: 12px; }
+        
+        header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 3px solid var(--primary); padding-bottom: 20px; margin-bottom: 30px; }
+        .logo { max-height: 80px; }
         .header-info { text-align: right; }
-        h2 { color: var(--primary); border-left: 5px solid var(--accent); padding-left: 15px; margin-top: 35px; font-size: 1.3em; }
-        textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; font-size: 14px; box-sizing: border-box; resize: vertical; }
-        textarea:disabled { background: #f9f9f9; color: #777; border-color: #eee; }
-        .competency-item { margin-bottom: 45px; page-break-inside: avoid; }
-        .question-text { font-weight: bold; color: var(--primary); display: block; font-size: 1.1em; }
-        .question-desc { font-size: 0.85em; color: #666; margin-bottom: 15px; display: block; font-style: italic; line-height: 1.3; }
-        .scale-options { display: flex; gap: 8px; justify-content: flex-start; }
-        .scale-box { flex: 1; min-width: 80px; padding: 10px 5px; border: 2px solid var(--accent); text-align: center; cursor: pointer; transition: 0.2s; font-weight: bold; font-size: 0.85em; color: var(--accent); border-radius: 4px; }
-        .scale-box.active { background: var(--accent); color: white; }
-        .scale-labels { display: flex; justify-content: space-between; margin-top: 5px; font-size: 0.75em; color: #999; text-transform: uppercase; }
-        .student-comment { margin-top: 10px; background: #fcfcfc; padding: 10px; border: 1px dashed #ddd; border-radius: 4px; }
-        .student-comment label { font-size: 0.8em; color: #555; font-weight: bold; display: block; margin-bottom: 5px; }
-        .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .header-info h1 { margin: 0 0 5px 0; font-size: 1.8em; color: var(--primary); font-weight: 700; }
+        .student-name { font-weight: 700; color: var(--accent); font-size: 1.4em; margin-top: 5px; }
+
+        .role-ui { background: #eff6ff; padding: 20px; border-radius: 8px; margin-bottom: 30px; border: 1px solid #bfdbfe; }
+        #studentSelector { width: 100%; max-width: 400px; padding: 12px; border-radius: 6px; border: 1px solid var(--accent); font-size: 15px; font-family: inherit; font-weight: 600; }
+        
+        h2 { color: var(--primary); border-left: 5px solid var(--accent); padding-left: 15px; margin-top: 40px; font-size: 1.4em; }
+        textarea { width: 100%; padding: 15px; border: 1px solid #d1d5db; border-radius: 6px; font-family: inherit; font-size: 14px; box-sizing: border-box; resize: vertical; background: #fff; }
+        textarea:focus { outline: none; border-color: var(--accent); }
+        textarea:disabled { background: #f9fafb; color: #6b7280; border-color: #e5e7eb; }
+
+        .category-title { font-size: 1.2em; color: #4b5563; text-transform: uppercase; letter-spacing: 1px; border-bottom: 2px solid #e5e7eb; padding-bottom: 5px; margin: 40px 0 20px 0; }
+        .competency-item { margin-bottom: 40px; page-break-inside: avoid; background: #fafafa; padding: 20px; border-radius: 8px; border: 1px solid #f3f4f6; }
+        .question-text { font-weight: 700; color: var(--primary); display: block; font-size: 1.15em; margin-bottom: 5px; }
+        .question-desc { font-size: 0.9em; color: #4b5563; margin-bottom: 20px; display: block; font-style: italic; }
+        
+        .scale-options { display: flex; gap: 10px; justify-content: space-between; margin-bottom: 5px; }
+        .scale-box { flex: 1; padding: 12px 5px; border: 2px solid var(--accent); text-align: center; cursor: pointer; transition: all 0.2s ease; font-weight: 700; font-size: 0.9em; color: var(--accent); border-radius: 6px; background: #fff; }
+        .scale-box.active { background: var(--accent); color: white; transform: translateY(-2px); }
+        .scale-box:hover:not(.active) { background: #eff6ff; }
+        .scale-labels { display: flex; justify-content: space-between; font-size: 0.75em; color: #9ca3af; text-transform: uppercase; font-weight: 600; padding: 0 5px; }
+
+        .student-comment { margin-top: 15px; }
+        .student-comment label { font-size: 0.85em; color: #4b5563; font-weight: 700; display: block; margin-bottom: 8px; }
+        .student-comment textarea { border: 1px dashed #cbd5e1; background: #fff; }
+
+        .btn { padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-weight: 700; transition: 0.2s; font-family: inherit; font-size: 14px; }
         .btn-primary { background: var(--accent); color: white; }
-        #studentSelector { padding: 12px; margin: 10px 0; width: 100%; max-width: 400px; border-radius: 4px; border: 1px solid var(--accent); }
-        .save-bar { position: fixed; bottom: 20px; right: 20px; display: flex; gap: 10px; z-index: 1000; }
-        @media print { .no-print, .save-bar, #studentSelector { display: none !important; } .container { box-shadow: none; border: none; width: 100%; padding: 0; } textarea { border: none; } }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-logout { background: #ef4444; color: white; }
+        .save-bar { position: fixed; bottom: 30px; right: 30px; display: flex; gap: 15px; z-index: 1000; }
+
+        @media print { 
+            .no-print, .save-bar, #role-ui { display: none !important; } 
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; border: none; width: 100%; max-width: 100%; padding: 0; margin: 0; } 
+            textarea { border: none !important; padding: 0 !important; resize: none; background: transparent !important; }
+            .competency-item { border: none; padding: 10px 0; background: transparent; }
+            .scale-box { border-width: 1px; transform: none !important; box-shadow: none !important; }
+        }
     </style>
 </head>
 <body>
+
 <div id="auth-container" class="no-print"></div>
+
 <div id="app" class="container" style="display: none;">
     <header>
         <img src="https://raw.githubusercontent.com/knopak/hodnoceni/main/GALAXIE-logo_male%20(1).jpg" alt="ZŠ Galaxie" class="logo">
         <div class="header-info">
-            <h1 style="margin:0; font-size: 1.4em;">Sebehodnocení a hodnocení</h1>
-            <div id="current-year">Školní rok 2025/2026</div>
-            <div id="student-header-name" style="font-weight: bold; color: var(--accent); font-size: 1.2em;"></div>
+            <h1>Sebehodnocení a hodnocení</h1>
+            <div>Školní rok 2025/2026</div>
+            <div id="student-header-name" class="student-name"></div>
         </div>
     </header>
-    <div id="role-ui" class="no-print"></div>
+
+    <div id="role-ui" class="role-ui no-print"></div>
+
     <div class="section-intro">
         <h2>Slovo třídního učitele</h2>
-        <textarea id="class-teacher-intro" rows="4" placeholder="Tuto část vyplňuje třídní učitel..."></textarea>
+        <textarea id="class-teacher-intro" rows="5" placeholder="Tuto část vyplňuje a upravuje pouze třídní učitel žáka..."></textarea>
     </div>
+
     <div id="competencies-area"></div>
+
     <div class="section-notes">
         <h2>Zpětná vazba a postřehy učitelů</h2>
-        <textarea id="teachers-notes" rows="8" placeholder="Souhrnné postřehy vyučujících k žákovi..."></textarea>
+        <textarea id="teachers-notes" rows="10" placeholder="Společné pole pro poznámky všech vyučujících..."></textarea>
     </div>
+
     <div class="save-bar">
-        <button class="btn btn-primary" onclick="saveData()">ULOŽIT DO CLOUDU</button>
-        <button class="btn" onclick="window.print()" style="background: #27ae60; color: white;">TISK / PDF</button>
+        <button class="btn btn-primary" onclick="saveData()">ULOŽIT ZMĚNY</button>
+        <button class="btn" onclick="window.print()" style="background: #10b981; color: white;">VYTISKNOUT</button>
     </div>
 </div>
 
@@ -71,6 +102,7 @@ const firebaseConfig = {
     messagingSenderId: "542387123987",
     appId: "1:542387123987:web:867a54df5s4"
 };
+
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
@@ -85,135 +117,155 @@ const TEACHERS = {
     "ondrej.cervenka@skolagalaxie.cz": "3. A"
 };
 
-// --- DATA ŽÁKŮ ---
-const STUDENTS = {
 const STUDENTS = {
     "antonin.anlauf@skolagalaxie.cz": { name: "Antonín Jaromír Anlauf", class: "1. A" },
     "emma.burgetova@skolagalaxie.cz": { name: "Emma Burgetová", class: "1. A" },
     "julie.cervenkova@skolagalaxie.cz": { name: "Julie Červenková", class: "1. A" },
     "tea.hanzelkova@skolagalaxie.cz": { name: "Tea Hanzelková", class: "1. A" },
-    "tobias.havlik@skolagalaxie.cz": { name: "Tobiáš Havlík", class: "1. A" },
-    "leila.isailovic@skolagalaxie.cz": { name: "Leila Isailovič", class: "1. A" },
-    "matej.janis@skolagalaxie.cz": { name: "Matěj Janiš", class: "1. A" },
-    "jan.jurak@skolagalaxie.cz": { name: "Jan Jurák", class: "1. A" },
-    "nikola.kopencova@skolagalaxie.cz": { name: "Nikola Kopencová", class: "1. A" },
-    "nora.kopencova@skolagalaxie.cz": { name: "Nora Kopencová", class: "1. A" },
-    "miroslav.kral@skolagalaxie.cz": { name: "Miroslav Král", class: "1. A" },
-    "dominik.krystof@skolagalaxie.cz": { name: "Dominik Kryštof", class: "1. A" },
-    "eduard.morys@skolagalaxie.cz": { name: "Eduard Morys", class: "1. A" },
-    "nina.mysinska@skolagalaxie.cz": { name: "Nina Myšinská", class: "1. A" },
-    "ester.novotna@skolagalaxie.cz": { name: "Ester Novotná", class: "1. A" },
-    "teodor.pazdera@skolagalaxie.cz": { name: "Teodor Pazdera", class: "1. A" },
-    "mia.pazderova@skolagalaxie.cz": { name: "Mia Pazderová", class: "1. A" },
-    "krystof.pika@skolagalaxie.cz": { name: "Kryštof Píka", class: "1. A" },
-    "filip.pizur@skolagalaxie.cz": { name: "Filip Pizúr", class: "1. A" },
-    "matej.stancik@skolagalaxie.cz": { name: "Matěj Stančík", class: "1. A" },
-    "olivia.stepanova@skolagalaxie.cz": { name: "Olivia Štěpánová", class: "1. A" },
-    "oliver.vavrik@skolagalaxie.cz": { name: "Oliver Vavřík", class: "1. A" },
-    "zora.zakova@skolagalaxie.cz": { name: "Zora Žáková", class: "1. A" },
-    "stepan.cervenka@skolagalaxie.cz": { name: "Štěpán Červenka", class: "3. A" },
-    "matyáš.dorazil@skolagalaxie.cz": { name: "Matyáš Dorazil", class: "3. A" },
-    "greta.eichhorn@skolagalaxie.cz": { name: "Greta Eichhorn", class: "3. A" },
-    "eliska.fabikova@skolagalaxie.cz": { name: "Eliška Fabíková", class: "3. A" },
-    "stepanka.fickova@skolagalaxie.cz": { name: "Štěpánka Ficková", class: "3. A" },
-    "eva.furmankova@skolagalaxie.cz": { name: "Eva Furmánková", class: "3. A" },
-    "michal.jinek@skolagalaxie.cz": { name: "Michal Jinek", class: "3. A" },
-    "david.kejik@skolagalaxie.cz": { name: "David Kejik", class: "3. A" },
-    "stepan.marek@skolagalaxie.cz": { name: "Štěpán Marek", class: "3. A" },
-    "adam.mik@skolagalaxie.cz": { name: "Adam Mik", class: "3. A" },
-    "sara.ondrejkova@skolagalaxie.cz": { name: "Sára Ondrejková", class: "3. A" },
-    "miroslav.plesek@skolagalaxie.cz": { name: "Miroslav Plesek", class: "3. A" },
-    "tadeas.schon@skolagalaxie.cz": { name: "Tadeáš Schön", class: "3. A" },
-    "ondrej.slezak@skolagalaxie.cz": { name: "Ondřej Slezák", class: "3. A" },
-    "josef.snapka@skolagalaxie.cz": { name: "Josef Šnapka", class: "3. A" },
-    "viktorie.sojkova@skolagalaxie.cz": { name: "Viktorie Sojková", class: "3. A" },
-    "matej.cirkva@skolagalaxie.cz": { name: "Matěj Církva", class: "4. A" },
-    "josef.eichhorn@skolagalaxie.cz": { name: "Josef Eichhorn", class: "4. A" },
-    "klara.furmankova@skolagalaxie.cz": { name: "Klára Furmánková", class: "4. A" },
-    "michaela.chrenkova@skolagalaxie.cz": { name: "Michaela Chrenková", class: "4. A" },
-    "jana.jakabovicova@skolagalaxie.cz": { name: "Jana Jakabovičová", class: "4. A" },
-    "marek.jurak@skolagalaxie.cz": { name: "Marek Jurák", class: "4. A" },
-    "michal.landa@skolagalaxie.cz": { name: "Michal Landa", class: "4. A" },
-    "anna.maurey@skolagalaxie.cz": { name: "Anna Maurey", class: "4. A" },
-    "erika.mottelova@skolagalaxie.cz": { name: "Erika Mottelová", class: "4. A" },
-    "pavel.novak@skolagalaxie.cz": { name: "Pavel Novák", class: "4. A" },
-    "viktorie.plihalova@skolagalaxie.cz": { name: "Viktorie Plíhalová", class: "4. A" },
-    "vanessa.pokludova@skolagalaxie.cz": { name: "Vanessa Pokludová", class: "4. A" },
-    "jan.prada@skolagalaxie.cz": { name: "Jan Přáda", class: "4. A" },
-    "tomas.sosik@skolagalaxie.cz": { name: "Tomáš Sosík", class: "4. A" },
-    "tereza.syrovatkova@skolagalaxie.cz": { name: "Tereza Syrovátková", class: "4. A" },
-    "filip.skrabak@skolagalaxie.cz": { name: "Filip Škrabák", class: "4. A" },
-    "estelle.vicenova@skolagalaxie.cz": { name: "Estelle Vicenová", class: "4. A" },
-    "sofie.vytlacilova@skolagalaxie.cz": { name: "Sofie Vytlačilová", class: "4. A" },
-    "ondrej.cesek@skolagalaxie.cz": { name: "Ondřej Češek", class: "5. A" },
-    "julie.haslerova@skolagalaxie.cz": { name: "Julie Hašlerová", class: "5. A" },
-    "tereza.holisova@skolagalaxie.cz": { name: "Tereza Holišová", class: "5. A" },
-    "sara.irglova@skolagalaxie.cz": { name: "Sára Irglová", class: "5. A" },
-    "bara.jancalkova@skolagalaxie.cz": { name: "Bára Jančálková", class: "5. A" },
-    "stepan.janis@skolagalaxie.cz": { name: "Štěpán Janiš", class: "5. A" },
-    "natalie.javorkova@skolagalaxie.cz": { name: "Natálie Javorková", class: "5. A" },
-    "krystof.mikulenka@skolagalaxie.cz": { name: "Kryštof Mikulenka", class: "5. A" },
-    "filip.mraz@skolagalaxie.cz": { name: "Filip Mráz", class: "5. A" },
-    "vojtech.orlita@skolagalaxie.cz": { name: "Vojtěch Orlita", class: "5. A" },
-    "kristyna.pancova@skolagalaxie.cz": { name: "Kristýna Pancová", class: "5. A" },
-    "matteo.strbacka@skolagalaxie.cz": { name: "Matteo Strbačka", class: "5. A" },
-    "katerina.syrovatkova@skolagalaxie.cz": { name: "Kateřina Syrovátková", class: "5. A" },
-    "karolina.simkova@skolagalaxie.cz": { name: "Karolína Šimková", class: "5. A" },
-    "jan.skrabak@skolagalaxie.cz": { name: "Jan Škrabák", class: "5. A" },
-    "vladimir.taborsky@skolagalaxie.cz": { name: "Vladimír Táborský", class: "5. A" },
-    "jan.benes@skolagalaxie.cz": { name: "Jan Beneš", class: "6. A" },
-    "jonas.hanak@skolagalaxie.cz": { name: "Jonáš Hanák", class: "6. A" },
-    "daniel.chrustawczuk@skolagalaxie.cz": { name: "Daniel Chrustawczuk", class: "6. A" },
-    "julia.jakabovicova@skolagalaxie.cz": { name: "Júlia Jakabovičová", class: "6. A" },
-    "tomas.jedlicka@skolagalaxie.cz": { name: "Tomáš Jedlička", class: "6. A" },
-    "leo.kelnar@skolagalaxie.cz": { name: "Leo Kelnar", class: "6. A" },
-    "vojtech.kolman@skolagalaxie.cz": { name: "Vojtěch Kolman", class: "6. A" },
-    "evelina.konopacova@skolagalaxie.cz": { name: "Evelina Konopáčová", class: "6. A" },
-    "emma.kuzdralova@skolagalaxie.cz": { name: "Emma Kuzdřálová", class: "6. A" },
-    "jan.novak@skolagalaxie.cz": { name: "Jan Novák", class: "6. A" },
-    "simon.prada@skolagalaxie.cz": { name: "Šimon Přáda", class: "6. A" },
-    "julie.sklenarova@skolagalaxie.cz": { name: "Julie Anna Sklenářová", class: "6. A" },
-    "richard.stancik@skolagalaxie.cz": { name: "Richard Stančík", class: "6. A" },
-    "ellen.svojanovska@skolagalaxie.cz": { name: "Ellen Svojanovská", class: "6. A" },
-    "natalie.uhlarova@skolagalaxie.cz": { name: "Natálie Uhlárová", class: "6. A" },
-    "jan.vrobel@skolagalaxie.cz": { name: "Jan Vrobel", class: "6. A" },
-    "robin.bacul@skolagalaxie.cz": { name: "Robin Bacul", class: "7. A" },
-    "ema.cirkvova@skolagalaxie.cz": { name: "Ema Církvová", class: "7. A" },
-    "ema.courtemanche@skolagalaxie.cz": { name: "Ema Elaine Courtemanche", class: "7. A" },
-    "marketa.canova@skolagalaxie.cz": { name: "Markéta Čaňová", class: "7. A" },
-    "ella.dorazilova@skolagalaxie.cz": { name: "Ella Dorazilová", class: "7. A" },
-    "kristyna.harrandova@skolagalaxie.cz": { name: "Kristýna Harrandová", class: "7. A" },
-    "jakub.chmelar@skolagalaxie.cz": { name: "Jakub Chmelař", class: "7. A" },
-    "anezka.chrenkova@skolagalaxie.cz": { name: "Anežka Chrenková", class: "7. A" },
-    "klara.chrustawczukova@skolagalaxie.cz": { name: "Klára Chrustawczuková", class: "7. A" },
-    "michal.indrak@skolagalaxie.cz": { name: "Michal Indrák", class: "7. A" },
-    "viktorie.jurakova@skolagalaxie.cz": { name: "Viktorie Juráková", class: "7. A" },
-    "renata.kocourkova@skolagalaxie.cz": { name: "Renáta Kocourková", class: "7. A" },
-    "krystof.novotny@skolagalaxie.cz": { name: "Kryštof Novotný", class: "7. A" },
-    "matej.plechacek@skolagalaxie.cz": { name: "Matěj Plecháček", class: "7. A" },
-    "marek.plihal@skolagalaxie.cz": { name: "Marek Plíhal", class: "7. A" },
-    "viktor.posad@skolagalaxie.cz": { name: "Viktor Posád", class: "7. A" },
-    "stela.regeci@skolagalaxie.cz": { name: "Stela Regeci", class: "7. A" },
-    "karel.taborsky@skolagalaxie.cz": { name: "Karel Táborský", class: "7. A" },
-    "stepanka.vasickova@skolagalaxie.cz": { name: "Štěpánka Vašíčková", class: "7. A" },
-    "lucie.bugova@skolagalaxie.cz": { name: "Lucie Bugová", class: "8. A" },
-    "eliska.cechova@skolagalaxie.cz": { name: "Eliška Čechová", class: "8. A" },
-    "nicolas.drga@skolagalaxie.cz": { name: "Nicolas Drga", class: "8. A" },
-    "barbora.fojtikova@skolagalaxie.cz": { name: "Barbora Fojtíková", class: "8. A" },
-    "eliska.halatova@skolagalaxie.cz": { name: "Eliška Halátová", class: "8. A" },
-    "pavel.horak@skolagalaxie.cz": { name: "Pavel Horák", class: "8. A" },
-    "vojtech.chrenka@skolagalaxie.cz": { name: "Vojtěch Chrenka", class: "8. A" },
-    "martin.jandik@skolagalaxie.cz": { name: "Martin Jandík", class: "8. A" },
-    "magdalena.kozelkova@skolagalaxie.cz": { name: "Magdaléna Kozelková", class: "8. A" },
-    "jakub.mikulenka@skolagalaxie.cz": { name: "Jakub Mikulenka", class: "8. A" },
-    "simon.mraz@skolagalaxie.cz": { name: "Šimon Mráz", class: "8. A" },
-    "michaela.mrazkova@skolagalaxie.cz": { name: "Michaela Mrázková", class: "8. A" },
-    "eva.pancova.ml@skolagalaxie.cz": { name: "Eva Pancová", class: "8. A" },
-    "jana.pancova@skolagalaxie.cz": { name: "Jana Pancová", class: "8. A" },
-    "matej.paruzek@skolagalaxie.cz": { name: "Matěj Parůžek", class: "8. A" },
-    "adela.plihalova@skolagalaxie.cz": { name: "Adéla Plíhalová", class: "8. A" },
-    "tomas.polach@skolagalaxie.cz": { name: "Tomáš Polach", class: "8. A" },
-    "alex.vavrik@skolagalaxie.cz": { name: "Alex Vavřík", class: "8. A" },
+    "viktorie.holeckova@skolagalaxie.cz": { name: "Viktorie Holečková", class: "1. A" },
+    "teodor.chromek@skolagalaxie.cz": { name: "Teodor Chromek", class: "1. A" },
+    "jakub.kaplan@skolagalaxie.cz": { name: "Jakub Kaplan", class: "1. A" },
+    "josef.klos@skolagalaxie.cz": { name: "Josef Klos", class: "1. A" },
+    "nina.londin@skolagalaxie.cz": { name: "Nina Londin", class: "1. A" },
+    "dominik.maralik@skolagalaxie.cz": { name: "Dominik Maralík", class: "1. A" },
+    "beata.padusakova@skolagalaxie.cz": { name: "Beáta Padušáková", class: "1. A" },
+    "veronika.pancova@skolagalaxie.cz": { name: "Veronika Pancová", class: "1. A" },
+    "ales.pavlica@skolagalaxie.cz": { name: "Aleš Pavlica", class: "1. A" },
+    "michael.podzorny@skolagalaxie.cz": { name: "Michael Podžorný", class: "1. A" },
+    "justyna.sopuchova@skolagalaxie.cz": { name: "Justýna Sopuchová", class: "1. A" },
+    "stella.sopikova@skolagalaxie.cz": { name: "Stella Šopíková", class: "1. A" },
+    "tobias.toman@skolagalaxie.cz": { name: "Tobias Toman", class: "1. A" },
+    "ryan.vaner@skolagalaxie.cz": { name: "Ryan Petr VANER", class: "1. A" },
+    "william.vavra@skolagalaxie.cz": { name: "William David Vávra", class: "1. A" },
+    "luisa.vnenk@skolagalaxie.cz": { name: "Luisa Vnenk", class: "1. A" },
+    "matyas.dorazil@skolagalaxie.cz": { name: "Matyáš Dorazil", class: "2. A" },
+    "greta.eichhorn@skolagalaxie.cz": { name: "Greta Eichhorn", class: "2. A" },
+    "eliska.fabikova@skolagalaxie.cz": { name: "Eliška Fabíková", class: "2. A" },
+    "stepanka.fickova@skolagalaxie.cz": { name: "Štěpánka Ficková", class: "2. A" },
+    "eva.furmankova@skolagalaxie.cz": { name: "Eva Furmánková", class: "2. A" },
+    "michal.jinek@skolagalaxie.cz": { name: "Michal Jínek", class: "2. A" },
+    "david.kejik@skolagalaxie.cz": { name: "David Kejík", class: "2. A" },
+    "stepan.marek@skolagalaxie.cz": { name: "Štěpán Marek", class: "2. A" },
+    "adam.mik@skolagalaxie.cz": { name: "Adam Mík", class: "2. A" },
+    "sara.ondrejkova@skolagalaxie.cz": { name: "Sára Ondrejková", class: "2. A" },
+    "miroslav.plesek@skolagalaxie.cz": { name: "Miroslav Plešek", class: "2. A" },
+    "daniel.reinhardt@skolagalaxie.cz": { name: "Daniel Reinhardt", class: "2. A" },
+    "tadeas.schon@skolagalaxie.cz": { name: "Tadeáš Schön", class: "2. A" },
+    "ondrej.slezak@skolagalaxie.cz": { name: "Ondřej Slezák", class: "2. A" },
+    "josef.snapka@skolagalaxie.cz": { name: "Josef Šnapka", class: "2. A" },
+    "rozarie.tomaskova@skolagalaxie.cz": { name: "Rozárie Tomášková", class: "2. A" },
+    "maximilian.vicen@skolagalaxie.cz": { name: "Maximilian Vicen", class: "2. A" },
+    "libor.zdrahal@skolagalaxie.cz": { name: "Libor Zdráhal", class: "2. A" },
+    "igor.ziman@skolagalaxie.cz": { name: "Igor Ziman", class: "2. A" },
+    "michaela.burdova@skolagalaxie.cz": { name: "Michaela Burdová", class: "3. A" },
+    "sebastian.dulak@skolagalaxie.cz": { name: "Sebastian Dulák", class: "3. A" },
+    "mia.hanzelkova@skolagalaxie.cz": { name: "Mia Hanzelková", class: "3. A" },
+    "albert.hasler@skolagalaxie.cz": { name: "Albert Jan Hašler", class: "3. A" },
+    "theodor.hok@skolagalaxie.cz": { name: "Theodor Hok", class: "3. A" },
+    "tomas.hradecky@skolagalaxie.cz": { name: "Tomáš Hradecký", class: "3. A" },
+    "hana.jakubkova@skolagalaxie.cz": { name: "Hana Jakůbková", class: "3. A" },
+    "valerie.klvanova@skolagalaxie.cz": { name: "Valérie Klvaňová", class: "3. A" },
+    "lukas.landa@skolagalaxie.cz": { name: "Lukáš Landa", class: "3. A" },
+    "maximilian.larman@skolagalaxie.cz": { name: "Maximilian James Larman", class: "3. A" },
+    "daniel.maralik@skolagalaxie.cz": { name: "Daniel Maralík", class: "3. A" },
+    "robert.osmancik@skolagalaxie.cz": { name: "Robert Osmančík", class: "3. A" },
+    "jakub.panc@skolagalaxie.cz": { name: "Jakub Panc", class: "3. A" },
+    "agata.stanekova@skolagalaxie.cz": { name: "Agáta Staneková", class: "3. A" },
+    "ela.simkova@skolagalaxie.cz": { name: "Ela Šimková", class: "3. A" },
+    "vanesa.vahalikova@skolagalaxie.cz": { name: "Vanesa Vahalíková", class: "3. A" },
+    "eliska.vasickova@skolagalaxie.cz": { name: "Eliška Vašíčková", class: "3. A" },
+    "sebastian.vavra@skolagalaxie.cz": { name: "Sebastian Josef Vávra", class: "3. A" },
+    "petr.zdrahal@skolagalaxie.cz": { name: "Petr Zdráhal", class: "3. A" },
+    "tereza.kudelkova@skolagalaxie.cz": { name: "Tereza Kudělková", class: "3. A" },
+    "sami.brini@skolagalaxie.cz": { name: "Sami Brini", class: "4. A" },
+    "erika.ceplikova@skolagalaxie.cz": { name: "Erika Čeplíková", class: "4. A" },
+    "pavel.hlavacek@skolagalaxie.cz": { name: "Pavel Hlaváček", class: "4. A" },
+    "martin.chromek@skolagalaxie.cz": { name: "Martin Chromek", class: "4. A" },
+    "bernard.jenkins@skolagalaxie.cz": { name: "Bernard William Jenkins", class: "4. A" },
+    "elena.kalinova@skolagalaxie.cz": { name: "Elena Kalinová", class: "4. A" },
+    "alica.kolmanova@skolagalaxie.cz": { name: "Alica Kolmanová", class: "4. A" },
+    "oliver.londin@skolagalaxie.cz": { name: "Oliver Londin", class: "4. A" },
+    "julie.malirova@skolagalaxie.cz": { name: "Julie Malířová", class: "4. A" },
+    "madlen.markova@skolagalaxie.cz": { name: "Madlen Marková", class: "4. A" },
+    "sofie.martochova@skolagalaxie.cz": { name: "Sofie Karolína Martochová", class: "4. A" },
+    "julie.orlitova@skolagalaxie.cz": { name: "Julie Orlitová", class: "4. A" },
+    "mikulas.pavlica@skolagalaxie.cz": { name: "Mikuláš Pavlica", class: "4. A" },
+    "mia.podzorna@skolagalaxie.cz": { name: "Mia Podžorná", class: "4. A" },
+    "barbora.slezakova@skolagalaxie.cz": { name: "Barbora Slezáková", class: "4. A" },
+    "simon.zogata@skolagalaxie.cz": { name: "Šimon Zogata", class: "4. A" },
+    "veronika.rabe@skolagalaxie.cz": { name: "Veronika Rabe", class: "4. A" },
+    "natalie.benesova@skolagalaxie.cz": { name: "Natálie Benešová", class: "5. A" },
+    "matej.cirkva@skolagalaxie.cz": { name: "Matěj Církva", class: "5. A" },
+    "josef.eichhorn@skolagalaxie.cz": { name: "Josef Eichhorn", class: "5. A" },
+    "klara.furmankova@skolagalaxie.cz": { name: "Klára Furmánková", class: "5. A" },
+    "michaela.chrenkova@skolagalaxie.cz": { name: "Michaela Chrenková", class: "5. A" },
+    "jana.jakabovicova@skolagalaxie.cz": { name: "Jana Jakabovičová", class: "5. A" },
+    "marek.jurak@skolagalaxie.cz": { name: "Marek Jurák", class: "5. A" },
+    "michal.landa@skolagalaxie.cz": { name: "Michal Landa", class: "5. A" },
+    "anna.maurey@skolagalaxie.cz": { name: "Anna Maurey", class: "5. A" },
+    "erika.mottelova@skolagalaxie.cz": { name: "Erika Mottelová", class: "5. A" },
+    "pavel.novak@skolagalaxie.cz": { name: "Pavel Novák", class: "5. A" },
+    "viktorie.plihalova@skolagalaxie.cz": { name: "Viktorie Plíhalová", class: "5. A" },
+    "vanessa.pokludova@skolagalaxie.cz": { name: "Vanessa Pokludová", class: "5. A" },
+    "jan.prada@skolagalaxie.cz": { name: "Jan Přáda", class: "5. A" },
+    "tomas.sosik@skolagalaxie.cz": { name: "Tomáš Sosík", class: "5. A" },
+    "tereza.syrovatkova@skolagalaxie.cz": { name: "Tereza Syrovátková", class: "5. A" },
+    "filip.skrabak@skolagalaxie.cz": { name: "Filip Škrabák", class: "5. A" },
+    "estelle.vicenova@skolagalaxie.cz": { name: "Estelle Vicenová", class: "5. A" },
+    "sara.volkova@skolagalaxie.cz": { name: "Sára Volková", class: "5. A" },
+    "ondrej.cesek@skolagalaxie.cz": { name: "Ondřej Češek", class: "6. A" },
+    "gary.glogar@skolagalaxie.cz": { name: "Gary Glogar", class: "6. A" },
+    "julie.haslerova@skolagalaxie.cz": { name: "Julie Hašlerová", class: "6. A" },
+    "tereza.holisova@skolagalaxie.cz": { name: "Tereza Holišová", class: "6. A" },
+    "sara.irglova@skolagalaxie.cz": { name: "Sára Irglová", class: "6. A" },
+    "bara.jancalkova@skolagalaxie.cz": { name: "Bára Jančálková", class: "6. A" },
+    "stepan.janis@skolagalaxie.cz": { name: "Štěpán Janiš", class: "6. A" },
+    "natalie.javorkova@skolagalaxie.cz": { name: "Natálie Javorková", class: "6. A" },
+    "krystof.mikulenka@skolagalaxie.cz": { name: "Kryštof Mikulenka", class: "6. A" },
+    "filip.mraz@skolagalaxie.cz": { name: "Filip Mráz", class: "6. A" },
+    "vojtech.orlita@skolagalaxie.cz": { name: "Vojtěch Orlita", class: "6. A" },
+    "kristyna.pancova@skolagalaxie.cz": { name: "Kristýna Pancová", class: "6. A" },
+    "vanesa.slamova@skolagalaxie.cz": { name: "Vanesa Slámová", class: "6. A" },
+    "matteo.strbacka@skolagalaxie.cz": { name: "Matteo Strbačka", class: "6. A" },
+    "katerina.syrovatkova@skolagalaxie.cz": { name: "Kateřina Syrovátková", class: "6. A" },
+    "tereza.scerbova@skolagalaxie.cz": { name: "Tereza Ščerbová", class: "6. A" },
+    "karolina.simkova@skolagalaxie.cz": { name: "Karolína Šimková", class: "6. A" },
+    "jan.skrabak@skolagalaxie.cz": { name: "Jan Škrabák", class: "6. A" },
+    "vladimir.taborsky@skolagalaxie.cz": { name: "Vladimír Táborský", class: "6. A" },
+    "filip.rabe@skolagalaxie.cz": { name: "Filip Rabe", class: "6. A" },
+    "jan.benes@skolagalaxie.cz": { name: "Jan Beneš", class: "7. A" },
+    "jonas.hanak@skolagalaxie.cz": { name: "Jonáš Hanák", class: "7. A" },
+    "daniel.chrustawczuk@skolagalaxie.cz": { name: "Daniel Chrustawczuk", class: "7. A" },
+    "julia.jakabovicova@skolagalaxie.cz": { name: "Júlia Jakabovičová", class: "7. A" },
+    "tomas.jedlicka@skolagalaxie.cz": { name: "Tomáš Jedlička", class: "7. A" },
+    "leo.kelnar@skolagalaxie.cz": { name: "Leo Kelnar", class: "7. A" },
+    "vojtech.kolman@skolagalaxie.cz": { name: "Vojtěch Kolman", class: "7. A" },
+    "evelina.konopacova@skolagalaxie.cz": { name: "Evelina Konopáčová", class: "7. A" },
+    "emma.kuzdralova@skolagalaxie.cz": { name: "Emma Kuzdřálová", class: "7. A" },
+    "jan.novak@skolagalaxie.cz": { name: "Jan Novák", class: "7. A" },
+    "simon.prada@skolagalaxie.cz": { name: "Šimon Přáda", class: "7. A" },
+    "julie.sklenarova@skolagalaxie.cz": { name: "Julie Anna Sklenářová", class: "7. A" },
+    "richard.stancik@skolagalaxie.cz": { name: "Richard Stančík", class: "7. A" },
+    "ellen.svojanovska@skolagalaxie.cz": { name: "Ellen Svojanovská", class: "7. A" },
+    "amelie.sajnarova@skolagalaxie.cz": { name: "Amélie Šajnarová", class: "7. A" },
+    "tereza.sustkova@skolagalaxie.cz": { name: "Tereza Šustková", class: "7. A" },
+    "jan.vrobel@skolagalaxie.cz": { name: "Jan Vrobel", class: "7. A" },
+    "benjamin.youngberg@skolagalaxie.cz": { name: "Benjamin Douglas Youngberg", class: "7. A" },
+    "filip.krotil@skolagalaxie.cz": { name: "Filip Krotil", class: "7. A" },
+    "robin.bacul@skolagalaxie.cz": { name: "Robin Bacul", class: "8. A" },
+    "ema.cirkvova@skolagalaxie.cz": { name: "Ema Církvová", class: "8. A" },
+    "ema.courtemanche@skolagalaxie.cz": { name: "Ema Elaine Courtemanche", class: "8. A" },
+    "marketa.canova@skolagalaxie.cz": { name: "Markéta Čaňová", class: "8. A" },
+    "ella.dorazilova@skolagalaxie.cz": { name: "Ella Dorazilová", class: "8. A" },
+    "kristyna.harrandova@skolagalaxie.cz": { name: "Kristýna Harrandová", class: "8. A" },
+    "anezka.chrenkova@skolagalaxie.cz": { name: "Anežka Chrenková", class: "8. A" },
+    "michal.indrak@skolagalaxie.cz": { name: "Michal Indrák", class: "8. A" },
+    "viktorie.jurakova@skolagalaxie.cz": { name: "Viktorie Juráková", class: "8. A" },
+    "renata.kocourkova@skolagalaxie.cz": { name: "Renáta Kocourková", class: "8. A" },
+    "nela.kytkova@skolagalaxie.cz": { name: "Nela Kytková", class: "8. A" },
+    "krystof.novotny@skolagalaxie.cz": { name: "Kryštof Novotný", class: "8. A" },
+    "matej.plechacek@skolagalaxie.cz": { name: "Matěj Plecháček", class: "8. A" },
+    "stepanka.vasickova@skolagalaxie.cz": { name: "Štěpánka Vašíčková", class: "8. A" },
     "adriana.barsovska@skolagalaxie.cz": { name: "Adriana Baršovská", class: "9. A" },
     "jakub.drgac@skolagalaxie.cz": { name: "Jakub Drgáč", class: "9. A" },
     "ondrej.fojtik@skolagalaxie.cz": { name: "Ondřej Fojtík", class: "9. A" },
@@ -229,16 +281,21 @@ const STUDENTS = {
     "ella.synkova@skolagalaxie.cz": { name: "Ella Synková", class: "9. A" },
     "martin.snapka@skolagalaxie.cz": { name: "Martin Šnapka", class: "9. A" }
 };
+
 const SCALE_LABELS = ["Ne", "Spíše ne", "Spíše ano", "Ano"];
+
 const QUESTIONS = [
-    { id: "q1", text: "Vyjadřuješ své myšlenky a pocity přiměřeně situaci", desc: "Umím říct, co si myslím nebo jak se cítím." },
-    { id: "q2", text: "Rozpoznáš vhodné a nevhodné chování a jednáš podle toho", desc: "Poznám, co se sluší a co ne." },
-    { id: "q3", text: "Umím přijmout zpětnou vazbu a dál s ní pracovat", desc: "Neurazím se, když mi někdo poradí." },
-    { id: "q4", text: "Dodržuješ stanovená pravidla", desc: "Respektuji pravidla třídy a školy." },
-    { id: "q5", text: "Spolupracuješ s ostatními", desc: "Dokážu se domluvit v týmu." },
-    { id: "q6", text: "Přispíváš k vytváření bezpečného prostředí", desc: "Nikoho neshazuji a neposmívám se." },
-    { id: "q7", text: "Zodpovědně přistupuješ k učení", desc: "Mám pomůcky a plním úkoly." },
-    { id: "q8", text: "Vytrváš v práci na obtížných úkolech", desc: "Když mi něco nejde, nevzdávám to." }
+    { id: "q1", cat: "Ve vztahu k sobě", text: "Vyjadřuješ své myšlenky a pocity přiměřeně situaci", desc: "Umím říct, co si myslím nebo jak se cítím. Vím, kdy je čas na vtipkování a kdy je potřeba mluvit vážně." },
+    { id: "q2", cat: "Ve vztahu k sobě", text: "Rozpoznáš vhodné a nevhodné chování a jednáš podle toho", desc: "Poznám, co se v danou chvíli sluší a co ne, jak v hodině, tak i o přestávce. Když mě někdo provokuje, dokážu se ovládnout." },
+    { id: "q3", cat: "Ve vztahu k sobě", text: "Umím přijmout zpětnou vazbu a dál s ní pracovat", desc: "Když mi učitel nebo spolužák řekne, co dělám dobře a co mi nejde, neurazím se. Místo toho se zamyslím." },
+    { id: "q4", cat: "Ve vztahu k druhým", text: "Dodržuješ stanovená pravidla", desc: "Respektuji pravidla třídy a školy. Nikdo mě nemusí napomínat, abych dělal to, na čem jsme se dohodli." },
+    { id: "q5", cat: "Ve vztahu k druhým", text: "Spolupracuješ s ostatními", desc: "Dokážu se domluvit na společném postupu a splnit svou část úkolu. V týmu neshazuji práci ostatních." },
+    { id: "q6", cat: "Ve vztahu k druhým", text: "Dokážeš poskytovat účelnou zpětnou vazbu", desc: "Umím spolužáka konkrétně ocenit, dát mu radu či doporučení." },
+    { id: "q7", cat: "Ve vztahu k druhým", text: "Přispíváš k vytváření bezpečného prostředí a atmosféry", desc: "Ostatní se v mé přítomnosti cítí dobře a beze strachu. Nikoho neshazuji, neposmívám se a nevyčleňuji." },
+    { id: "q8", cat: "Při učení", text: "Zodpovědně přistupuješ k učení", desc: "Do školy přicházím připravený. Mám v pořádku pomůcky, dávám v hodině pozor a plním úkoly včas." },
+    { id: "q9", cat: "Při učení", text: "Vytrváš v práci na obtížných úkolech", desc: "Když mi něco nejde hned napoprvé, nevzdávám se. Zkusím hledat řešení nebo požádám o pomoc." },
+    { id: "q10", cat: "Při učení", text: "Čteš s porozuměním", desc: "Když si přečtu text nebo zadání úkolu, dokážu vlastními slovy říct, o čem to bylo a co mám udělat." },
+    { id: "q11", cat: "Při učení", text: "Dokážeš srozumitelně prezentovat výsledky své práce", desc: "Umím ostatním vysvětlit, co jsem vytvořil. Můj přednes je hlasitý, udržuji oční kontakt a vím, o čem mluvím." }
 ];
 
 let currentUser = null;
@@ -250,59 +307,110 @@ auth.onAuthStateChanged(user => {
     else { showLogin(); }
 });
 
+function loginWithGoogle() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider).catch(error => {
+        console.error("Chyba přihlášení:", error);
+        alert("Přihlášení se nezdařilo: " + error.message + "\n\nTip: Zkontrolujte, zda nespouštíte soubor jako lokální (file://) nebo zda nemáte blokována vyskakovací okna.");
+    });
+}
+
 function showLogin() {
     document.getElementById('app').style.display = 'none';
-    document.getElementById('auth-container').innerHTML = `<div style="text-align:center; margin-top:100px;"><button class="btn btn-primary" onclick="auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())">Přihlásit se školním účtem</button></div>`;
+    document.getElementById('auth-container').innerHTML = `
+        <div style="text-align:center; padding: 50px;">
+            <img src="https://raw.githubusercontent.com/knopak/hodnoceni/main/GALAXIE-logo_male%20(1).jpg" style="max-height:100px; margin-bottom:20px;"><br>
+            <h2 style="margin-bottom: 20px; color: #1e3a8a;">Systém hodnocení Galaxie</h2>
+            <button class="btn btn-primary" style="font-size: 16px; padding: 15px 30px;" onclick="loginWithGoogle()">
+                Přihlásit se školním Google účtem
+            </button>
+        </div>`;
 }
 
 function initApp() {
     const email = currentUser.email.toLowerCase();
-    document.getElementById('auth-container').innerHTML = `<div style="display:flex; justify-content:space-between; padding:10px;"><span>Uživatel: ${email}</span><button onclick="auth.signOut()">Odhlásit</button></div>`;
-    if (STUDENTS[email]) { currentTargetStudent = email; loadStudentData(email); } 
-    else if (TEACHERS[email]) { renderTeacherUI(); }
+    document.getElementById('auth-container').innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-weight: 600; color: #4b5563;">Uživatel: <b style="color: #1e3a8a;">${email}</b></span>
+            <button class="btn btn-logout" onclick="auth.signOut()">Odhlásit se</button>
+        </div>`;
+    
+    if (STUDENTS[email]) { 
+        currentTargetStudent = email; 
+        loadStudentData(email); 
+    } else if (TEACHERS[email]) { 
+        renderTeacherUI(); 
+    } else { 
+        alert("Váš e-mail nebyl nalezen v databázi žáků ani učitelů."); 
+    }
 }
 
 function renderTeacherUI() {
     document.getElementById('app').style.display = 'block';
-    let html = `<select id="studentSelector" onchange="loadStudentData(this.value)"><option value="">-- Vyberte žáka --</option>`;
-    Object.keys(STUDENTS).sort((a,b) => STUDENTS[a].class.localeCompare(STUDENTS[b].class) || STUDENTS[a].name.localeCompare(STUDENTS[b].name))
-          .forEach(e => { html += `<option value="${e}">${STUDENTS[e].class} - ${STUDENTS[e].name}</option>`; });
-    document.getElementById('role-ui').innerHTML = html + `</select>`;
+    let html = `<label style="font-weight:bold; color: #1e3a8a; display:block; margin-bottom:10px;">Vyberte žáka:</label>`;
+    html += `<select id="studentSelector" onchange="loadStudentData(this.value)"><option value="">-- Zvolte jméno --</option>`;
+    
+    const sortedEmails = Object.keys(STUDENTS).sort((a,b) => STUDENTS[a].class.localeCompare(STUDENTS[b].class) || STUDENTS[a].name.localeCompare(STUDENTS[b].name));
+    sortedEmails.forEach(e => { 
+        html += `<option value="${e}">${STUDENTS[e].class} - ${STUDENTS[e].name}</option>`; 
+    });
+    
+    html += `</select>`;
+    document.getElementById('role-ui').innerHTML = html;
 }
 
 async function loadStudentData(email) {
     if (!email) return;
     currentTargetStudent = email;
     document.getElementById('student-header-name').innerText = STUDENTS[email].name + " (" + STUDENTS[email].class + ")";
+    
     const doc = await db.collection('hodnoceni').doc(email).get();
     currentData = doc.exists ? doc.data() : { scales: {}, comments: {}, intro: "", notes: "" };
+    
     document.getElementById('class-teacher-intro').value = currentData.intro || "";
     document.getElementById('teachers-notes').value = currentData.notes || "";
     document.getElementById('app').style.display = 'block';
+    
     renderForm();
 }
 
 function renderForm() {
     const area = document.getElementById('competencies-area');
     area.innerHTML = '';
+    
     const isTeacher = !!TEACHERS[currentUser.email.toLowerCase()];
     const isClassTeacher = isTeacher && TEACHERS[currentUser.email.toLowerCase()] === STUDENTS[currentTargetStudent].class;
 
+    let currentCategory = "";
+
     QUESTIONS.forEach(q => {
+        if (q.cat !== currentCategory) {
+            const catDiv = document.createElement('div');
+            catDiv.className = 'category-title';
+            catDiv.innerText = q.cat;
+            area.appendChild(catDiv);
+            currentCategory = q.cat;
+        }
+
         const div = document.createElement('div');
         div.className = 'competency-item';
         div.innerHTML = `
             <span class="question-text">${q.text}</span>
             <span class="question-desc">${q.desc}</span>
-            <div class="scale-options">
-                ${SCALE_LABELS.map(label => `<div class="scale-box ${currentData.scales?.[q.id] === label ? 'active' : ''}" onclick="${isTeacher ? `updateScale('${q.id}', '${label}')` : ''}">${label}</div>`).join('')}
+            <div class="scale-options" id="scale-${q.id}">
+                ${SCALE_LABELS.map(label => `
+                    <div class="scale-box ${currentData.scales?.[q.id] === label ? 'active' : ''}" 
+                         onclick="updateScale('${q.id}', '${label}')">${label}</div>
+                `).join('')}
             </div>
+            <div class="scale-labels"><span>Zatím ne</span><span>Vždy</span></div>
             <div class="student-comment">
-                <label>Vysvětlení žáka:</label>
-                <textarea id="comment-${q.id}" rows="2" ${isTeacher ? 'disabled' : ''}>${currentData.comments?.[q.id] || ''}</textarea>
+                <label>Moje vysvětlení (žák):</label>
+                <textarea id="comment-${q.id}" rows="2" placeholder="Proč se takto hodnotím?" ${isTeacher ? 'disabled' : ''}>${currentData.comments?.[q.id] || ''}</textarea>
             </div>`;
         area.appendChild(div);
     });
+
     document.getElementById('class-teacher-intro').disabled = !isClassTeacher;
     document.getElementById('teachers-notes').disabled = !isTeacher;
 }
@@ -310,21 +418,36 @@ function renderForm() {
 function updateScale(qId, val) {
     if (!currentData.scales) currentData.scales = {};
     currentData.scales[qId] = val;
-    loadStudentData(currentTargetStudent); // Refresh UI
+    document.querySelectorAll(`#scale-${qId} .scale-box`).forEach(box => { 
+        box.classList.toggle('active', box.innerText === val); 
+    });
 }
 
 async function saveData() {
+    if (!currentTargetStudent) return;
+    
     const comments = {};
-    QUESTIONS.forEach(q => { comments[q.id] = document.getElementById(`comment-${q.id}`).value; });
-    await db.collection('hodnoceni').doc(currentTargetStudent).set({
-        scales: currentData.scales || {},
-        comments: comments,
-        intro: document.getElementById('class-teacher-intro').value,
-        notes: document.getElementById('teachers-notes').value,
-        lastUpdate: new Date()
-    }, { merge: true });
-    alert("Uloženo!");
+    QUESTIONS.forEach(q => { 
+        comments[q.id] = document.getElementById(`comment-${q.id}`).value; 
+    });
+    
+    const payload = { 
+        scales: currentData.scales || {}, 
+        comments: comments, 
+        intro: document.getElementById('class-teacher-intro').value, 
+        notes: document.getElementById('teachers-notes').value, 
+        lastUpdate: new Date(),
+        updatedBy: currentUser.email
+    };
+    
+    try {
+        await db.collection('hodnoceni').doc(currentTargetStudent).set(payload, { merge: true });
+        alert("Hodnocení bylo úspěšně uloženo.");
+    } catch (error) {
+        alert("Chyba při ukládání: " + error.message);
+    }
 }
 </script>
+
 </body>
 </html>
