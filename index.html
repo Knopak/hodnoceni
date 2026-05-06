@@ -351,4 +351,320 @@
             "stepanka.vasickova@skolagalaxie.cz": { name: "Štěpánka Vašíčková", class: "8. A" },
             "adriana.barsovska@skolagalaxie.cz": { name: "Adriana Baršovská", class: "9. A" },
             "jakub.drgac@skolagalaxie.cz": { name: "Jakub Drgáč", class: "9. A" },
-            "ondrej.fojtik@skolagalaxie.cz": { name: "Ondřej Fojtík", class
+            "ondrej.fojtik@skolagalaxie.cz": { name: "Ondřej Fojtík", class: "9. A" },
+            "vojtech.janis@skolagalaxie.cz": { name: "Vojtěch Janiš", class: "9. A" },
+            "matyas.javorka@skolagalaxie.cz": { name: "Matyáš Javorka", class: "9. A" },
+            "svetlana.kanova@skolagalaxie.cz": { name: "Světlana Kaňová", class: "9. A" },
+            "alice.kavanova@skolagalaxie.cz": { name: "Alice Kavanová", class: "9. A" },
+            "jan.klein@skolagalaxie.cz": { name: "Jan Klein", class: "9. A" },
+            "valentina.konopacova@skolagalaxie.cz": { name: "Valentina Konopáčová", class: "9. A" },
+            "vit.kosarek@skolagalaxie.cz": { name: "Vít Košárek", class: "9. A" },
+            "marco.maietta@skolagalaxie.cz": { name: "Marco Maietta", class: "9. A" },
+            "tomas.pollak@skolagalaxie.cz": { name: "Tomáš Pollak", class: "9. A" },
+            "ella.synkova@skolagalaxie.cz": { name: "Ella Synková", class: "9. A" },
+            "martin.snapka@skolagalaxie.cz": { name: "Martin Šnapka", class: "9. A" },
+            "print@skolagalaxie.cz": { name: "Print", class: "Testovací" }
+        };
+
+        const COMPETENCIES = [
+            { id: "s1", cat: "Ve vztahu k sobě", text: "Vyjadřuješ své myšlenky a pocity přiměřeně situaci.", desc: "Umím říct, co si myslím nebo jak se cítím. Vím, kdy je čas na vtipkování a kdy je potřeba mluvit vážně." },
+            { id: "s2", cat: "Ve vztahu k sobě", text: "Rozpoznáš vhodné a nevhodné chování a jednáš podle toho.", desc: "Poznám, co se v danou chvíli sluší a co ne. Když mě někdo provokuje, dokážu se ovládnout." },
+            { id: "s3", cat: "Ve vztahu k sobě", text: "Umím přijmout zpětnou vazbu a dál s ní pracovat.", desc: "Neurazím se. Místo toho se zamyslím, jak mohu rady a doporučení využít pro svůj růst." },
+            { id: "o1", cat: "Ve vztahu k druhým", text: "Dodržuješ stanovená pravidla.", desc: "Respektuji pravidla třídy a školy. Nikdo mě nemusí napomínat." },
+            { id: "o2", cat: "Ve vztahu k druhým", text: "Spolupracuješ s ostatními.", desc: "Dokážu se domluvit na společném postupu. V týmu neshazuji práci ostatních." },
+            { id: "o3", cat: "Ve vztahu k druhým", text: "Dokážeš poskytovat účelnou zpětnou vazbu.", desc: "Umím spolužáka konkrétně ocenit, dát mu radu či doporučení." },
+            { id: "o4", cat: "Ve vztahu k druhým", text: "Přispíváš k vytváření bezpečného prostředí a atmosféry.", desc: "Ostatní se v mé přítomnosti cítí dobře. Nikoho neshazuji a nevyčleňuji." },
+            { id: "l1", cat: "Při učení", text: "Zodpovědně přistupuješ k učení.", desc: "Do školy přicházím připravený*á. Mám pomůcky, dávám v hodině pozor." },
+            { id: "l2", cat: "Při učení", text: "Vytrváš v práci na obtížných úkolech.", desc: "Když mi něco nejde hned napoprvé, nevzdávám se. Zkusím hledat řešení." },
+            { id: "l3", cat: "Při učení", text: "Čteš s porozuměním.", desc: "Dokážu vlastními slovy říct, o čem byl text a co mám vlastně udělat." },
+            { id: "l4", cat: "Při učení", text: "Dokážeš srozumitelně prezentovat výsledky své práce.", desc: "Umím vysvětlit svou práci. Můj přednes je hlasitý, udržuji oční kontakt." }
+        ];
+
+        const SCALE_LABELS = ['Ne', 'Spíše ne', 'Spíše ano', 'Ano'];
+        const ACTIVE_COLOR = '#1d4ed8'; 
+        const INACTIVE_COLOR = '#f3f4f6';
+
+        let currentUser = null;
+        let userRole = null; 
+        let isClassTeacher = false;
+        let currentTargetEmail = null;
+        let dbData = { teacherScales: {}, studentScales: {}, studentComments: {}, topNote: "", bottomNote: "" };
+
+        window.onload = () => lucide.createIcons();
+
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                currentUser = user;
+                const email = user.email.toLowerCase();
+                document.getElementById('user-email-display').innerText = email;
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('app-screen').classList.remove('hidden');
+
+                if (TEACHERS[email] !== undefined) { 
+                    userRole = 'teacher';
+                    setupTeacherUI();
+                } else if (STUDENTS[email]) {
+                    userRole = 'student';
+                    setupStudentUI(email);
+                } else {
+                    alert("Účet nebyl rozpoznán. Kontaktujte administrátora.");
+                    auth.signOut();
+                }
+            } else {
+                document.getElementById('auth-screen').classList.remove('hidden');
+                document.getElementById('app-screen').classList.add('hidden');
+            }
+        });
+
+        function loginWithGoogle() {
+            console.log("Bylo kliknuto na tlačítko přihlášení, volám Firebase...");
+            try {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                auth.signInWithPopup(provider).catch(err => {
+                    console.error("Chyba od Googlu:", err);
+                    alert("Chyba přihlášení: " + err.message);
+                });
+            } catch (err) {
+                console.error("Kritická chyba JS:", err);
+                alert("Došlo k chybě v prohlížeči. Podívejte se do konzole (F12).");
+            }
+        }
+
+        function setupTeacherUI() {
+            document.getElementById('controls-container').classList.remove('hidden');
+            document.getElementById('student-notice').classList.add('hidden');
+            document.getElementById('printBtn').classList.remove('hidden');
+            
+            const classes = [...new Set(Object.values(STUDENTS).map(s => s.class))].sort();
+            const classSelect = document.getElementById('classSelect');
+            classSelect.innerHTML = '<option value="">Vyberte třídu</option>';
+            classes.forEach(c => classSelect.add(new Option(c, c)));
+        }
+
+        function onClassChange() {
+            const cls = document.getElementById('classSelect').value;
+            const studentSelect = document.getElementById('studentSelect');
+            studentSelect.innerHTML = '<option value="">Vyberte žáka</option>';
+            
+            if(!cls) {
+                document.getElementById('print-container').classList.add('hidden');
+                document.getElementById('page-2-container').classList.add('hidden');
+                return;
+            }
+
+            const studentsInClass = Object.entries(STUDENTS)
+                .filter(([email, data]) => data.class === cls)
+                .sort((a,b) => a[1].name.localeCompare(b[1].name));
+
+            studentsInClass.forEach(([email, data]) => studentSelect.add(new Option(data.name, email)));
+        }
+
+        function setupStudentUI(email) {
+            document.getElementById('controls-container').classList.add('hidden');
+            document.getElementById('student-notice').classList.remove('hidden');
+            document.getElementById('printBtn').classList.add('hidden'); 
+            document.getElementById('studentSelect').value = email; 
+            currentTargetEmail = email;
+            loadStudentData(email);
+        }
+
+        async function loadStudentData(forcedEmail = null) {
+            const email = forcedEmail || document.getElementById('studentSelect').value;
+            if (!email) return;
+
+            currentTargetEmail = email;
+            const studentInfo = STUDENTS[email];
+            
+            if (userRole === 'teacher' && TEACHERS[currentUser.email.toLowerCase()] === studentInfo.class) {
+                isClassTeacher = true;
+            } else {
+                isClassTeacher = false;
+            }
+
+            document.getElementById('studentNameDisplay').textContent = studentInfo.name;
+            document.getElementById('classNameDisplay').textContent = "Třída: " + studentInfo.class;
+            
+            dbData = { teacherScales: {}, studentScales: {}, studentComments: {}, topNote: "", bottomNote: "" };
+            
+            try {
+                const doc = await db.collection('evaluations').doc(email).get();
+                if (doc.exists) dbData = { ...dbData, ...doc.data() };
+            } catch (e) { console.error("Chyba čtení:", e); }
+
+            renderForms(studentInfo.name);
+        }
+
+        function renderForms(studentName) {
+            if (userRole === 'student') {
+                document.getElementById('print-container').classList.add('hidden');
+                document.getElementById('compact-legend').classList.add('hidden');
+                document.getElementById('page2-title').innerHTML = `Moje sebehodnocení a vysvětlení<br><span class="text-2xl text-black mt-2 inline-block">${studentName}</span>`;
+            } else {
+                document.getElementById('print-container').classList.remove('hidden');
+                document.getElementById('compact-legend').classList.remove('hidden');
+                document.getElementById('page2-title').innerHTML = `Sebehodnocení žáka (Strana 2)<br><span class="text-2xl text-black mt-2 inline-block font-bold">${studentName}</span>`;
+            }
+            
+            document.getElementById('page-2-container').classList.remove('hidden');
+
+            const topNoteEl = document.getElementById('schoolYearNoteInput');
+            const bottomNoteEl = document.getElementById('summaryInput');
+            
+            topNoteEl.value = dbData.topNote || "";
+            bottomNoteEl.value = dbData.bottomNote || "";
+            document.getElementById('schoolYearNoteDisplay').textContent = dbData.topNote || "";
+            document.getElementById('summaryDisplay').textContent = dbData.bottomNote || "";
+
+            if (userRole === 'teacher') {
+                topNoteEl.disabled = !isClassTeacher; 
+                bottomNoteEl.disabled = false; 
+            }
+
+            autoResize(topNoteEl);
+            autoResize(bottomNoteEl);
+
+            renderTeacherScales();
+            renderStudentScales();
+        }
+
+        function renderTeacherScales() {
+            const container = document.getElementById('teacherSectionsContainer');
+            container.innerHTML = '';
+            
+            const categories = [...new Set(COMPETENCIES.map(c => c.cat))];
+            
+            categories.forEach(cat => {
+                let html = `<div class="bg-white rounded-lg border border-gray-200 p-3 break-inside-avoid print-border-none print:p-0">
+                                <h2 class="text-[11px] font-bold mb-2 text-blue-900 border-b border-blue-100 pb-1 text-center font-print uppercase tracking-wide">${cat}</h2>
+                                <div class="space-y-1">`;
+                
+                COMPETENCIES.filter(c => c.cat === cat).forEach(q => {
+                    const val = dbData.teacherScales[q.id];
+                    let btns = '', printSquares = '';
+                    
+                    for(let i=0; i<4; i++) {
+                        const active = val === i; // Obarví jen to jedno správné políčko
+                        const bgColor = active ? ACTIVE_COLOR : INACTIVE_COLOR;
+                        const textColor = active ? '#ffffff' : '#4b5563';
+                        const pointer = userRole === 'teacher' ? 'cursor-pointer hover:opacity-80' : 'cursor-not-allowed opacity-60';
+                        
+                        btns += `<button onclick="setTeacherScale('${q.id}', ${i})" class="scale-btn text-[8px] px-0.5 py-1 leading-tight text-center border border-gray-300 rounded ${pointer}" style="background-color: ${bgColor}; color: ${textColor};" ${userRole === 'student' ? 'disabled' : ''}>${SCALE_LABELS[i]}</button>`;
+                        printSquares += `<div class="w-[9px] h-[9px] border rounded-[1.5px]" style="background-color: ${bgColor}; border-color: #9ca3af;"></div>`;
+                    }
+
+                    html += `<div class="flex flex-col py-1 border-b border-gray-50 last:border-0 break-inside-avoid print:py-1">
+                                <span class="text-[10px] leading-tight font-print text-gray-800 mb-1 print:text-[8.5pt] font-medium">${q.text}</span>
+                                <div class="grid grid-cols-4 gap-1 no-print">${btns}</div>
+                                <div class="hidden print-content print-flex gap-2.5 items-center">${printSquares}</div>
+                             </div>`;
+                });
+                
+                html += `</div></div>`;
+                container.innerHTML += html;
+            });
+        }
+
+        function renderStudentScales() {
+            const container = document.getElementById('studentSectionsContainer');
+            container.innerHTML = '';
+            
+            const categories = [...new Set(COMPETENCIES.map(c => c.cat))];
+
+            categories.forEach(cat => {
+                let catHtml = `<div class="mb-8 break-inside-avoid print:mb-4">
+                                <h3 class="text-lg font-bold text-blue-900 border-b border-blue-200 pb-1 mb-4 print:text-base print:mb-2 uppercase">${cat}</h3>
+                                <div class="space-y-4 print:space-y-2">`;
+                
+                COMPETENCIES.filter(c => c.cat === cat).forEach(q => {
+                    const val = dbData.studentScales[q.id];
+                    const comment = dbData.studentComments[q.id] || "";
+                    let btns = '', printSquares = '';
+                    
+                    for(let i=0; i<4; i++) {
+                        const active = val === i; // Obarví jen to jedno správné políčko
+                        const bgColor = active ? ACTIVE_COLOR : INACTIVE_COLOR;
+                        const textColor = active ? '#ffffff' : '#4b5563';
+                        const pointer = userRole === 'student' ? 'cursor-pointer hover:opacity-80' : 'cursor-not-allowed opacity-60';
+                        
+                        btns += `<button onclick="setStudentScale('${q.id}', ${i})" class="scale-btn text-xs font-medium py-1.5 px-2 border border-gray-300 rounded ${pointer}" style="background-color: ${bgColor}; color: ${textColor};" ${userRole === 'teacher' ? 'disabled' : ''}>${SCALE_LABELS[i]}</button>`;
+                        
+                        printSquares += `<div class="flex items-center gap-1"><div class="w-[9px] h-[9px] border rounded-[1.5px]" style="background-color: ${bgColor}; border-color: #9ca3af;"></div><span class="text-[8px] text-gray-600">${SCALE_LABELS[i]}</span></div>`;
+                    }
+
+                    catHtml += `
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 print:bg-transparent print:border-b print:border-x-0 print:border-t-0 print:rounded-none print:p-2">
+                            <div class="font-bold text-sm text-gray-800 font-print">${q.text}</div>
+                            <div class="text-xs text-gray-500 italic mb-3 font-print">${q.desc}</div>
+                            
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3 no-print">${btns}</div>
+                            <div class="hidden print-content print-flex gap-4 mb-2">${printSquares}</div>
+                            
+                            <textarea id="comment-${q.id}" class="w-full p-2 border border-gray-300 rounded text-sm bg-white focus:ring-2 focus:ring-blue-500 font-print print:border-none print:bg-transparent print:italic" placeholder="Moje vysvětlení (proč jsem se takto ohodnotil/a)..." rows="2" oninput="autoResize(this); dbData.studentComments['${q.id}'] = this.value;" ${userRole === 'teacher' ? 'disabled' : ''}>${comment}</textarea>
+                        </div>
+                    `;
+                });
+                
+                catHtml += `</div></div>`;
+                container.innerHTML += catHtml;
+            });
+        }
+
+        function setTeacherScale(qId, val) {
+            if (userRole !== 'teacher') return;
+            dbData.teacherScales[qId] = val;
+            renderTeacherScales();
+        }
+
+        function setStudentScale(qId, val) {
+            if (userRole !== 'student') return;
+            dbData.studentScales[qId] = val;
+            renderStudentScales(); 
+        }
+
+        function autoResize(el) {
+            el.style.height = 'auto';
+            el.style.height = el.scrollHeight + 'px';
+        }
+
+        async function saveData() {
+            if (!currentTargetEmail) return;
+
+            if (userRole === 'teacher') {
+                dbData.bottomNote = document.getElementById('summaryInput').value;
+                if (isClassTeacher) {
+                    dbData.topNote = document.getElementById('schoolYearNoteInput').value;
+                }
+            }
+
+            try {
+                const payload = { lastUpdated: new Date() };
+                
+                if (userRole === 'teacher') {
+                    payload.teacherScales = dbData.teacherScales;
+                    payload.bottomNote = dbData.bottomNote;
+                    if (isClassTeacher) payload.topNote = dbData.topNote;
+                } else if (userRole === 'student') {
+                    payload.studentScales = dbData.studentScales;
+                    payload.studentComments = dbData.studentComments;
+                }
+
+                await db.collection('evaluations').doc(currentTargetEmail).set(payload, { merge: true });
+                
+                const toast = document.getElementById('toast');
+                toast.style.transform = 'translateY(0)';
+                toast.style.opacity = '1';
+                setTimeout(() => {
+                    toast.style.transform = 'translateY(20px)';
+                    toast.style.opacity = '0';
+                }, 3000);
+
+                document.getElementById('schoolYearNoteDisplay').textContent = dbData.topNote;
+                document.getElementById('summaryDisplay').textContent = dbData.bottomNote;
+
+            } catch (error) {
+                alert("Chyba při ukládání: " + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
