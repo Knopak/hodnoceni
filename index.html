@@ -5,11 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Galaxie - Hodnocení kompetencí</title>
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- Firebase SDK (v8 compat mode) -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -24,6 +22,7 @@
         textarea { resize: none; overflow: hidden; transition: height 0.1s ease; }
         textarea:disabled { background-color: #f3f4f6; color: #6b7280; cursor: not-allowed; border-color: #e5e7eb; }
 
+        /* Interaktivní tlačítka škály v aplikaci */
         .scale-btn { transition: all 0.2s; word-wrap: break-word; }
         .scale-btn:active { transform: scale(0.95); }
 
@@ -45,7 +44,6 @@
 </head>
 <body>
 
-    <!-- AUTH SCREEN -->
     <div id="auth-screen" class="min-h-screen flex flex-col items-center justify-center p-4">
         <div class="bg-white p-8 rounded-xl shadow-lg text-center max-w-md w-full">
             <h1 class="text-3xl font-bold mb-2 text-blue-900">ZŠ Galaxie</h1>
@@ -56,14 +54,11 @@
         </div>
     </div>
 
-    <!-- APP SCREEN -->
     <div id="app-screen" class="hidden">
         
-        <!-- TOOLBAR (Ne-tiskne se) -->
         <div class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm px-4 py-3 no-print">
             <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
                 
-                <!-- Levá část: Výběr -->
                 <div id="controls-container" class="flex items-center gap-3 flex-1">
                     <div class="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200">
                         <i data-lucide="users" class="w-4 h-4 text-gray-500"></i>
@@ -80,12 +75,10 @@
                     </div>
                 </div>
                 
-                <!-- Upozornění pro žáka -->
                 <div id="student-notice" class="hidden text-blue-700 font-bold items-center gap-2">
                     <i data-lucide="user-check"></i> Pohled žáka
                 </div>
 
-                <!-- Pravá část: Akce -->
                 <div class="flex gap-3 items-center">
                     <span id="user-email-display" class="text-xs text-gray-500 font-medium hidden md:block"></span>
                     <button onclick="saveData()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 shadow-md transition-colors">
@@ -101,12 +94,15 @@
             </div>
         </div>
 
-        <!-- STRANA 1: HODNOCENÍ UČITELŮ -->
         <div id="print-container" class="max-w-[210mm] mx-auto p-6 bg-white my-8 shadow-md flex flex-col hidden">
             
+            <div class="flex justify-center mb-6 print:mb-4">
+                <img src="https://raw.githubusercontent.com/knopak/hodnoceni/main/GALAXIE-logo_male%20(1).jpg" alt="ZŠ Galaxie" class="h-20 object-contain">
+            </div>
+
             <div class="bg-white rounded-lg border border-gray-200 p-4 mb-2 text-center print-border-none print-padding-0">
                 <div class="inline-block border-[3px] border-blue-600 px-8 py-1 mb-2">
-                    <span id="studentNameDisplay" class="text-2xl font-bold text-black font-print">Vyberte žáka</span>
+                    <span id="studentNameDisplay" class="text-2xl font-bold text-black font-print uppercase tracking-wide">Vyberte žáka</span>
                 </div>
                 <div class="flex justify-between items-center text-sm font-bold text-black px-2 mb-1 font-print">
                     <div>Školní rok: 2025/2026 - I. POLOLETÍ</div>
@@ -114,7 +110,6 @@
                 </div>
                 <div class="w-full border-b border-gray-400 my-2"></div>
 
-                <!-- Slovo třídního učitele -->
                 <div class="w-full mt-2 text-left">
                     <label class="text-xs font-bold text-blue-800 uppercase no-print">Slovo třídního učitele:</label>
                     <textarea id="schoolYearNoteInput" class="w-full p-2 border border-gray-300 rounded text-sm bg-blue-50 focus:bg-white focus:ring-2 focus:ring-blue-500" placeholder="Zde píše shrnutí třídní učitel..." rows="3" oninput="autoResize(this)"></textarea>
@@ -124,10 +119,8 @@
 
             <h2 class="text-sm font-bold mt-2 mb-2 text-center text-black uppercase tracking-widest font-print">HODNOTY A POSTOJE (Pohled školy)</h2>
 
-            <!-- Škály - pohled učitelů -->
             <div id="teacherSectionsContainer" class="grid grid-cols-1 md:grid-cols-3 gap-4 print:grid-cols-3 print:gap-3 mt-1"></div>
 
-            <!-- Svodka (Společné pro všechny učitele) -->
             <div class="flex-grow bg-white rounded-lg border border-gray-200 p-4 mt-4 print-border-none flex flex-col">
                 <label class="text-xs font-bold text-blue-800 uppercase no-print mb-1">Zpětná vazba od vyučujících:</label>
                 <textarea id="summaryInput" class="w-full p-3 border border-gray-300 rounded text-sm min-h-[200px] bg-yellow-50 focus:bg-white focus:ring-2 focus:ring-blue-500" placeholder="Zde píšou postřehy všichni vyučující, třídní to pak učeše..." oninput="autoResize(this)"></textarea>
@@ -135,12 +128,10 @@
             </div>
         </div>
 
-        <!-- STRANA 2: ŽÁK (SEBEHODNOCENÍ) NEBO UČITEL (KOMPAKTNÍ LEGENDA + NÁHLED) -->
         <div id="page-2-container" class="max-w-[210mm] mx-auto p-6 bg-white my-8 shadow-md flex flex-col hidden">
             
             <h2 class="text-xl font-bold mb-4 text-center text-blue-900 font-print uppercase" id="page2-title">Sebehodnocení žáka</h2>
             
-            <!-- Kompaktní legenda pouze pro tisk/učitele -->
             <div id="compact-legend" class="grid grid-cols-1 md:grid-cols-3 gap-4 text-[10px] leading-tight font-print mb-6 bg-gray-50 p-4 border border-gray-200 rounded-lg print:bg-transparent print:border-none print:p-0 print:mb-4">
                 <div>
                     <h3 class="font-bold border-b border-gray-300 pb-1 mb-1">Ve vztahu k sobě</h3>
@@ -170,14 +161,12 @@
                 </div>
             </div>
 
-            <!-- Interaktivní část sebehodnocení -->
             <div id="studentSectionsContainer" class="space-y-6"></div>
 
         </div>
 
     </div>
 
-    <!-- Oznámení (Toast) -->
     <div id="toast" class="fixed bottom-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-xl font-bold transform translate-y-20 opacity-0 transition-all duration-300 z-50">
         Změny byly uloženy!
     </div>
@@ -373,7 +362,7 @@
             "tomas.pollak@skolagalaxie.cz": { name: "Tomáš Pollak", class: "9. A" },
             "ella.synkova@skolagalaxie.cz": { name: "Ella Synková", class: "9. A" },
             "martin.snapka@skolagalaxie.cz": { name: "Martin Šnapka", class: "9. A" },
-            "print@skolagalaxie.cz": { name: "Testovací Žák (Print)", class: "Testovací" }
+            "print@skolagalaxie.cz": { name: "Print", class: "Testovací" }
         };
 
         const COMPETENCIES = [
@@ -467,7 +456,7 @@
         function setupStudentUI(email) {
             document.getElementById('controls-container').classList.add('hidden');
             document.getElementById('student-notice').classList.remove('hidden');
-            document.getElementById('printBtn').classList.add('hidden'); // Žák nepotřebuje tlačítko tisk
+            document.getElementById('printBtn').classList.add('hidden'); 
             document.getElementById('studentSelect').value = email; 
             currentTargetEmail = email;
             loadStudentData(email);
@@ -497,20 +486,20 @@
                 if (doc.exists) dbData = { ...dbData, ...doc.data() };
             } catch (e) { console.error("Chyba čtení:", e); }
 
-            renderForms();
+            renderForms(studentInfo.name);
         }
 
         // --- VYKRESLENÍ FORMULÁŘŮ ---
-        function renderForms() {
-            // Žák nevidí první stranu učitelů a nevidí nahoře kompaktní legendu
+        function renderForms(studentName) {
+            // Přidání jména žáka do nadpisu na druhé stránce
             if (userRole === 'student') {
                 document.getElementById('print-container').classList.add('hidden');
                 document.getElementById('compact-legend').classList.add('hidden');
-                document.getElementById('page2-title').textContent = "Moje sebehodnocení a vysvětlení";
+                document.getElementById('page2-title').innerHTML = `Moje sebehodnocení a vysvětlení<br><span class="text-2xl text-black mt-2 inline-block">${studentName}</span>`;
             } else {
                 document.getElementById('print-container').classList.remove('hidden');
                 document.getElementById('compact-legend').classList.remove('hidden');
-                document.getElementById('page2-title').textContent = "Sebehodnocení žáka (Strana 2)";
+                document.getElementById('page2-title').innerHTML = `Sebehodnocení žáka (Strana 2)<br><span class="text-2xl text-black mt-2 inline-block">${studentName}</span>`;
             }
             
             document.getElementById('page-2-container').classList.remove('hidden');
@@ -551,17 +540,12 @@
                     let btns = '', printSquares = '';
                     
                     for(let i=0; i<4; i++) {
-                        // Vykreslení kumulativně jako progress bar
                         const active = val !== undefined && val >= i;
-                        const isCurrent = val === i;
                         const bgColor = active ? ACTIVE_COLOR : INACTIVE_COLOR;
                         const textColor = active ? '#ffffff' : '#4b5563';
                         const pointer = userRole === 'teacher' ? 'cursor-pointer hover:opacity-80' : 'cursor-not-allowed opacity-60';
                         
-                        // Online tlačítka
                         btns += `<button onclick="setTeacherScale('${q.id}', ${i})" class="scale-btn text-[9px] px-0.5 py-1 leading-tight text-center border border-gray-300 rounded ${pointer}" style="background-color: ${bgColor}; color: ${textColor};" ${userRole === 'student' ? 'disabled' : ''}>${SCALE_LABELS[i]}</button>`;
-                        
-                        // Tiskové čtverečky
                         printSquares += `<div class="w-[10px] h-[10px] border rounded-[2px]" style="background-color: ${bgColor}; border-color: #9ca3af;"></div>`;
                     }
 
@@ -600,14 +584,12 @@
                         const pointer = userRole === 'student' ? 'cursor-pointer hover:opacity-80' : 'cursor-not-allowed opacity-60';
                         
                         btns += `<button onclick="setStudentScale('${q.id}', ${i})" class="scale-btn text-xs font-medium py-1.5 px-2 border border-gray-300 rounded ${pointer}" style="background-color: ${bgColor}; color: ${textColor};" ${userRole === 'teacher' ? 'disabled' : ''}>${SCALE_LABELS[i]}</button>`;
-                        
                         printSquares += `<div class="flex items-center gap-1"><div class="w-[10px] h-[10px] border rounded-[2px]" style="background-color: ${bgColor}; border-color: #9ca3af;"></div><span class="text-[8px] text-gray-600">${SCALE_LABELS[i]}</span></div>`;
                     }
 
                     catHtml += `
                         <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 print:bg-transparent print:border-b print:border-x-0 print:border-t-0 print:rounded-none print:p-2">
                             <div class="font-bold text-sm text-gray-800 font-print">${q.text}</div>
-                            <!-- LEGENDA JE ZDE (popis pod otázkou) -->
                             <div class="text-xs text-gray-500 italic mb-3 font-print">${q.desc}</div>
                             
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3 no-print">${btns}</div>
