@@ -105,7 +105,8 @@
 
         <!-- STRANA 2 -->
         <div id="page-2-container" class="max-w-[210mm] mx-auto p-10 bg-white my-8 shadow-md flex flex-col hidden">
-            <h2 class="text-2xl font-black mb-8 text-center text-blue-900 uppercase border-b-4 border-blue-900 pb-3 tracking-wide">Sebehodnocení žáka</h2>
+            <!-- OPRAVA: přidáno id="page2-title" -->
+            <h2 id="page2-title" class="text-2xl font-black mb-8 text-center text-blue-900 uppercase border-b-4 border-blue-900 pb-3 tracking-wide">Sebehodnocení žáka</h2>
             <div id="studentSectionsContainer" class="space-y-10"></div>
             <div class="mt-auto pt-10">
                 <div class="grid grid-cols-3 gap-8 text-[10px] text-slate-400 border-t border-slate-100 pt-6 font-print italic">
@@ -134,7 +135,6 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth(), db = firebase.firestore();
 
-        // Učitelé podle tvého CSV
         const TEACHERS = {
             "barbora.bezdekova@skolagalaxie.cz": "",
             "eva.pancova@skolagalaxie.cz": "7. A",
@@ -153,7 +153,7 @@
             "pavlina.bittnerova@skolagalaxie.cz": "5. A",
             "skola@skolagalaxie.cz": "",
             "tereza.malirova@skolagalaxie.cz": "2. A",
-            "nastenka@skolagalaxie.cz": "" 
+            "nastenka@skolagalaxie.cz": ""
         };
 
         const STUDENTS = {
@@ -337,7 +337,7 @@
         ];
 
         const SCALE_LABELS = ['Ne', 'Sp. ne', 'Sp. ano', 'Ano'];
-        const ACTIVE_COLOR = '#1d4ed8'; 
+        const ACTIVE_COLOR = '#1d4ed8';
         const INACTIVE_COLOR = '#f1f5f9';
 
         let userRole = null, isClassTeacher = false, currentTargetEmail = null;
@@ -359,7 +359,9 @@
             }
         });
 
-        function loginWithGoogle() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
+        function loginWithGoogle() {
+            auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+        }
 
         function setupTeacherUI() {
             const classes = [...new Set(Object.values(STUDENTS).map(s => s.class))].sort();
@@ -375,8 +377,10 @@
             const cls = document.getElementById('classSelect').value;
             const studentSelect = document.getElementById('studentSelect');
             studentSelect.innerHTML = '<option value="">Vyberte žáka</option>';
-            if(!cls) return;
-            Object.entries(STUDENTS).filter(([e, d]) => d.class === cls).sort((a,b) => a[1].name.localeCompare(b[1].name))
+            if (!cls) return;
+            Object.entries(STUDENTS)
+                .filter(([e, d]) => d.class === cls)
+                .sort((a, b) => a[1].name.localeCompare(b[1].name))
                 .forEach(([e, d]) => studentSelect.add(new Option(d.name, e)));
         }
 
@@ -384,10 +388,11 @@
             document.getElementById('controls-container').classList.add('hidden');
             document.getElementById('student-notice').classList.remove('hidden');
             document.getElementById('printBtn').classList.add('hidden');
-            currentTargetEmail = email; loadStudentData(email);
+            currentTargetEmail = email;
+            loadStudentData(email);
         }
 
-        async function loadStudentData(forcedEmail = null) {
+        async function loadStudentData(forcedEmail) {
             const email = forcedEmail || document.getElementById('studentSelect').value;
             if (!email) return;
             currentTargetEmail = email;
@@ -405,29 +410,44 @@
             const isStudent = userRole === 'student';
             document.getElementById('print-container').classList.toggle('hidden', isStudent);
             document.getElementById('page-2-container').classList.remove('hidden');
-            document.getElementById('page2-title').innerHTML = isStudent ? `Moje sebehodnocení<br><span class="text-xl text-black font-black mt-2 inline-block">${name}</span>` : `Sebehodnocení žáka (Strana 2)<br><span class="text-xl text-black font-black mt-2 inline-block">${name}</span>`;
+
+            // OPRAVA: element page2-title nyní existuje v HTML
+            document.getElementById('page2-title').innerHTML = isStudent
+                ? `Moje sebehodnocení<br><span class="text-xl text-black font-black mt-2 inline-block">${name}</span>`
+                : `Sebehodnocení žáka<br><span class="text-xl text-black font-black mt-2 inline-block">${name}</span>`;
+
             document.getElementById('schoolYearNoteInput').value = dbData.topNote || "";
             document.getElementById('summaryInput').value = dbData.bottomNote || "";
             document.getElementById('schoolYearNoteDisplay').textContent = dbData.topNote || "";
             document.getElementById('summaryDisplay').textContent = dbData.bottomNote || "";
-            if (userRole === 'teacher') { document.getElementById('schoolYearNoteInput').disabled = !isClassTeacher; document.getElementById('summaryInput').disabled = false; }
-            else { document.getElementById('schoolYearNoteInput').disabled = true; document.getElementById('summaryInput').disabled = true; }
-            autoResize(document.getElementById('schoolYearNoteInput')); autoResize(document.getElementById('summaryInput'));
-            renderTeacherScales(); renderStudentScales();
+
+            if (userRole === 'teacher') {
+                document.getElementById('schoolYearNoteInput').disabled = !isClassTeacher;
+                document.getElementById('summaryInput').disabled = false;
+            } else {
+                document.getElementById('schoolYearNoteInput').disabled = true;
+                document.getElementById('summaryInput').disabled = true;
+            }
+
+            autoResize(document.getElementById('schoolYearNoteInput'));
+            autoResize(document.getElementById('summaryInput'));
+            renderTeacherScales();
+            renderStudentScales();
         }
 
         function renderTeacherScales() {
-            const container = document.getElementById('teacherSectionsContainer'); container.innerHTML = '';
+            const container = document.getElementById('teacherSectionsContainer');
+            container.innerHTML = '';
             const cats = [...new Set(COMPETENCIES.map(c => c.cat))];
             cats.forEach(cat => {
                 let h = `<div class="bg-white border rounded p-3"><h3 class="text-[10px] font-black text-center border-b mb-3 uppercase tracking-wider text-blue-900">${cat}</h3>`;
                 COMPETENCIES.filter(c => c.cat === cat).forEach(q => {
                     const val = dbData.teacherScales[q.id];
                     let btns = '', sqs = '';
-                    for(let i=0; i<4; i++) {
+                    for (let i = 0; i < 4; i++) {
                         const act = val === i;
-                        btns += `<button onclick="setTeacherScale('${q.id}', ${i})" class="scale-btn" style="background-color:${act?ACTIVE_COLOR:INACTIVE_COLOR}; color:${act?'#fff':'#64748b'}; border-color:${act?ACTIVE_COLOR:'#cbd5e1'}" ${userRole==='student'?'disabled':''}>${SCALE_LABELS[i]}</button>`;
-                        sqs += `<div class="w-2.5 h-2.5 border" style="background-color:${act?ACTIVE_COLOR:INACTIVE_COLOR}; border-color:#94a3b8"></div>`;
+                        btns += `<button onclick="setTeacherScale('${q.id}', ${i})" class="scale-btn" style="background-color:${act ? ACTIVE_COLOR : INACTIVE_COLOR}; color:${act ? '#fff' : '#64748b'}; border-color:${act ? ACTIVE_COLOR : '#cbd5e1'}" ${userRole === 'student' ? 'disabled' : ''}>${SCALE_LABELS[i]}</button>`;
+                        sqs += `<div class="w-2.5 h-2.5 border" style="background-color:${act ? ACTIVE_COLOR : INACTIVE_COLOR}; border-color:#94a3b8"></div>`;
                     }
                     h += `<div class="mb-3"><div class="text-[9px] font-bold leading-tight mb-2 text-slate-800">${q.text}</div><div class="grid grid-cols-4 gap-1 no-print">${btns}</div><div class="hidden print-flex gap-2 items-center justify-center">${sqs}</div></div>`;
                 });
@@ -436,35 +456,66 @@
         }
 
         function renderStudentScales() {
-            const container = document.getElementById('studentSectionsContainer'); container.innerHTML = '';
+            const container = document.getElementById('studentSectionsContainer');
+            container.innerHTML = '';
             const cats = [...new Set(COMPETENCIES.map(c => c.cat))];
             cats.forEach(cat => {
                 let h = `<div class="bg-white border-2 border-slate-100 p-6 rounded-3xl shadow-sm print:shadow-none print:p-0 print:border-0"><h3 class="text-lg font-black text-blue-900 uppercase mb-6 border-b pb-1">${cat}</h3><div class="space-y-8">`;
                 COMPETENCIES.filter(c => c.cat === cat).forEach(q => {
                     const val = dbData.studentScales[q.id];
                     let btns = '', sqs = '';
-                    for(let i=0; i<4; i++) {
+                    for (let i = 0; i < 4; i++) {
                         const act = val === i;
-                        btns += `<button onclick="setStudentScale('${q.id}', ${i})" class="scale-btn py-3 text-sm" style="background-color:${act?ACTIVE_COLOR:INACTIVE_COLOR}; color:${act?'#fff':'#64748b'}; border-color:${act?ACTIVE_COLOR:'#cbd5e1'}" ${userRole==='teacher'?'disabled':''}>${SCALE_LABELS[i]}</button>`;
-                        sqs += `<div class="flex items-center gap-2"><div class="w-3 h-3 border" style="background-color:${act?ACTIVE_COLOR:INACTIVE_COLOR}; border-color:#94a3b8"></div><span class="text-[9px] font-bold text-slate-500">${SCALE_LABELS[i]}</span></div>`;
+                        btns += `<button onclick="setStudentScale('${q.id}', ${i})" class="scale-btn py-3 text-sm" style="background-color:${act ? ACTIVE_COLOR : INACTIVE_COLOR}; color:${act ? '#fff' : '#64748b'}; border-color:${act ? ACTIVE_COLOR : '#cbd5e1'}" ${userRole === 'teacher' ? 'disabled' : ''}>${SCALE_LABELS[i]}</button>`;
+                        sqs += `<div class="flex items-center gap-2"><div class="w-3 h-3 border" style="background-color:${act ? ACTIVE_COLOR : INACTIVE_COLOR}; border-color:#94a3b8"></div><span class="text-[9px] font-bold text-slate-500">${SCALE_LABELS[i]}</span></div>`;
                     }
                     h += `<div><div class="text-sm font-bold text-slate-700 mb-3">${q.text}</div><div class="grid grid-cols-4 gap-3 no-print">${btns}</div><div class="hidden print-flex gap-5 mb-2">${sqs}</div></div>`;
                 });
+
+                // OPRAVA: data-cat atribut místo přímého vkládání názvu kategorie do oninput
                 const comm = dbData.categoryComments[cat] || "";
-                h += `</div><div class="mt-8 pt-5 border-t"><label class="text-[10px] font-bold text-slate-400 uppercase no-print block mb-1">Moje vyjádření k oblasti:</label><textarea id="cat-${cat}" class="w-full p-4 border rounded-2xl text-sm bg-blue-50 focus:bg-white focus:ring-4 focus:ring-blue-100" placeholder="Shrň své hodnocení..." rows="1" oninput="autoResize(this); dbData.categoryComments['${cat}']=this.value" ${userRole==='teacher'?'disabled':''}>${comm}</textarea><div class="print-only text-sm italic mt-3 leading-relaxed text-slate-700 border-l-4 pl-4 font-print">${comm}</div></div></div>`;
+                const disabledAttr = userRole === 'teacher' ? 'disabled' : '';
+                h += `</div>
+                    <div class="mt-8 pt-5 border-t">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase no-print block mb-1">Moje vyjádření k oblasti:</label>
+                        <textarea
+                            id="cat-${cat}"
+                            data-cat="${cat}"
+                            class="w-full p-4 border rounded-2xl text-sm bg-blue-50 focus:bg-white focus:ring-4 focus:ring-blue-100"
+                            placeholder="Shrň své hodnocení..."
+                            rows="1"
+                            oninput="autoResize(this); dbData.categoryComments[this.dataset.cat] = this.value"
+                            ${disabledAttr}>${comm}</textarea>
+                        <div class="print-only text-sm italic mt-3 leading-relaxed text-slate-700 border-l-4 pl-4 font-print">${comm}</div>
+                    </div>
+                </div>`;
                 container.innerHTML += h;
             });
         }
 
-        function setTeacherScale(id, v) { if(userRole === 'teacher'){ dbData.teacherScales[id] = v; renderTeacherScales(); } }
-        function setStudentScale(id, v) { if(userRole === 'student'){ dbData.studentScales[id] = v; renderStudentScales(); } }
-        function autoResize(el) { el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; }
+        function setTeacherScale(id, v) {
+            if (userRole === 'teacher') { dbData.teacherScales[id] = v; renderTeacherScales(); }
+        }
+
+        function setStudentScale(id, v) {
+            if (userRole === 'student') { dbData.studentScales[id] = v; renderStudentScales(); }
+        }
+
+        function autoResize(el) {
+            el.style.height = 'auto';
+            el.style.height = el.scrollHeight + 'px';
+        }
 
         async function saveData() {
-            if(!currentTargetEmail) return;
-            if(userRole === 'teacher') { dbData.bottomNote = document.getElementById('summaryInput').value; if(isClassTeacher) dbData.topNote = document.getElementById('schoolYearNoteInput').value; }
+            if (!currentTargetEmail) return;
+            if (userRole === 'teacher') {
+                dbData.bottomNote = document.getElementById('summaryInput').value;
+                if (isClassTeacher) dbData.topNote = document.getElementById('schoolYearNoteInput').value;
+            }
             await db.collection('evaluations').doc(currentTargetEmail).set(dbData, { merge: true });
-            const t = document.getElementById('toast'); t.style.transform = 'translateY(0)'; t.style.opacity = '1';
+            const t = document.getElementById('toast');
+            t.style.transform = 'translateY(0)';
+            t.style.opacity = '1';
             setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(24px)'; }, 2000);
             document.getElementById('schoolYearNoteDisplay').textContent = dbData.topNote;
             document.getElementById('summaryDisplay').textContent = dbData.bottomNote;
