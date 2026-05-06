@@ -20,20 +20,20 @@
         .hidden { display: none !important; }
         .print-content { display: none; }
         textarea { resize: none; overflow: hidden; transition: height 0.1s ease; }
-        textarea:disabled { background-color: #f3f4f6; color: #6b7280; cursor: not-allowed; border-color: #e5e7eb; }
+        textarea:disabled { background-color: #f8fafc; color: #64748b; cursor: not-allowed; border-color: #e2e8f0; }
 
-        .scale-btn { transition: all 0.2s; word-wrap: break-word; }
+        .scale-btn { transition: all 0.2s; }
         .scale-btn:active { transform: scale(0.95); }
 
         @media print {
             @page { size: A4; margin: 0; }
-            html, body { background-color: white !important; margin: 0; padding: 0; font-size: 10pt; height: 100%; width: 100%; overflow: visible !important; }
+            html, body { background-color: white !important; margin: 0; padding: 0; font-size: 10pt; width: 100%; overflow: visible !important; }
             .no-print { display: none !important; }
             .print-content { display: block !important; }
             .print-flex { display: flex !important; }
             
-            #print-container { padding: 8mm 12mm !important; box-shadow: none !important; width: 100% !important; max-width: none !important; page-break-after: always; }
-            #page-2-container { padding: 8mm 12mm !important; display: block !important; box-shadow: none !important; width: 100% !important; max-width: none !important; }
+            #print-container { padding: 10mm 15mm !important; box-shadow: none !important; width: 100% !important; page-break-after: always; }
+            #page-2-container { padding: 10mm 15mm !important; display: block !important; box-shadow: none !important; width: 100% !important; }
             
             textarea { display: none !important; }
             .break-inside-avoid { break-inside: avoid; }
@@ -47,29 +47,27 @@
         <div class="bg-white p-8 rounded-xl shadow-lg text-center max-w-md w-full border-t-4 border-blue-600">
             <img src="https://raw.githubusercontent.com/knopak/hodnoceni/main/logo.jpg" alt="ZŠ Galaxie" class="mx-auto h-24 mb-6">
             <h1 class="text-3xl font-bold mb-2 text-blue-900">ZŠ Galaxie</h1>
-            <p class="text-gray-500 mb-8">Systém hodnocení kompetencí</p>
-            <button onclick="loginWithGoogle()" class="w-full bg-blue-600 text-white font-bold px-6 py-3 rounded-lg flex items-center justify-center gap-3 hover:bg-blue-700 transition-colors shadow-md">
+            <button onclick="loginWithGoogle()" class="w-full mt-6 bg-blue-600 text-white font-bold px-6 py-3 rounded-lg flex items-center justify-center gap-3 hover:bg-blue-700 shadow-md">
                 Přihlásit se školním účtem Google
             </button>
         </div>
     </div>
 
     <div id="app-screen" class="hidden">
-        
         <div class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm px-4 py-3 no-print">
             <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
-                <div id="controls-container" class="flex items-center gap-3 flex-1">
+                <div id="controls-container" class="flex items-center gap-3">
                     <select id="classSelect" onchange="onClassChange()" class="bg-gray-50 font-bold text-sm px-3 py-1.5 rounded-lg border border-gray-200">
                         <option value="">Vyberte třídu</option>
                     </select>
-                    <select id="studentSelect" onchange="loadStudentData()" class="bg-gray-50 font-bold text-sm px-3 py-1.5 rounded-lg border border-gray-200 w-[200px]">
+                    <select id="studentSelect" onchange="loadStudentData()" class="bg-gray-50 font-bold text-sm px-3 py-1.5 rounded-lg border border-gray-200 w-[220px]">
                         <option value="">Vyberte žáka</option>
                     </select>
                 </div>
                 <div id="student-notice" class="hidden text-blue-700 font-bold items-center gap-2">
                     <i data-lucide="user-check"></i> Moje Sebehodnocení
                 </div>
-                <div class="flex gap-3">
+                <div class="flex gap-2">
                     <button onclick="saveData()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2">
                         <i data-lucide="save" class="w-4 h-4"></i> Uložit
                     </button>
@@ -81,61 +79,59 @@
             </div>
         </div>
 
-        <div id="print-container" class="max-w-[210mm] mx-auto p-6 bg-white my-8 shadow-md flex flex-col hidden">
-            <div class="flex justify-center mb-4">
+        <div id="print-container" class="max-w-[210mm] mx-auto p-8 bg-white my-8 shadow-md flex flex-col hidden">
+            <div class="flex justify-center mb-6">
                 <img src="https://raw.githubusercontent.com/knopak/hodnoceni/main/logo.jpg" alt="ZŠ Galaxie" class="h-16 object-contain" onerror="this.src='https://via.placeholder.com/200x80?text=ZŠ+GALAXIE'">
             </div>
-
-            <div class="bg-white rounded-lg border border-gray-200 p-4 text-center print-border-none print-p-0">
-                <div class="inline-block border-[3px] border-blue-600 px-8 py-1 mb-2">
-                    <span id="studentNameDisplay" class="text-2xl font-bold text-black font-print uppercase">Vyberte žáka</span>
+            <div class="text-center mb-6">
+                <div class="inline-block border-[3px] border-blue-600 px-10 py-1 mb-2">
+                    <span id="studentNameDisplay" class="text-2xl font-bold text-black uppercase tracking-wide">Vyberte žáka</span>
                 </div>
-                <div class="flex justify-between items-center text-xs font-bold text-black px-2 mb-1 uppercase font-print">
+                <div class="flex justify-between items-center text-xs font-bold text-black px-4 mt-2 font-print uppercase">
                     <div>Školní rok: 2025/2026 - I. POLOLETÍ</div>
                     <div id="classNameDisplay">Třída: -</div>
                 </div>
-                <div class="w-full border-b border-gray-400 my-2"></div>
-
-                <div class="w-full mt-2 text-left">
-                    <label class="text-[10px] font-bold text-blue-800 uppercase no-print">Slovo třídního učitele:</label>
-                    <textarea id="schoolYearNoteInput" class="w-full p-2 border border-gray-300 rounded text-sm bg-blue-50 focus:bg-white" placeholder="Úvodní slovo třídního..." rows="3" oninput="autoResize(this)"></textarea>
-                    <div id="schoolYearNoteDisplay" class="print-content text-justify text-sm font-print text-gray-800 leading-tight italic"></div>
+                <div class="w-full border-b border-gray-400 my-4"></div>
+                <div class="text-left">
+                    <label class="text-[10px] font-bold text-blue-800 uppercase no-print">Úvodní slovo třídního učitele:</label>
+                    <textarea id="schoolYearNoteInput" class="w-full p-2 border border-gray-300 rounded text-sm bg-blue-50" rows="3" oninput="autoResize(this)"></textarea>
+                    <div id="schoolYearNoteDisplay" class="print-content text-justify text-sm italic leading-tight"></div>
                 </div>
             </div>
-
-            <h2 class="text-xs font-bold mt-4 mb-2 text-center text-black uppercase tracking-widest font-print">HODNOTY A POSTOJE (Škola)</h2>
-            <div id="teacherSectionsContainer" class="grid grid-cols-3 gap-3 mt-1"></div>
-
-            <div class="flex-grow bg-white rounded-lg border border-gray-200 p-4 mt-4 print-border-none flex flex-col">
+            <h2 class="text-xs font-bold mb-2 text-center uppercase tracking-widest border-b pb-1">Hodnocení školy</h2>
+            <div id="teacherSectionsContainer" class="grid grid-cols-3 gap-4 mt-2"></div>
+            <div class="mt-8 flex-grow flex flex-col">
                 <label class="text-[10px] font-bold text-blue-800 uppercase no-print mb-1">Zpětná vazba vyučujících:</label>
-                <textarea id="summaryInput" class="w-full p-3 border border-gray-300 rounded text-sm min-h-[220px] bg-yellow-50" placeholder="Zde píšou postřehy všichni vyučující..." oninput="autoResize(this)"></textarea>
-                <div id="summaryDisplay" class="print-content text-justify text-sm leading-snug whitespace-pre-wrap font-print text-gray-800"></div>
+                <textarea id="summaryInput" class="w-full p-3 border border-gray-300 rounded text-sm min-h-[250px] bg-yellow-50" oninput="autoResize(this)"></textarea>
+                <div id="summaryDisplay" class="print-content text-justify text-sm leading-relaxed whitespace-pre-wrap"></div>
             </div>
         </div>
 
-        <div id="page-2-container" class="max-w-[210mm] mx-auto p-6 bg-white my-8 shadow-md flex flex-col hidden">
-            <h2 class="text-xl font-bold mb-4 text-center text-blue-900 font-print uppercase" id="page2-title">Sebehodnocení žáka</h2>
+        <div id="page-2-container" class="max-w-[210mm] mx-auto p-8 bg-white my-8 shadow-md flex flex-col hidden">
+            <h2 class="text-xl font-bold mb-6 text-center text-blue-900 uppercase tracking-wide border-b-2 border-blue-900 pb-2">Sebehodnocení žáka</h2>
             
-            <div id="studentSectionsContainer" class="space-y-4"></div>
+            <div id="studentSectionsContainer" class="space-y-8"></div>
 
-            <div id="compact-legend" class="mt-8 pt-4 border-t border-gray-200 grid grid-cols-3 gap-4 text-[9px] leading-tight text-gray-500 font-print">
-                <div>
-                    <h3 class="font-bold uppercase mb-1">Kategorie: Sebe</h3>
-                    Vyjadřování myšlenek, rozpoznání chování, přijetí zpětné vazby.
-                </div>
-                <div>
-                    <h3 class="font-bold uppercase mb-1">Kategorie: Druzí</h3>
-                    Pravidla, spolupráce, pomoc ostatním, bezpečné prostředí.
-                </div>
-                <div>
-                    <h3 class="font-bold uppercase mb-1">Kategorie: Učení</h3>
-                    Zodpovědnost, vytrvalost, čtení s porozuměním, prezentace.
+            <div class="mt-auto pt-8">
+                <div class="grid grid-cols-3 gap-6 text-[9px] text-gray-500 border-t border-gray-200 pt-4 font-print italic">
+                    <div>
+                        <span class="font-bold uppercase text-gray-700 block mb-1">Ve vztahu k sobě:</span>
+                        Myšlenky a pocity, chování v situacích, práce se zpětnou vazbou.
+                    </div>
+                    <div>
+                        <span class="font-bold uppercase text-gray-700 block mb-1">Ve vztahu k druhým:</span>
+                        Pravidla, spolupráce, pomoc ostatním, bezpečné prostředí.
+                    </div>
+                    <div>
+                        <span class="font-bold uppercase text-gray-700 block mb-1">Při učení:</span>
+                        Zodpovědnost, vytrvalost, porozumění textu, prezentace práce.
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="toast" class="fixed bottom-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-xl font-bold transform translate-y-20 opacity-0 transition-all duration-300 z-50">Uloženo!</div>
+    <div id="toast" class="fixed bottom-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-xl font-bold transform translate-y-20 opacity-0 transition-all duration-300 z-50">Data uložena!</div>
 
     <script>
         const firebaseConfig = {
@@ -149,12 +145,10 @@
         };
 
         firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+        const auth = firebase.auth(), db = firebase.firestore();
 
         const TEACHERS = { "frantisek.knop@skolagalaxie.cz": "9. A", "eva.pancova@skolagalaxie.cz": "7. A", "jitka.zakova@skolagalaxie.cz": "1. A", "linda.vyvleckova@skolagalaxie.cz": "4. A", "lucie.haslerova@skolagalaxie.cz": "8. A", "michaela.raskova@skolagalaxie.cz": "6. A", "ondrej.cervenka@skolagalaxie.cz": "3. A", "pavlina.bittnerova@skolagalaxie.cz": "4. A", "tereza.malirova@skolagalaxie.cz": "2. A", "nastenka@skolagalaxie.cz": "" };
         
-        // Zde jsou data žáků (zkráceno pro kód)
         const STUDENTS = {
             "antonin.anlauf@skolagalaxie.cz": { name: "Antonín Jaromír Anlauf", class: "1. A" },
             "emma.burgetova@skolagalaxie.cz": { name: "Emma Burgetová", class: "1. A" },
@@ -336,38 +330,28 @@
         ];
 
         const SCALE_LABELS = ['Ne', 'Sp. ne', 'Sp. ano', 'Ano'];
-        const ACTIVE_COLOR = '#1d4ed8'; 
-        const INACTIVE_COLOR = '#f3f4f6';
+        const ACTIVE_COLOR = '#1d4ed8', INACTIVE_COLOR = '#f1f5f9';
 
-        let currentUser = null, userRole = null, isClassTeacher = false, currentTargetEmail = null;
+        let userRole = null, isClassTeacher = false, currentTargetEmail = null;
         let dbData = { teacherScales: {}, studentScales: {}, categoryComments: {}, topNote: "", bottomNote: "" };
 
         window.onload = () => lucide.createIcons();
 
         auth.onAuthStateChanged(user => {
             if (user) {
-                currentUser = user;
                 const email = user.email.toLowerCase();
-                document.getElementById('user-email-display').innerText = email;
                 document.getElementById('auth-screen').classList.add('hidden');
                 document.getElementById('app-screen').classList.remove('hidden');
-
-                if (TEACHERS[email] !== undefined) { 
-                    userRole = 'teacher'; setupTeacherUI();
-                } else if (STUDENTS[email]) {
-                    userRole = 'student'; setupStudentUI(email);
-                } else {
-                    alert("Účet nebyl nalezen."); auth.signOut();
-                }
+                if (TEACHERS[email] !== undefined) { userRole = 'teacher'; setupTeacherUI(); }
+                else if (STUDENTS[email]) { userRole = 'student'; setupStudentUI(email); }
+                else { alert("Účet nebyl nalezen."); auth.signOut(); }
             } else {
                 document.getElementById('auth-screen').classList.remove('hidden');
                 document.getElementById('app-screen').classList.add('hidden');
             }
         });
 
-        function loginWithGoogle() {
-            auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(err => alert("Chyba: " + err.message));
-        }
+        function loginWithGoogle() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
 
         function setupTeacherUI() {
             const classes = [...new Set(Object.values(STUDENTS).map(s => s.class))].sort();
@@ -380,16 +364,15 @@
             const studentSelect = document.getElementById('studentSelect');
             studentSelect.innerHTML = '<option value="">Vyberte žáka</option>';
             if(!cls) return;
-            const filtered = Object.entries(STUDENTS).filter(([e, d]) => d.class === cls).sort((a,b) => a[1].name.localeCompare(b[1].name));
-            filtered.forEach(([e, d]) => studentSelect.add(new Option(d.name, e)));
+            Object.entries(STUDENTS).filter(([e, d]) => d.class === cls).sort((a,b) => a[1].name.localeCompare(b[1].name))
+                .forEach(([e, d]) => studentSelect.add(new Option(d.name, e)));
         }
 
         function setupStudentUI(email) {
             document.getElementById('controls-container').classList.add('hidden');
             document.getElementById('student-notice').classList.remove('hidden');
             document.getElementById('printBtn').classList.add('hidden');
-            currentTargetEmail = email;
-            loadStudentData(email);
+            currentTargetEmail = email; loadStudentData(email);
         }
 
         async function loadStudentData(forcedEmail = null) {
@@ -397,127 +380,84 @@
             if (!email) return;
             currentTargetEmail = email;
             const studentInfo = STUDENTS[email];
-            isClassTeacher = (userRole === 'teacher' && TEACHERS[currentUser.email.toLowerCase()] === studentInfo.class);
-
+            isClassTeacher = (userRole === 'teacher' && TEACHERS[auth.currentUser.email.toLowerCase()] === studentInfo.class);
             document.getElementById('studentNameDisplay').textContent = studentInfo.name;
             document.getElementById('classNameDisplay').textContent = "Třída: " + studentInfo.class;
-            
             dbData = { teacherScales: {}, studentScales: {}, categoryComments: {}, topNote: "", bottomNote: "" };
-            try {
-                const doc = await db.collection('evaluations').doc(email).get();
-                if (doc.exists) dbData = { ...dbData, ...doc.data() };
-            } catch (e) { console.error("Firestore Error:", e); }
-
+            const doc = await db.collection('evaluations').doc(email).get();
+            if (doc.exists) dbData = { ...dbData, ...doc.data() };
             renderForms(studentInfo.name);
         }
 
-        function renderForms(studentName) {
-            if (userRole === 'student') {
-                document.getElementById('print-container').classList.add('hidden');
-                document.getElementById('page2-title').innerHTML = `Moje sebehodnocení<br><span class="text-xl text-black font-bold">${studentName}</span>`;
-            } else {
-                document.getElementById('print-container').classList.remove('hidden');
-                document.getElementById('page2-title').innerHTML = `Sebehodnocení žáka (Strana 2)<br><span class="text-xl text-black font-bold">${studentName}</span>`;
-            }
-            
+        function renderForms(name) {
+            const isStudent = userRole === 'student';
+            document.getElementById('print-container').classList.toggle('hidden', isStudent);
             document.getElementById('page-2-container').classList.remove('hidden');
+            document.getElementById('page2-title').innerHTML = isStudent ? `Moje sebehodnocení<br><span class="text-xl text-black font-bold">${name}</span>` : `Sebehodnocení žáka (Strana 2)<br><span class="text-xl text-black font-bold">${name}</span>`;
+            
             document.getElementById('schoolYearNoteInput').value = dbData.topNote || "";
             document.getElementById('summaryInput').value = dbData.bottomNote || "";
             document.getElementById('schoolYearNoteDisplay').textContent = dbData.topNote || "";
             document.getElementById('summaryDisplay').textContent = dbData.bottomNote || "";
-
+            
             if (userRole === 'teacher') {
                 document.getElementById('schoolYearNoteInput').disabled = !isClassTeacher;
                 document.getElementById('summaryInput').disabled = false;
             }
-
             autoResize(document.getElementById('schoolYearNoteInput'));
             autoResize(document.getElementById('summaryInput'));
-
-            renderTeacherScales();
-            renderStudentScales();
+            renderTeacherScales(); renderStudentScales();
         }
 
         function renderTeacherScales() {
-            const container = document.getElementById('teacherSectionsContainer');
-            container.innerHTML = '';
-            const categories = [...new Set(COMPETENCIES.map(c => c.cat))];
-            
-            categories.forEach(cat => {
-                let html = `<div class="bg-white rounded-lg border border-gray-200 p-2 break-inside-avoid print:p-0">
-                                <h3 class="text-[10px] font-bold mb-2 text-blue-900 border-b pb-1 text-center font-print uppercase">${cat}</h3>`;
-                
+            const container = document.getElementById('teacherSectionsContainer'); container.innerHTML = '';
+            const cats = [...new Set(COMPETENCIES.map(c => c.cat))];
+            cats.forEach(cat => {
+                let h = `<div class="bg-white border rounded p-2"><h3 class="text-[9px] font-bold text-center border-b mb-2 uppercase">${cat}</h3>`;
                 COMPETENCIES.filter(c => c.cat === cat).forEach(q => {
                     const val = dbData.teacherScales[q.id];
-                    let btns = '', squares = '';
+                    let btns = '', sqs = '';
                     for(let i=0; i<4; i++) {
-                        const active = val === i;
-                        btns += `<button onclick="setTeacherScale('${q.id}', ${i})" class="text-[7px] py-1 border border-gray-300 rounded ${userRole==='student'?'hidden':''}" style="background-color: ${active?ACTIVE_COLOR:INACTIVE_COLOR}; color: ${active?'#fff':'#4b5563'};">${SCALE_LABELS[i]}</button>`;
-                        squares += `<div class="w-[8px] h-[8px] border" style="background-color: ${active?ACTIVE_COLOR:INACTIVE_COLOR}; border-color: #999;"></div>`;
+                        const act = val === i;
+                        btns += `<button onclick="setTeacherScale('${q.id}', ${i})" class="text-[7px] py-1 border rounded" style="background-color:${act?ACTIVE_COLOR:INACTIVE_COLOR}; color:${act?'#fff':'#666'}">${SCALE_LABELS[i]}</button>`;
+                        sqs += `<div class="w-2 h-2 border" style="background-color:${act?ACTIVE_COLOR:INACTIVE_COLOR}"></div>`;
                     }
-                    html += `<div class="mb-2 last:mb-0">
-                                <div class="text-[9px] font-medium leading-tight mb-1 font-print">${q.text}</div>
-                                <div class="grid grid-cols-4 gap-1 no-print">${btns}</div>
-                                <div class="hidden print-flex gap-2 items-center">${squares}</div>
-                             </div>`;
+                    h += `<div class="mb-2"><div class="text-[8px] leading-tight mb-1 font-bold">${q.text}</div><div class="grid grid-cols-4 gap-1 no-print">${btns}</div><div class="hidden print-flex gap-2">${sqs}</div></div>`;
                 });
-                html += `</div>`;
-                container.innerHTML += html;
+                container.innerHTML += h + `</div>`;
             });
         }
 
         function renderStudentScales() {
-            const container = document.getElementById('studentSectionsContainer');
-            container.innerHTML = '';
-            const categories = [...new Set(COMPETENCIES.map(c => c.cat))];
-
-            categories.forEach(cat => {
-                const comment = dbData.categoryComments[cat] || "";
-                let html = `<div class="bg-gray-50 p-4 rounded-xl border border-gray-200 print:bg-transparent print:p-2">
-                                <h3 class="text-sm font-bold text-blue-900 uppercase mb-3 border-b border-blue-200 pb-1 font-print">${cat}</h3>
-                                <div class="space-y-3">`;
-                
+            const container = document.getElementById('studentSectionsContainer'); container.innerHTML = '';
+            const cats = [...new Set(COMPETENCIES.map(c => c.cat))];
+            cats.forEach(cat => {
+                let h = `<div class="bg-white border-2 border-gray-100 p-5 rounded-2xl shadow-sm print:shadow-none print:p-0 print:border-0"><h3 class="text-sm font-bold text-blue-900 uppercase mb-4 border-b pb-1">${cat}</h3><div class="space-y-4">`;
                 COMPETENCIES.filter(c => c.cat === cat).forEach(q => {
                     const val = dbData.studentScales[q.id];
-                    let btns = '', squares = '';
+                    let btns = '', sqs = '';
                     for(let i=0; i<4; i++) {
-                        const active = val === i;
-                        btns += `<button onclick="setStudentScale('${q.id}', ${i})" class="text-xs font-bold py-1.5 border border-gray-300 rounded" style="background-color: ${active?ACTIVE_COLOR:INACTIVE_COLOR}; color: ${active?'#fff':'#4b5563'};">${SCALE_LABELS[i]}</button>`;
-                        squares += `<div class="flex items-center gap-1"><div class="w-[8px] h-[8px] border" style="background-color: ${active?ACTIVE_COLOR:INACTIVE_COLOR}; border-color: #999;"></div><span class="text-[8px] text-gray-500">${SCALE_LABELS[i]}</span></div>`;
+                        const act = val === i;
+                        btns += `<button onclick="setStudentScale('${q.id}', ${i})" class="text-xs font-bold py-2 border rounded-lg" style="background-color:${act?ACTIVE_COLOR:INACTIVE_COLOR}; color:${act?'#fff':'#666'}">${SCALE_LABELS[i]}</button>`;
+                        sqs += `<div class="flex items-center gap-1"><div class="w-2 h-2 border" style="background-color:${act?ACTIVE_COLOR:INACTIVE_COLOR}"></div><span class="text-[8px]">${SCALE_LABELS[i]}</span></div>`;
                     }
-                    html += `<div class="flex flex-col">
-                                <div class="text-xs font-bold text-gray-800 mb-1 font-print">${q.text}</div>
-                                <div class="grid grid-cols-4 gap-2 no-print">${btns}</div>
-                                <div class="hidden print-flex gap-3 mb-1">${squares}</div>
-                             </div>`;
+                    h += `<div><div class="text-xs font-bold text-gray-700 mb-2">${q.text}</div><div class="grid grid-cols-4 gap-2 no-print">${btns}</div><div class="hidden print-flex gap-4">${sqs}</div></div>`;
                 });
-
-                html += `</div>
-                         <div class="mt-3">
-                            <label class="text-[9px] font-bold text-gray-400 uppercase no-print">Moje vyjádření k oblasti ${cat}:</label>
-                            <textarea id="cat-comment-${cat}" class="w-full p-2 border border-gray-300 rounded text-sm mt-1 bg-white focus:ring-2 focus:ring-blue-500 font-print" placeholder="Zde piš své postřehy..." rows="1" oninput="autoResize(this); dbData.categoryComments['${cat}'] = this.value;" ${userRole==='teacher'?'disabled':''}>${comment}</textarea>
-                            <div class="print-content text-xs italic text-gray-700 mt-1 font-print leading-snug">${comment}</div>
-                         </div>
-                        </div>`;
-                container.innerHTML += html;
+                const comm = dbData.categoryComments[cat] || "";
+                h += `</div><div class="mt-5"><label class="text-[10px] font-bold text-gray-400 uppercase no-print">Moje vyjádření k oblasti:</label><textarea id="cat-${cat}" class="w-full p-3 border rounded-xl text-sm mt-1 bg-blue-50 focus:bg-white" placeholder="Sem napiš své shrnutí..." rows="1" oninput="autoResize(this); dbData.categoryComments['${cat}']=this.value" ${userRole==='teacher'?'disabled':''}>${comm}</textarea><div class="print-content text-sm italic mt-2 leading-relaxed">${comm}</div></div></div>`;
+                container.innerHTML += h;
             });
         }
 
-        function setTeacherScale(qId, val) { if (userRole==='teacher') { dbData.teacherScales[qId]=val; renderTeacherScales(); } }
-        function setStudentScale(qId, val) { if (userRole==='student') { dbData.studentScales[qId]=val; renderStudentScales(); } }
+        function setTeacherScale(id, v) { if(userRole==='teacher'){ dbData.teacherScales[id]=v; renderTeacherScales(); } }
+        function setStudentScale(id, v) { if(userRole==='student'){ dbData.studentScales[id]=v; renderStudentScales(); } }
         function autoResize(el) { el.style.height='auto'; el.style.height=el.scrollHeight+'px'; }
 
         async function saveData() {
-            if (!currentTargetEmail) return;
-            if (userRole==='teacher') {
-                dbData.bottomNote = document.getElementById('summaryInput').value;
-                if(isClassTeacher) dbData.topNote = document.getElementById('schoolYearNoteInput').value;
-            }
-            try {
-                await db.collection('evaluations').doc(currentTargetEmail).set(dbData, { merge: true });
-                const t=document.getElementById('toast'); t.style.transform='translateY(0)'; t.style.opacity='1';
-                setTimeout(()=>{ t.style.transform='translateY(20px)'; t.style.opacity='0'; }, 3000);
-            } catch (e) { alert("Chyba: " + e.message); }
+            if(!currentTargetEmail) return;
+            if(userRole==='teacher') { dbData.bottomNote=document.getElementById('summaryInput').value; if(isClassTeacher) dbData.topNote=document.getElementById('schoolYearNoteInput').value; }
+            await db.collection('evaluations').doc(currentTargetEmail).set(dbData, { merge: true });
+            const t=document.getElementById('toast'); t.style.transform='translateY(0)'; t.style.opacity='1'; setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(20px)';},2000);
         }
     </script>
 </body>
