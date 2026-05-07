@@ -111,17 +111,16 @@
                 </div>
                 <div id="schoolYearNoteDisplay" class="print-only text-justify text-sm italic leading-relaxed text-slate-800 px-2"></div>
             </div>
-            <h2 class="text-xs font-bold mb-3 text-center uppercase tracking-[0.2em] border-b pb-2 text-slate-500 uppercase">Hodnocení školy</h2>
             
-            <div class="flex justify-center gap-6 mb-4 print-legend">
-                <span class="text-[10px] font-bold uppercase tracking-wide mr-1">Škála (zleva doprava):</span>
-                <span class="text-[10px] font-bold">1. Ne</span>
-                <span class="text-[10px] font-bold">2. Spíše ne</span>
-                <span class="text-[10px] font-bold">3. Spíše ano</span>
-                <span class="text-[10px] font-bold">4. Ano</span>
+            <div id="teacherSectionsContainer" class="grid grid-cols-3 gap-6 mt-2"></div>
+            
+            <div class="flex justify-center gap-6 mt-4 print-legend legend-text">
+                <span class="flex items-center gap-1.5 text-[10px] font-bold"><div class="w-2.5 h-2.5 border border-[#0ea5e9]"></div> 1. Ne</span>
+                <span class="flex items-center gap-1.5 text-[10px] font-bold"><div class="w-2.5 h-2.5 border border-[#0ea5e9]"></div> 2. Spíše ne</span>
+                <span class="flex items-center gap-1.5 text-[10px] font-bold"><div class="w-2.5 h-2.5 border border-[#0ea5e9]"></div> 3. Spíše ano</span>
+                <span class="flex items-center gap-1.5 text-[10px] font-bold"><div class="w-2.5 h-2.5 border border-[#0ea5e9]"></div> 4. Ano</span>
             </div>
 
-            <div id="teacherSectionsContainer" class="grid grid-cols-3 gap-6 mt-2"></div>
             <div class="mt-10 flex-grow flex flex-col">
                 <label class="text-[10px] font-bold text-blue-800 uppercase no-print mb-2 ml-1">Zpětná vazba od vyučujících:</label>
                 <textarea id="summaryInput" class="w-full p-4 border border-slate-200 rounded-xl text-sm min-h-[300px] bg-yellow-50 focus:bg-white shadow-inner"></textarea>
@@ -131,66 +130,16 @@
 
         <div id="page-2-container" class="max-w-[210mm] mx-auto p-10 bg-white my-8 shadow-md flex flex-col hidden">
             <h2 id="page2-title" class="text-2xl font-black mb-8 text-center text-blue-900 uppercase border-b-4 border-blue-900 pb-3 tracking-wide">Sebehodnocení žáka</h2>
+            
             <div id="studentSectionsContainer" class="space-y-3"></div>
+            
             <div class="mt-6 pt-4 border-t-2 border-slate-200">
-                <div class="grid grid-cols-3 gap-4 text-[8px] text-slate-500 leading-snug">
-
-                    <div>
-                        <div class="font-black uppercase text-slate-700 text-[9px] mb-2 tracking-wide">Ve vztahu k sobě</div>
-                        <div class="mb-2">
-                            <div class="font-bold text-slate-700">Vyjadřuješ své myšlenky a pocity přiměřeně situaci</div>
-                            <div class="text-slate-400 italic">Umím říct, co si myslím nebo jak se cítím. Vím, kdy je čas na vtipkování a kdy je potřeba mluvit vážně.</div>
-                        </div>
-                        <div class="mb-2">
-                            <div class="font-bold text-slate-700">Rozpoznáš vhodné a nevhodné chování a jednáš podle toho</div>
-                            <div class="text-slate-400 italic">Poznám, co se v danou chvíli sluší a co ne. Když mě někdo provokuje, dokážu se ovládnout a reagovat správně.</div>
-                        </div>
-                        <div>
-                            <div class="font-bold text-slate-700">Umím přijmout zpětnou vazbu a dál s ní pracovat</div>
-                            <div class="text-slate-400 italic">Když mi učitel nebo spolužák řekne, co dělám dobře a co mi nejde, neurazím se a zamyslím se, jak radu využít.</div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div class="font-black uppercase text-slate-700 text-[9px] mb-2 tracking-wide">Ve vztahu k druhým</div>
-                        <div class="mb-2">
-                            <div class="font-bold text-slate-700">Dodržuješ stanovená pravidla</div>
-                            <div class="text-slate-400 italic">Respektuji pravidla třídy a školy. Nikdo mě nemusí napomínat, abych dělal/a to, na čem jsme se jako skupina dohodli.</div>
-                        </div>
-                        <div class="mb-2">
-                            <div class="font-bold text-slate-700">Spolupracuješ s ostatními</div>
-                            <div class="text-slate-400 italic">Dokážu se domluvit na společném postupu a splnit svou část úkolu. Uznávám práci ostatních a přispívám svým názorem.</div>
-                        </div>
-                        <div class="mb-2">
-                            <div class="font-bold text-slate-700">Dokážeš poskytovat účelnou zpětnou vazbu</div>
-                            <div class="text-slate-400 italic">Umím spolužáka konkrétně ocenit, dát mu radu či doporučení.</div>
-                        </div>
-                        <div>
-                            <div class="font-bold text-slate-700">Přispíváš k vytváření bezpečného prostředí</div>
-                            <div class="text-slate-400 italic">Ostatní se v mé přítomnosti cítí dobře a beze strachu. Nikoho neshazuji ani nevyčleňuji z kolektivu.</div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div class="font-black uppercase text-slate-700 text-[9px] mb-2 tracking-wide">Při učení</div>
-                        <div class="mb-2">
-                            <div class="font-bold text-slate-700">Zodpovědně přistupuješ k učení</div>
-                            <div class="text-slate-400 italic">Do školy přicházím připravený/á, mám v pořádku pomůcky, dávám pozor a snažím se plnit úkoly včas.</div>
-                        </div>
-                        <div class="mb-2">
-                            <div class="font-bold text-slate-700">Vytrváš v práci na obtížných úkolech</div>
-                            <div class="text-slate-400 italic">Když mi něco nejde hned napoprvé, nevzdávám se. Zkusím hledat řešení a nebojím se požádat o pomoc.</div>
-                        </div>
-                        <div class="mb-2">
-                            <div class="font-bold text-slate-700">Čteš s porozuměním</div>
-                            <div class="text-slate-400 italic">Když si přečtu text nebo zadání úkolu, dokážu vlastními slovy říct, o čem to bylo a co mám udělat.</div>
-                        </div>
-                        <div>
-                            <div class="font-bold text-slate-700">Dokážeš srozumitelně prezentovat výsledky své práce</div>
-                            <div class="text-slate-400 italic">Umím ostatním ukázat a vysvětlit, co jsem vytvořil/a. Mluvím dostatečně hlasitě, udržuji oční kontakt a volím vhodná slova.</div>
-                        </div>
-                    </div>
-
+                <div class="flex justify-center gap-6 print-legend legend-text">
+                    <span class="text-[10px] font-bold uppercase tracking-wide mr-1">Význam škály:</span>
+                    <span class="flex items-center gap-1.5 text-[10px] font-bold"><div class="w-2.5 h-2.5 border border-[#0ea5e9]"></div> 1. Ne</span>
+                    <span class="flex items-center gap-1.5 text-[10px] font-bold"><div class="w-2.5 h-2.5 border border-[#0ea5e9]"></div> 2. Spíše ne</span>
+                    <span class="flex items-center gap-1.5 text-[10px] font-bold"><div class="w-2.5 h-2.5 border border-[#0ea5e9]"></div> 3. Spíše ano</span>
+                    <span class="flex items-center gap-1.5 text-[10px] font-bold"><div class="w-2.5 h-2.5 border border-[#0ea5e9]"></div> 4. Ano</span>
                 </div>
             </div>
         </div>
@@ -452,8 +401,23 @@
             { id: "l4", cat: "Při učení", text: "Dokážeš srozumitelně prezentovat." }
         ];
 
+        // Seznam protažených vysvětlivek, které dáme napravo od škál
+        const COMPETENCY_DETAILS = {
+            "s1": "Umím říct, co si myslím nebo jak se cítím. Vím, kdy je čas na vtipkování a kdy je potřeba mluvit vážně.",
+            "s2": "Poznám, co se v danou chvíli sluší a co ne. Když mě někdo provokuje, dokážu se ovládnout a reagovat správně.",
+            "s3": "Když mi učitel nebo spolužák řekne, co dělám dobře a co mi nejde, neurazím se a zamyslím se, jak radu využít.",
+            "o1": "Respektuji pravidla třídy a školy. Nikdo mě nemusí napomínat, abych dělal/a to, na čem jsme se jako skupina dohodli.",
+            "o2": "Dokážu se domluvit na společném postupu a splnit svou část úkolu. Uznávám práci ostatních a přispívám svým názorem.",
+            "o3": "Umím spolužáka konkrétně ocenit, dát mu radu či doporučení.",
+            "o4": "Ostatní se v mé přítomnosti cítí dobře a beze strachu. Nikoho neshazuji ani nevyčleňuji z kolektivu.",
+            "l1": "Do školy přicházím připravený/á, mám v pořádku pomůcky, dávám pozor a snažím se plnit úkoly včas.",
+            "l2": "Když mi něco nejde hned napoprvé, nevzdávám se. Zkusím hledat řešení a nebojím se požádat o pomoc.",
+            "l3": "Když si přečtu text nebo zadání úkolu, dokážu vlastními slovy říct, o čem to bylo a co mám udělat.",
+            "l4": "Umím ostatním ukázat a vysvětlit, co jsem vytvořil/a. Mluvím dostatečně hlasitě, udržuji oční kontakt a volím vhodná slova."
+        };
+
         const SCALE_LABELS = ['Ne', 'Sp. ne', 'Sp. ano', 'Ano'];
-        const ACTIVE_COLOR = '#0ea5e9'; // NOVÁ SVĚTLE MODRÁ BARVA
+        const ACTIVE_COLOR = '#0ea5e9'; // SVĚTLE MODRÁ BARVA
         const INACTIVE_COLOR = '#f1f5f9';
 
         let userRole = null, isClassTeacher = false, currentTargetEmail = null;
@@ -630,11 +594,10 @@
             const cats = [...new Set(COMPETENCIES.map(c => c.cat))];
             cats.forEach(cat => {
                 
-                // NOVÉ ROZLOŽENÍ STRANY 2 (Flex - Škála vlevo, Legenda vpravo)
+                // Přepracované rozložení pro žáka: Škála vlevo, text s vysvětlením napravo na stejné úrovni
                 let h = `<div class="bg-white border-2 border-slate-100 p-4 rounded-2xl shadow-sm print:shadow-none print:p-0 print:border-0 mb-4">
                     <h3 class="text-base font-black text-blue-900 uppercase mb-3 border-b pb-1">${cat}</h3>
-                    <div class="flex flex-row gap-4 items-center">
-                        <div class="flex-1 space-y-3">`;
+                    <div class="space-y-4">`;
 
                 COMPETENCIES.filter(c => c.cat === cat).forEach(q => {
                     const val = dbData.studentScales[q.id];
@@ -644,10 +607,17 @@
                         btns += `<button onclick="setStudentScale('${q.id}', ${i})" class="scale-btn py-3 text-sm" style="background-color:${act ? ACTIVE_COLOR : INACTIVE_COLOR}; color:${act ? '#fff' : '#64748b'}; border-color:${act ? ACTIVE_COLOR : '#cbd5e1'}" ${userRole === 'teacher' ? 'disabled' : ''}>${SCALE_LABELS[i]}</button>`;
                         sqs += `<div class="w-3 h-3 border" style="background-color:${act ? ACTIVE_COLOR : INACTIVE_COLOR}; border-color:${act ? ACTIVE_COLOR : '#94a3b8'}"></div>`;
                     }
-                    h += `<div class="mb-1">
-                            <div class="text-[11px] font-bold text-slate-700 mb-1 leading-tight">${q.text}</div>
-                            <div class="grid grid-cols-4 gap-2 no-print">${btns}</div>
-                            <div class="hidden print-flex gap-2 mb-1">${sqs}</div>
+                    
+                    // Flex box rozdělující obrazovku na půl (vlevo otázka, vpravo vysvětlení)
+                    h += `<div class="flex flex-row gap-4 items-center">
+                            <div class="w-1/2">
+                                <div class="text-[11px] font-bold text-slate-700 mb-1 leading-tight">${q.text}</div>
+                                <div class="grid grid-cols-4 gap-2 no-print">${btns}</div>
+                                <div class="hidden print-flex gap-2 mb-1">${sqs}</div>
+                            </div>
+                            <div class="w-1/2 pl-4 border-l border-slate-100 text-[9px] text-slate-500 italic">
+                                ${COMPETENCY_DETAILS[q.id]}
+                            </div>
                           </div>`;
                 });
 
@@ -655,17 +625,6 @@
                 const disabledAttr = userRole === 'teacher' ? 'disabled' : '';
 
                 h += `  </div>
-                        <div class="w-[110px] pl-4 border-l border-slate-100 hidden print-legend flex-col justify-center">
-                            <div class="text-[9px] font-black uppercase mb-2 tracking-wide">Škála (zleva):</div>
-                            <div class="space-y-1 text-[9px] font-bold">
-                                <div>1. Ne</div>
-                                <div>2. Spíše ne</div>
-                                <div>3. Spíše ano</div>
-                                <div>4. Ano</div>
-                            </div>
-                        </div>
-                    </div>
-                    
                     <div class="mt-3 pt-3 border-t border-slate-200">
                         <label class="text-[10px] font-bold text-slate-400 uppercase no-print block mb-1">Moje vyjádření k oblasti:</label>
                         <textarea
