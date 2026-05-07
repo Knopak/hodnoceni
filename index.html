@@ -184,12 +184,11 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-        // 1. BEZPEČNOSTNÍ VYLEPŠENÍ: ZAPNUTÍ OFFLINE PERSISTENCE FIREBASE
-        // Toto zaručí, že pokud vypadne internet, Firebase data podrží a odešle je sama, jakmile naskočí.
         db.enablePersistence({ synchronizeTabs: true }).catch(function(err) {
             console.warn("Offline persistence se nepodařilo aktivovat:", err.code);
         });
 
+        // AKTUALIZOVANÝ SEZNAM UČITELŮ
         const TEACHERS = {
             "barbora.bezdekova@skolagalaxie.cz": "",
             "eva.pancova@skolagalaxie.cz": "7. A",
@@ -212,6 +211,7 @@
             "nastenka@skolagalaxie.cz": ""
         };
 
+        // AKTUALIZOVANÝ SEZNAM PŘEZDÍVEK
         const TEACHER_NICKNAMES = {
             "barbora.bezdekova@skolagalaxie.cz": "Bára",
             "eva.pancova@skolagalaxie.cz": "Eva",
@@ -435,7 +435,6 @@
         let userRole = null, isClassTeacher = false, currentTargetEmail = null;
         let dbData = { teacherScales: {}, studentScales: {}, categoryComments: {}, topNote: "", bottomNote: "", teacherNotes: {} };
 
-        // 2. BEZPEČNOSTNÍ VYLEPŠENÍ: Detekce offline stavu pro učitele
         window.addEventListener('online',  () => document.getElementById('offline-indicator').classList.add('hidden'));
         window.addEventListener('offline', () => document.getElementById('offline-indicator').classList.remove('hidden'));
 
@@ -510,7 +509,6 @@
             const doc = await db.collection('evaluations').doc(email).get();
             const serverData = doc.exists ? doc.data() : {};
             
-            // Inteligentní merge cache vs server
             if (cached && cached.ts > (serverData._savedAt || 0)) {
                 dbData = { ...dbData, ...cached, teacherNotes: { ...(serverData.teacherNotes || {}), ...(cached.teacherNotes || {}) } };
             } else {
@@ -677,7 +675,6 @@
             el.style.height = el.scrollHeight + 'px';
         }
 
-        // 3. BEZPEČNOSTNÍ VYLEPŠENÍ: Nezávislý Cache Key pro každého učitele
         let localCacheTimer = null;
         let serverSyncTimer = null;
         const CACHE_PREFIX = 'galaxie_cache_';
@@ -719,13 +716,10 @@
             try { localStorage.removeItem(getCacheKey()); } catch(e) {}
         }
 
-        // 4. BEZPEČNOSTNÍ VYLEPŠENÍ: Rychlejší lokální zálohování (každé 3 sekundy)
         function scheduleAutosave() {
-            // Lokální cache ukládáme velmi rychle (aby se neztratil text při pádu PC)
             clearTimeout(localCacheTimer);
             localCacheTimer = setTimeout(() => { saveToCache(); }, 3000); 
 
-            // Na server posíláme s větším zpožděním, ať nezahlcujeme databázi
             clearTimeout(serverSyncTimer);
             serverSyncTimer = setTimeout(async () => { await saveData(true); }, 15000);
         }
@@ -774,8 +768,93 @@
 
         function closeSvodka() { document.getElementById('svodka-modal').classList.add('hidden'); }
         async function openSvodka() {
-            /* Ponechán původní kód Svodky pro úsporu místa, vlož zpět původní logiku openSvodka() */
-            alert('Pro plné zobrazení kódu sem prosím překopíruj vnitřek funkce openSvodka() ze své funkční zálohy.');
+            if (!currentTargetEmail) return;
+            const studentInfo = STUDENTS[currentTargetEmail];
+            document.getElementById('svodka-student-name').textContent = studentInfo.name + ' – ' + studentInfo.class;
+
+            const doc = await db.collection('evaluations').doc(currentTargetEmail).get();
+            const data = doc.exists ? doc.data() : {};
+
+            const teacherKeys = Object.keys(data).filter(k => k.startsWith('teacherScales_'));
+            const teacherEmails = teacherKeys.map(k => k.replace('teacherScales_', ''));
+            const hasShared = data.teacherScales && Object.keys(data.teacherScales).length > 0;
+
+            const cats = [...new Set(COMPETENCIES.map(c => c.cat))];
+            const CAT_ICONS = {
+                'Ve vztahu k sobě': '🌱',
+                'Ve vztahu k druhým': '🤝',
+                'Při učení': '📚'
+            };
+            const SCALE_COLORS = ['#ef4444','#f97316','#0ea5e9','#22c55e'];
+            const SCALE_SHORT = ['Ne','Sp.ne','Sp.ano','Ano'];
+
+            function scaleBoxes(val) {
+                let html = '<div class="flex gap-0.5 justify-center">';
+                for (let i = 0; i < 4; i++) {
+                    const filled = val !== undefined && val !== null && i <= val;
+                    html += `<div style="width:12px;height:12px;border-radius:2px;border:1px solid #cbd5e1;background:${filled ? SCALE_COLORS[val] : '#f1f5f9'};opacity:${filled ? 1 : 0.4}"></div>`;
+                }
+                html += '</div>';
+                if (val !== undefined && val !== null) {
+                    html += `<div style="font-size:9px;color:#64748b;text-align:center;margin-top:1px">${SCALE_SHORT[val]}</div>`;
+                }
+                return html;
+            }
+
+            const columns = [];
+            if (hasShared) columns.push({ label: 'Aktuální<br>(výsledek)', scales: data.teacherScales, isResult: true });
+            teacherEmails.forEach(email => {
+                const nick = TEACHER_NICKNAMES[email] || email.split('.')[0];
+                columns.push({ label: nick, scales: data[`teacherScales_${email}`] || {}, isResult: false });
+            });
+
+            if (columns.length === 0) {
+                document.getElementById('svodka-content').innerHTML = '<p class="text-slate-400 text-center py-12">Zatím žádné hodnocení od učitelů.</p>';
+                document.getElementById('svodka-modal').classList.remove('hidden');
+                lucide.createIcons();
+                return;
+            }
+
+            let html = '<table class="w-full text-xs border-collapse">';
+            html += '<thead><tr>';
+            html += '<th class="text-left py-2 px-3 text-slate-500 uppercase text-[10px] tracking-wide font-bold border-b-2 border-slate-200 w-48">Kompetence</th>';
+            columns.forEach(col => {
+                const bg = col.isResult ? 'bg-violet-50' : 'bg-slate-50';
+                const fw = col.isResult ? 'font-black text-violet-800' : 'font-bold text-slate-600';
+                html += `<th class="py-2 px-2 text-center border-b-2 border-slate-200 ${bg} ${fw} text-[10px] uppercase tracking-wide min-w-[70px]">${col.label}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+
+            cats.forEach(cat => {
+                const icon = CAT_ICONS[cat] || '';
+                html += `<tr><td colspan="${columns.length + 1}" class="py-2 px-3 font-black text-[11px] uppercase tracking-wider text-slate-700 bg-slate-50 border-t border-slate-200">${icon} ${cat}</td></tr>`;
+                COMPETENCIES.filter(c => c.cat === cat).forEach((q, qi) => {
+                    const rowBg = qi % 2 === 0 ? '' : 'bg-slate-50/50';
+                    html += `<tr class="${rowBg}">`;
+                    html += `<td class="py-2 px-3 text-slate-700 font-medium leading-tight border-b border-slate-100">${q.text}</td>`;
+                    columns.forEach(col => {
+                        const val = col.scales[q.id];
+                        const bg = col.isResult ? 'bg-violet-50/50' : '';
+                        let highlight = '';
+                        if (!col.isResult && columns.length > 2) {
+                            const others = columns.filter(c => !c.isResult && c !== col).map(c => c.scales[q.id]).filter(v => v !== undefined);
+                            if (others.length > 0 && val !== undefined) {
+                                const avg = others.reduce((a,b) => a+b, 0) / others.length;
+                                if (Math.abs(val - avg) >= 1.5) highlight = 'ring-2 ring-orange-400 rounded';
+                            }
+                        }
+                        html += `<td class="py-2 px-2 text-center border-b border-slate-100 ${bg}"><div class="${highlight}">${val !== undefined ? scaleBoxes(val) : '<span class="text-slate-300">–</span>'}</div></td>`;
+                    });
+                    html += '</tr>';
+                });
+            });
+
+            html += '</tbody></table>';
+            html += '<p class="text-[10px] text-slate-400 mt-3 px-1">* Orámované buňky značí odchylku ≥ 1,5 bodu od průměru ostatních učitelů.</p>';
+
+            document.getElementById('svodka-content').innerHTML = html;
+            document.getElementById('svodka-modal').classList.remove('hidden');
+            lucide.createIcons();
         }
 
         async function saveData(silent = false) {
@@ -792,21 +871,12 @@
                     dbData.teacherNotes[myEmail] = document.getElementById('summaryInput').value;
                 }
                 dbData.teacherScales = computeAveragedScales(dbData);
-                const notes = dbData.teacherNotes || {};
-                dbData.bottomNote = Object.entries(notes)
-                    .filter(([, v]) => v && v.trim())
-                    .map(([email, note]) => {
-                        const nick = TEACHER_NICKNAMES[email] || email.split('.')[0];
-                        return nick + ': ' + note.trim();
-                    })
-                    .join('\n\n');
             }
             dbData._savedAt = Date.now();
             
             try {
-                // Sloučí data v databázi bez toho, aby přepsal cizí data
                 await db.collection('evaluations').doc(currentTargetEmail).set(dbData, { merge: true });
-                clearCache(); // Vyčistit lokální cache po úspěšném odeslání
+                clearCache();
                 
                 if (!silent) {
                     const t = document.getElementById('toast');
