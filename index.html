@@ -66,6 +66,9 @@
                     <button onclick="saveData()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center gap-2 shadow-md transition-colors">
                         <i data-lucide="save" class="w-4 h-4"></i> Uložit
                     </button>
+                    <button id="reloadNotesBtn" onclick="reloadTeacherNotes()" class="hidden bg-amber-500 hover:bg-amber-600 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center gap-2 shadow-md transition-colors">
+                        <i data-lucide="refresh-cw" class="w-4 h-4"></i> Načíst od kolegů
+                    </button>
                     <button id="svodkaBtn" onclick="openSvodka()" class="hidden bg-violet-600 hover:bg-violet-700 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center gap-2 shadow-md transition-colors">
                         <i data-lucide="table-2" class="w-4 h-4"></i> Svodka
                     </button>
@@ -97,7 +100,15 @@
                 </div>
                 <div id="schoolYearNoteDisplay" class="print-only text-justify text-sm italic leading-relaxed text-slate-800 px-2"></div>
             </div>
-            <h2 class="text-xs font-bold mb-4 text-center uppercase tracking-[0.2em] border-b pb-2 text-slate-500 uppercase">Hodnocení školy</h2>
+            <h2 class="text-xs font-bold mb-3 text-center uppercase tracking-[0.2em] border-b pb-2 text-slate-500 uppercase">Hodnocení školy</h2>
+            <!-- Legenda škály -->
+            <div class="flex justify-center gap-6 mb-4 no-print">
+                <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wide mr-1">Škála:</span>
+                <span class="flex items-center gap-1.5 text-[10px] font-bold" style="color:#94a3b8"><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:#f1f5f9;border:1px solid #cbd5e1"></span>Ne</span>
+                <span class="flex items-center gap-1.5 text-[10px] font-bold" style="color:#f97316"><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:#f97316;border:1px solid #f97316"></span>Spíše ne</span>
+                <span class="flex items-center gap-1.5 text-[10px] font-bold" style="color:#3b82f6"><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:#3b82f6;border:1px solid #3b82f6"></span>Spíše ano</span>
+                <span class="flex items-center gap-1.5 text-[10px] font-bold" style="color:#22c55e"><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:#22c55e;border:1px solid #22c55e"></span>Ano</span>
+            </div>
             <div id="teacherSectionsContainer" class="grid grid-cols-3 gap-6 mt-2"></div>
             <div class="mt-10 flex-grow flex flex-col">
                 <label class="text-[10px] font-bold text-blue-800 uppercase no-print mb-2 ml-1">Zpětná vazba od vyučujících:</label>
@@ -441,9 +452,17 @@
         const INACTIVE_COLOR = '#f1f5f9';
 
         let userRole = null, isClassTeacher = false, currentTargetEmail = null;
-        let dbData = { teacherScales: {}, studentScales: {}, categoryComments: {}, topNote: "", bottomNote: "" };
+        let dbData = { teacherScales: {}, studentScales: {}, categoryComments: {}, topNote: "", bottomNote: "", teacherNotes: {} };
 
-        window.onload = () => lucide.createIcons();
+        window.onload = () => {
+            lucide.createIcons();
+            // Uložit cache při zavření stránky
+            window.addEventListener('beforeunload', () => { saveToCache(); });
+            // Uložit cache při přepnutí záložky
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'hidden') saveToCache();
+            });
+        };
 
         auth.onAuthStateChanged(user => {
             if (user) {
@@ -500,10 +519,20 @@
             isClassTeacher = (userRole === 'teacher' && TEACHERS[auth.currentUser.email.toLowerCase()] === studentInfo.class);
             document.getElementById('studentNameDisplay').textContent = studentInfo.name;
             document.getElementById('classNameDisplay').textContent = "Třída: " + studentInfo.class;
-            dbData = { teacherScales: {}, studentScales: {}, categoryComments: {}, topNote: "", bottomNote: "" };
+            dbData = { teacherScales: {}, studentScales: {}, categoryComments: {}, topNote: "", bottomNote: "", teacherNotes: {} };
+            // Nejdřív zkusit cache
+            const cached = loadFromCache();
+            // Načíst z Firestore
             const doc = await db.collection('evaluations').doc(email).get();
-            if (doc.exists) dbData = { ...dbData, ...doc.data() };
+            const serverData = doc.exists ? doc.data() : {};
+            if (cached && cached.ts > (serverData._savedAt || 0)) {
+                // Cache je novější – použít ji, ale teacherNotes vždy ze serveru (ostatní učitelé mohli přidat)
+                dbData = { ...dbData, ...cached, teacherNotes: { ...(serverData.teacherNotes || {}), ...(cached.teacherNotes || {}) } };
+            } else {
+                dbData = { ...dbData, ...serverData };
+            }
             renderForms(studentInfo.name);
+            attachAutosaveListeners();
         }
 
         function renderForms(name) {
@@ -522,11 +551,31 @@
             // Pole na straně 1 měníme jen pokud je učitel (pro studenta jsou skrytá)
             if (!isStudent) {
                 document.getElementById('schoolYearNoteInput').value = dbData.topNote || "";
-                document.getElementById('summaryInput').value = dbData.bottomNote || "";
                 document.getElementById('schoolYearNoteDisplay').textContent = dbData.topNote || "";
-                document.getElementById('summaryDisplay').textContent = dbData.bottomNote || "";
                 document.getElementById('schoolYearNoteInput').disabled = !isClassTeacher;
-                document.getElementById('summaryInput').disabled = false;
+                // Třídní vidí sjednocené poznámky všech učitelů; ostatní jen svou
+                const myEmail = auth.currentUser.email.toLowerCase();
+                if (isClassTeacher) {
+                    // Třídní: pokud už má uložený bottomNote (ručně editovaný), zobraz ten;
+                    // jinak automaticky slož z teacherNotes
+                    const notes = dbData.teacherNotes || {};
+                    const combined = Object.entries(notes)
+                        .filter(([, v]) => v && v.trim())
+                        .map(([email, note]) => {
+                            const nick = TEACHER_NICKNAMES[email] || email.split('.')[0];
+                            return nick + ':\n' + note.trim();
+                        })
+                        .join('\n\n---\n\n');
+                    const finalText = dbData.bottomNote || combined;
+                    document.getElementById('summaryInput').value = finalText;
+                    document.getElementById('summaryDisplay').textContent = finalText;
+                    document.getElementById('summaryInput').disabled = false; // třídní může editovat
+                } else {
+                    const myNote = (dbData.teacherNotes || {})[myEmail] || "";
+                    document.getElementById('summaryInput').value = myNote;
+                    document.getElementById('summaryDisplay').textContent = myNote;
+                    document.getElementById('summaryInput').disabled = false;
+                }
                 autoResize(document.getElementById('schoolYearNoteInput'));
                 autoResize(document.getElementById('summaryInput'));
                 renderTeacherScales();
@@ -534,9 +583,11 @@
 
             renderStudentScales();
 
-            // Svodka tlačítko jen pro učitele když je vybrán žák
+            // Svodka + reload tlačítka jen pro učitele
             const svodkaBtn = document.getElementById('svodkaBtn');
             if (svodkaBtn) svodkaBtn.classList.toggle('hidden', userRole !== 'teacher');
+            const reloadBtn = document.getElementById('reloadNotesBtn');
+            if (reloadBtn) reloadBtn.classList.toggle('hidden', !isClassTeacher);
         }
 
         // Spočítá průměr ze všech per-teacher škál a vrátí objekt {id: zaokrouhlenaHodnota}
@@ -638,6 +689,103 @@
         function autoResize(el) {
             el.style.height = 'auto';
             el.style.height = el.scrollHeight + 'px';
+        }
+
+        // ── AUTOSAVE & CACHE ──
+        let autosaveTimer = null;
+        const CACHE_PREFIX = 'galaxie_cache_';
+
+        function getCacheKey() {
+            return CACHE_PREFIX + (currentTargetEmail || 'none');
+        }
+
+        function saveToCache() {
+            if (!currentTargetEmail) return;
+            try {
+                // Aktualizovat poznámku z pole před cachováním
+                if (userRole === 'teacher') {
+                    if (isClassTeacher) {
+                        dbData.topNote = document.getElementById('schoolYearNoteInput').value;
+                        dbData.bottomNote = document.getElementById('summaryInput').value;
+                    } else {
+                        const myEmail = auth.currentUser.email.toLowerCase();
+                        if (!dbData.teacherNotes) dbData.teacherNotes = {};
+                        dbData.teacherNotes[myEmail] = document.getElementById('summaryInput').value;
+                    }
+                }
+                const payload = JSON.stringify({ data: dbData, ts: Date.now() });
+                localStorage.setItem(getCacheKey(), payload);
+            } catch(e) { console.warn('Cache write failed', e); }
+        }
+
+        function loadFromCache() {
+            try {
+                const raw = localStorage.getItem(getCacheKey());
+                if (!raw) return null;
+                const parsed = JSON.parse(raw);
+                // Cache platná max 24 hodin
+                if (Date.now() - parsed.ts > 86400000) { localStorage.removeItem(getCacheKey()); return null; }
+                return parsed.data;
+            } catch(e) { return null; }
+        }
+
+        function clearCache() {
+            try { localStorage.removeItem(getCacheKey()); } catch(e) {}
+        }
+
+        function scheduleAutosave() {
+            clearTimeout(autosaveTimer);
+            autosaveTimer = setTimeout(async () => {
+                saveToCache();
+                await saveData(true); // tiché uložení
+            }, 30000); // 30 sekund nečinnosti
+        }
+
+        // Připojit autosave na vstupy
+        function attachAutosaveListeners() {
+            ['summaryInput', 'schoolYearNoteInput'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener('input', scheduleAutosave);
+            });
+            // Také po kliknutí na škálové tlačítko
+            document.addEventListener('click', e => {
+                if (e.target.classList.contains('scale-btn')) scheduleAutosave();
+            });
+        }
+
+        // Znovu načíst poznámky kolegů a složit je (pro třídního)
+        async function reloadTeacherNotes() {
+            if (!currentTargetEmail || !isClassTeacher) return;
+            const btn = document.getElementById('reloadNotesBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Načítám...';
+            lucide.createIcons();
+            try {
+                const doc = await db.collection('evaluations').doc(currentTargetEmail).get();
+                const freshData = doc.exists ? doc.data() : {};
+                // Sloučit teacherNotes ze serveru (zachovat lokální škály třídního)
+                dbData.teacherNotes = freshData.teacherNotes || {};
+                const notes = dbData.teacherNotes;
+                const combined = Object.entries(notes)
+                    .filter(([, v]) => v && v.trim())
+                    .map(([email, note]) => {
+                        const nick = TEACHER_NICKNAMES[email] || email.split('.')[0];
+                        return nick + ':\n' + note.trim();
+                    })
+                    .join('\n\n---\n\n');
+                document.getElementById('summaryInput').value = combined;
+                dbData.bottomNote = combined;
+                autoResize(document.getElementById('summaryInput'));
+                saveToCache();
+                // Toast
+                const t = document.getElementById('toast');
+                t.innerHTML = '<i data-lucide="refresh-cw" class="w-5 h-5"></i> Poznámky načteny';
+                t.style.transform = 'translateY(0)'; t.style.opacity = '1';
+                setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(24px)'; t.innerHTML = '<i data-lucide="check-circle-2"></i> Úspěšně uloženo'; }, 2500);
+            } catch(e) { alert('Chyba při načítání: ' + e.message); }
+            btn.disabled = false;
+            btn.innerHTML = '<i data-lucide="refresh-cw" class="w-4 h-4"></i> Načíst od kolegů';
+            lucide.createIcons();
         }
 
         function closeSvodka() {
@@ -742,21 +890,43 @@
             lucide.createIcons();
         }
 
-        async function saveData() {
+        async function saveData(silent = false) {
             if (!currentTargetEmail) return;
             if (userRole === 'teacher') {
-                dbData.bottomNote = document.getElementById('summaryInput').value;
-                if (isClassTeacher) dbData.topNote = document.getElementById('schoolYearNoteInput').value;
-                document.getElementById('schoolYearNoteDisplay').textContent = dbData.topNote || "";
-                document.getElementById('summaryDisplay').textContent = dbData.bottomNote || "";
+                if (isClassTeacher) {
+                    dbData.topNote = document.getElementById('schoolYearNoteInput').value;
+                    document.getElementById('schoolYearNoteDisplay').textContent = dbData.topNote || "";
+                    // Třídní může finální text editovat – uloží se jako bottomNote
+                    dbData.bottomNote = document.getElementById('summaryInput').value;
+                    document.getElementById('summaryDisplay').textContent = dbData.bottomNote || "";
+                } else {
+                    // Ostatní učitelé ukládají svou poznámku per-teacher
+                    const myEmail = auth.currentUser.email.toLowerCase();
+                    if (!dbData.teacherNotes) dbData.teacherNotes = {};
+                    dbData.teacherNotes[myEmail] = document.getElementById('summaryInput').value;
+                }
                 // Vždy přepočítat průměr před uložením
                 dbData.teacherScales = computeAveragedScales(dbData);
+                // Zpětná kompatibilita: bottomNote = spojené poznámky
+                const notes = dbData.teacherNotes || {};
+                dbData.bottomNote = Object.entries(notes)
+                    .filter(([, v]) => v && v.trim())
+                    .map(([email, note]) => {
+                        const nick = TEACHER_NICKNAMES[email] || email.split('.')[0];
+                        return nick + ': ' + note.trim();
+                    })
+                    .join('\n\n');
             }
+            dbData._savedAt = Date.now();
             await db.collection('evaluations').doc(currentTargetEmail).set(dbData, { merge: true });
-            const t = document.getElementById('toast');
-            t.style.transform = 'translateY(0)';
-            t.style.opacity = '1';
-            setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(24px)'; }, 2000);
+            clearCache(); // Po úspěšném uložení vymazat cache
+            if (!silent) {
+                const t = document.getElementById('toast');
+                t.innerHTML = '<i data-lucide="check-circle-2"></i> Úspěšně uloženo';
+                t.style.transform = 'translateY(0)';
+                t.style.opacity = '1';
+                setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(24px)'; }, 2000);
+            }
         }
     </script>
 </body>
