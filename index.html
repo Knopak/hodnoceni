@@ -42,15 +42,15 @@
     <div id="delete-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[200] hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8 text-center">
             <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i data-lucide="alert-triangle" class="w-8 h-8"></i>
+                <i data-lucide="alert-triangle"></i>
             </div>
             <h3 class="text-xl font-bold text-slate-900 mb-2">Opravdu smazat?</h3>
-            <p class="text-slate-500 text-sm mb-6 leading-relaxed">
-                Smažete data od: <br><span id="delete-target-name" class="font-bold text-slate-800"></span>.
+            <p class="text-slate-500 text-sm mb-6">
+                Smažete všechna data od: <br><span id="delete-target-name" class="font-bold text-slate-800"></span>.
             </p>
             <div class="flex gap-3">
-                <button onclick="closeDeleteModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 font-bold py-3 rounded-xl transition-colors text-sm text-slate-700">Zrušit</button>
-                <button onclick="confirmDelete()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl shadow-lg transition-colors text-sm">Smazat</button>
+                <button onclick="closeDeleteModal()" class="flex-1 bg-slate-100 font-bold py-3 rounded-xl text-sm">Zrušit</button>
+                <button onclick="confirmDelete()" class="flex-1 bg-red-600 text-white font-bold py-3 rounded-xl text-sm shadow-lg">Ano, smazat</button>
             </div>
         </div>
     </div>
@@ -60,8 +60,7 @@
         <div class="bg-white p-10 rounded-2xl shadow-xl text-center max-w-md w-full border-t-8 border-blue-600">
             <img src="https://github.com/Knopak/hodnoceni/blob/main/logo.jpg?raw=true" alt="ZŠ Galaxie" class="mx-auto h-24 mb-8 object-contain">
             <h1 class="text-3xl font-extrabold mb-2 text-blue-900 uppercase">ZŠ Galaxie</h1>
-            <p class="text-slate-500 mb-8 font-medium">Informační systém hodnocení</p>
-            <button onclick="loginWithGoogle()" class="w-full bg-blue-600 text-white font-bold px-6 py-4 rounded-xl flex items-center justify-center gap-3 hover:bg-blue-700 transition-all shadow-lg active:scale-95">
+            <button onclick="loginWithGoogle()" class="w-full mt-6 bg-blue-600 text-white font-bold px-6 py-4 rounded-xl flex items-center justify-center gap-3 hover:bg-blue-700 shadow-lg active:scale-95">
                 <i data-lucide="log-in"></i> Přihlásit se školním Googlem
             </button>
         </div>
@@ -83,7 +82,7 @@
                     <i data-lucide="user-check"></i> Moje Sebehodnocení
                 </div>
                 <div class="flex items-center gap-2">
-                    <button onclick="downloadAllData()" class="bg-slate-100 text-slate-700 px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-slate-200 shadow-sm" title="Záloha všech dat">
+                    <button onclick="downloadAllData()" class="bg-slate-100 text-slate-700 px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-slate-200" title="Záloha všech dat">
                         <i data-lucide="download" class="w-4 h-4"></i> Záloha
                     </button>
                     <button onclick="saveData()" class="bg-emerald-600 text-white px-5 py-2 rounded-lg flex items-center gap-2 shadow-md hover:bg-emerald-700 transition-colors">
@@ -97,11 +96,11 @@
             </div>
         </div>
 
-        <!-- SVODKA -->
-        <div id="summary-panel" class="max-w-[210mm] mx-auto mt-4 no-print hidden px-4 md:px-0">
+        <!-- SVODKA PRO TŘÍDNÍ -->
+        <div id="summary-panel" class="max-w-[210mm] mx-auto mt-4 no-print hidden">
             <div class="bg-blue-900 text-white p-6 rounded-2xl shadow-lg">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-                    <h3 class="text-lg font-bold flex items-center gap-2 uppercase tracking-wide text-blue-100">
+                    <h3 class="text-lg font-bold flex items-center gap-2 uppercase tracking-wide text-blue-100 font-print">
                         <i data-lucide="bar-chart-3"></i> Svodka od kolegů
                     </h3>
                     <div class="flex flex-wrap gap-2">
@@ -133,33 +132,30 @@
                     <label class="text-[10px] font-bold text-blue-800 uppercase block mb-1">Úvodní slovo třídního učitele:</label>
                     <textarea id="schoolYearNoteInput" class="w-full p-3 border rounded-lg text-sm bg-white shadow-sm focus:ring-2 focus:ring-blue-500" rows="3"></textarea>
                 </div>
-                <div id="schoolYearNoteDisplay" class="print-only text-justify text-sm italic leading-tight text-slate-800 font-print"></div>
+                <div id="schoolYearNoteDisplay" class="print-only text-justify text-sm italic leading-tight text-slate-800"></div>
             </div>
-
-            <h2 class="text-xs font-bold mb-4 text-center uppercase tracking-widest border-b pb-2 text-slate-500 font-print">Hodnocení školy</h2>
+            <h2 class="text-xs font-bold mb-4 text-center uppercase tracking-widest border-b pb-2 text-slate-500">Hodnocení školy</h2>
             <div id="teacherSectionsContainer" class="grid grid-cols-3 gap-6 mt-2"></div>
-            
             <div class="mt-8 p-4 bg-blue-50 rounded-xl border border-blue-100 no-print">
                 <label class="text-[10px] font-bold text-blue-800 uppercase block mb-1">Můj postřeh k žákovi (ostatní uvidí ve svodce):</label>
                 <textarea id="myPersonalComment" class="w-full p-3 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500" rows="3"></textarea>
             </div>
-
             <div class="mt-10 flex-grow flex flex-col">
                 <label class="text-[10px] font-bold text-blue-800 uppercase no-print mb-1 ml-1 text-slate-400">Finální zpětná vazba pro tisk:</label>
-                <textarea id="summaryInput" class="w-full p-4 border border-slate-200 rounded-xl text-sm min-h-[300px] bg-yellow-50 focus:bg-white shadow-inner" placeholder="Tento text píše třídní učitel..."></textarea>
-                <div id="summaryDisplay" class="print-only text-justify text-sm leading-relaxed whitespace-pre-wrap border-t pt-4 font-print"></div>
+                <textarea id="summaryInput" class="w-full p-4 border border-slate-200 rounded-xl text-sm min-h-[300px] bg-yellow-50 focus:bg-white shadow-inner"></textarea>
+                <div id="summaryDisplay" class="print-only text-justify text-sm leading-relaxed whitespace-pre-wrap border-t pt-4 font-print text-slate-800"></div>
             </div>
         </div>
 
         <!-- STRANA 2 -->
         <div id="page-2-container" class="max-w-[210mm] mx-auto p-10 bg-white my-8 shadow-md flex flex-col hidden font-print">
             <h2 class="text-2xl font-black mb-8 text-center text-blue-900 uppercase border-b-4 border-blue-900 pb-3 tracking-wide">Sebehodnocení žáka</h2>
-            <div id="studentSectionsContainer" class="space-y-10 font-print"></div>
-            <div class="mt-auto pt-10 font-print">
+            <div id="studentSectionsContainer" class="space-y-10"></div>
+            <div class="mt-auto pt-10">
                 <div class="grid grid-cols-3 gap-8 text-[10px] text-slate-400 border-t border-slate-100 pt-6 italic">
-                    <div><span class="font-bold uppercase text-slate-600 block mb-1 not-italic">Ve vztahu k sobě:</span>Vyjadřování myšlenek, pocity, chování, zpětná vazba.</div>
-                    <div><span class="font-bold uppercase text-slate-600 block mb-1 not-italic">Ve vztahu k druhým:</span>Pravidla, spolupráce, bezpečné prostředí.</div>
-                    <div><span class="font-bold uppercase text-slate-600 block mb-1 not-italic">Při učení:</span>Zodpovědnost, vytrvalost, porozumění textu.</div>
+                    <div><span class="font-bold uppercase text-slate-600 block mb-1 not-italic font-print">Ve vztahu k sobě:</span>Vyjadřování myšlenek, pocity, chování, zpětná vazba.</div>
+                    <div><span class="font-bold uppercase text-slate-600 block mb-1 not-italic font-print">Ve vztahu k druhým:</span>Pravidla, spolupráce, bezpečné prostředí.</div>
+                    <div><span class="font-bold uppercase text-slate-600 block mb-1 not-italic font-print">Při učení:</span>Zodpovědnost, vytrvalost, porozumění textu.</div>
                 </div>
             </div>
         </div>
@@ -180,7 +176,6 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth(), db = firebase.firestore();
 
-        // Učitelé a jejich třídy
         const TEACHERS = {
             "barbora.bezdekova@skolagalaxie.cz": "",
             "eva.pancova@skolagalaxie.cz": "7. A",
@@ -390,7 +385,6 @@
 
         window.onload = () => lucide.createIcons();
 
-        // AUTH LISTENER
         auth.onAuthStateChanged(user => {
             if (user) {
                 const email = user.email.toLowerCase();
@@ -421,8 +415,7 @@
             const studentSelect = document.getElementById('studentSelect');
             studentSelect.innerHTML = '<option value="">Vyberte žáka</option>';
             if(!cls) return;
-            const filtered = Object.entries(STUDENTS).filter(([e, d]) => d.class === cls).sort((a,b) => a[1].name.localeCompare(b[1].name));
-            filtered.forEach(([e, d]) => studentSelect.add(new Option(d.name, e)));
+            Object.entries(STUDENTS).filter(([e, d]) => d.class === cls).sort((a,b) => a[1].name.localeCompare(b[1].name)).forEach(([e, d]) => studentSelect.add(new Option(d.name, e)));
         }
 
         function setupStudentUI(email) {
@@ -449,7 +442,7 @@
             try {
                 const doc = await db.collection('evaluations').doc(email).get();
                 if (doc.exists) dbData = { ...dbData, ...doc.data() };
-            } catch (e) { console.error("Firestore error", e); }
+            } catch (e) { console.error("Firebase fetch error", e); }
 
             renderForms(studentInfo.name);
             renderSummary();
@@ -483,16 +476,15 @@
             renderTeacherScales(); renderStudentScales();
         }
 
-        // RENDER ŠKÁL UČITELE (STRANA 1)
         function renderTeacherScales() {
             const container = document.getElementById('teacherSectionsContainer');
             if(!container) return;
             const cats = [...new Set(COMPETENCIES.map(c => c.cat))];
             const currEmail = auth.currentUser.email.toLowerCase();
             
-            let html = "";
+            let finalHtml = "";
             cats.forEach(cat => {
-                html += `<div class="bg-white border rounded p-3 break-inside-avoid"><h3 class="text-[10px] font-black text-center border-b mb-3 uppercase text-blue-900">${cat}</h3>`;
+                let h = `<div class="bg-white border rounded p-3 break-inside-avoid"><h3 class="text-[10px] font-black text-center border-b mb-3 uppercase text-blue-900 font-print">${cat}</h3>`;
                 COMPETENCIES.filter(c => c.cat === cat).forEach(q => {
                     const myObs = (dbData.colleagueObservations?.[currEmail] || {})[q.id];
                     const finalVal = (dbData.teacherScales || {})[q.id];
@@ -504,14 +496,13 @@
                         const prn = finalVal === i;
                         sqs += `<div class="w-2.5 h-2.5 border" style="background-color:${prn?ACTIVE_COLOR:INACTIVE_COLOR}; border-color:#94a3b8"></div>`;
                     }
-                    html += `<div class="mb-3 last:mb-0"><div class="text-[9px] font-bold leading-tight mb-2 text-slate-800">${q.text}</div><div class="grid grid-cols-4 gap-1 no-print">${btns}</div><div class="hidden print-flex gap-2 items-center justify-center">${sqs}</div></div>`;
+                    h += `<div class="mb-3 last:mb-0"><div class="text-[9px] font-bold leading-tight mb-2 text-slate-800 font-print">${q.text}</div><div class="grid grid-cols-4 gap-1 no-print">${btns}</div><div class="hidden print-flex gap-2 items-center justify-center">${sqs}</div></div>`;
                 });
-                html += `</div>`;
+                finalHtml += h + `</div>`;
             });
-            container.innerHTML = html;
+            container.innerHTML = finalHtml;
         }
 
-        // RENDER SVODKY (POUZE TŘÍDNÍ)
         function renderSummary() {
             const panel = document.getElementById('summary-panel'), statsDiv = document.getElementById('summary-stats'), textsDiv = document.getElementById('colleague-texts-list'), contributorDiv = document.getElementById('contributor-list');
             const currUser = auth.currentUser;
@@ -522,49 +513,47 @@
             const allEmails = [...new Set([...Object.keys(obs), ...Object.keys(comments)])];
             
             let contrHtml = '<span class="text-xs font-bold text-blue-300 mr-2 uppercase self-center">Přispěli:</span>';
-            allEmails.forEach(e => { contrHtml += `<div class="flex items-center gap-1.5 bg-blue-800 px-3 py-1 rounded-full border border-blue-700"><span class="text-[10px] font-medium">${e}</span><button onclick="openDeleteModal('${e}')" class="text-red-400 hover:text-red-200"><i data-lucide="x-circle" class="w-3.5 h-3.5"></i></button></div>`; });
-            contributorDiv.innerHTML = contrHtml || '<div class="text-xs opacity-50 italic">Nikdo zatím nepřispěl.</div>';
+            allEmails.forEach(e => { contrHtml += `<div class="flex items-center gap-1.5 bg-blue-800 px-3 py-1 rounded-full border border-blue-700 shadow-sm"><span class="text-[10px] font-medium">${e}</span><button onclick="openDeleteModal('${e}')" class="text-red-400 hover:text-red-200"><i data-lucide="x-circle" class="w-3.5 h-3.5"></i></button></div>`; });
+            contributorDiv.innerHTML = contrHtml || '<div class="text-xs opacity-50 italic">Žádné příspěvky.</div>';
 
-            let sHtml = `<div class="grid grid-cols-12 gap-2 font-bold border-b border-blue-700 pb-2 mb-2 text-blue-200 uppercase"><div class="col-span-5">Kompetence</div><div class="col-span-1 text-center">Ne</div><div class="col-span-1 text-center">SpN</div><div class="col-span-1 text-center">SpA</div><div class="col-span-1 text-center">Ano</div><div class="col-span-1 text-center text-emerald-300">Průměr</div><div class="col-span-2 text-center text-blue-100 font-print">Můj postřeh</div></div>`;
+            let sHtml = `<div class="grid grid-cols-12 gap-2 font-bold border-b border-blue-700 pb-2 mb-2 text-blue-200 uppercase"><div class="col-span-5">Kompetence</div><div class="col-span-1 text-center">Ne</div><div class="col-span-1 text-center">SpN</div><div class="col-span-1 text-center">SpA</div><div class="col-span-1 text-center">Ano</div><div class="col-span-1 text-center text-emerald-300">Průměr</div><div class="col-span-2 text-center text-blue-100">Můj postřeh</div></div>`;
             COMPETENCIES.forEach(q => {
                 let cnt = [0,0,0,0], sum=0, tot=0;
                 Object.values(obs).forEach(d => { if(d[q.id]!==undefined){ cnt[d[q.id]]++; sum+=d[q.id]; tot++; } });
                 const avg = tot>0 ? (sum/tot).toFixed(1) : "-", myV = (obs[currUser.email.toLowerCase()]||{})[q.id], myL = myV!==undefined ? SCALE_LABELS[myV] : "-";
-                sHtml += `<div class="grid grid-cols-12 gap-2 border-b border-blue-800 py-1 items-center font-print"><div class="col-span-5 opacity-90">${q.text}</div><div class="col-span-1 text-center font-bold ${cnt[0]>0?'text-white':'opacity-30'}">${cnt[0]}</div><div class="col-span-1 text-center font-bold ${cnt[1]>0?'text-white':'opacity-30'}">${cnt[1]}</div><div class="col-span-1 text-center font-bold ${cnt[2]>0?'text-white':'opacity-30'}">${cnt[2]}</div><div class="col-span-1 text-center font-bold ${cnt[3]>0?'text-white':'opacity-30'}">${cnt[3]}</div><div class="col-span-1 text-center text-emerald-400 font-black bg-blue-800 rounded py-0.5">${avg}</div><div class="col-span-2 text-center text-blue-200 font-bold italic">${myL}</div></div>`;
+                sHtml += `<div class="grid grid-cols-12 gap-2 border-b border-blue-800 py-1 items-center"><div class="col-span-5 opacity-90">${q.text}</div><div class="col-span-1 text-center font-bold ${cnt[0]>0?'text-white':'opacity-30'}">${cnt[0]}</div><div class="col-span-1 text-center font-bold ${cnt[1]>0?'text-white':'opacity-30'}">${cnt[1]}</div><div class="col-span-1 text-center font-bold ${cnt[2]>0?'text-white':'opacity-30'}">${cnt[2]}</div><div class="col-span-1 text-center font-bold ${cnt[3]>0?'text-white':'opacity-30'}">${cnt[3]}</div><div class="col-span-1 text-center text-emerald-400 font-black bg-blue-800 rounded py-0.5">${avg}</div><div class="col-span-2 text-center text-blue-200 font-bold italic">${myL}</div></div>`;
             });
             statsDiv.innerHTML = sHtml;
 
             let tHtml = "";
-            Object.entries(comments).forEach(([e, t]) => { if(t && t.trim()){ tHtml += `<div class="bg-blue-800/50 p-3 rounded-lg border border-blue-700"><div class="text-[9px] font-bold text-blue-200 mb-1 uppercase">${e} píše:</div><div class="text-xs text-white whitespace-pre-wrap">${t}</div></div>`; } });
-            textsDiv.innerHTML = tHtml || '<div class="text-xs opacity-50 italic">Žádné texty od kolegů.</div>';
+            Object.entries(comments).forEach(([e, t]) => { if(t && t.trim()){ tHtml += `<div class="bg-blue-800/50 p-3 rounded-lg border border-blue-700"><div class="text-[9px] font-bold text-blue-200 mb-1 uppercase">${e} píše:</div><div class="text-xs text-white whitespace-pre-wrap leading-relaxed">${t}</div></div>`; } });
+            textsDiv.innerHTML = tHtml || '<div class="text-xs opacity-50 italic">Žádné texty kolegů.</div>';
             lucide.createIcons();
         }
 
-        // RENDER ŠKÁL ŽÁKA (STRANA 2)
         function renderStudentScales() {
             const container = document.getElementById('studentSectionsContainer');
             if(!container) return;
             const cats = [...new Set(COMPETENCIES.map(c => c.cat))];
             let html = "";
             cats.forEach(cat => {
-                html += `<div class="bg-white border-2 border-slate-100 p-6 rounded-3xl shadow-sm print:shadow-none print:p-0 print:border-0"><h3 class="text-lg font-black text-blue-900 uppercase mb-6 border-b pb-1">${cat}</h3><div class="space-y-8 font-print">`;
+                html += `<div class="bg-white border-2 border-slate-100 p-6 rounded-3xl shadow-sm print:shadow-none print:p-0 print:border-0"><h3 class="text-lg font-black text-blue-900 uppercase mb-6 border-b pb-1 font-print">${cat}</h3><div class="space-y-8">`;
                 COMPETENCIES.filter(c => c.cat === cat).forEach(q => {
                     const val = (dbData.studentScales || {})[q.id];
                     let btns = '', sqs = '';
                     for(let i=0; i<4; i++) {
                         const act = val === i;
                         btns += `<button onclick="setStudentScale('${q.id}', ${i})" class="scale-btn py-3 text-sm" style="background-color:${act?ACTIVE_COLOR:INACTIVE_COLOR}; color:${act?'#fff':'#64748b'}; border-color:${act?ACTIVE_COLOR:'#cbd5e1'}" ${userRole==='teacher'?'disabled':''}>${SCALE_LABELS[i]}</button>`;
-                        sqs += `<div class="flex items-center gap-2"><div class="w-3 h-3 border" style="background-color:${act?ACTIVE_COLOR:INACTIVE_COLOR}; border-color:#94a3b8"></div><span class="text-[9px] font-bold text-slate-500">${SCALE_LABELS[i]}</span></div>`;
+                        sqs += `<div class="flex items-center gap-2 font-print"><div class="w-3 h-3 border" style="background-color:${act?ACTIVE_COLOR:INACTIVE_COLOR}; border-color:#94a3b8"></div><span class="text-[9px] font-bold text-slate-500">${SCALE_LABELS[i]}</span></div>`;
                     }
-                    html += `<div><div class="text-sm font-bold text-slate-700 mb-3">${q.text}</div><div class="grid grid-cols-4 gap-3 no-print">${btns}</div><div class="hidden print-flex gap-5 mb-2">${sqs}</div></div>`;
+                    html += `<div><div class="text-sm font-bold text-slate-700 mb-3 font-print">${q.text}</div><div class="grid grid-cols-4 gap-3 no-print">${btns}</div><div class="hidden print-flex gap-5 mb-2">${sqs}</div></div>`;
                 });
                 const comm = (dbData.categoryComments || {})[cat] || "";
-                html += `</div><div class="mt-8 pt-5 border-t"><label class="text-[10px] font-bold text-slate-400 uppercase no-print block mb-1">Moje vyjádření k oblasti:</label><textarea id="cat-${cat}" class="w-full p-4 border rounded-2xl text-sm bg-blue-50 focus:bg-white focus:ring-4 focus:ring-blue-100" placeholder="Shrň své hodnocení..." rows="1" oninput="autoResize(this); if(!dbData.categoryComments) dbData.categoryComments={}; dbData.categoryComments['${cat}']=this.value" ${userRole==='teacher'?'disabled':''}>${comm}</textarea><div class="print-only text-sm italic mt-3 leading-relaxed text-slate-700 border-l-4 pl-4">${comm}</div></div></div>`;
+                html += `</div><div class="mt-8 pt-5 border-t"><label class="text-[10px] font-bold text-slate-400 uppercase no-print block mb-1">Moje vyjádření k oblasti:</label><textarea id="cat-${cat}" class="w-full p-4 border rounded-2xl text-sm bg-blue-50 focus:bg-white focus:ring-4 focus:ring-blue-100" rows="1" oninput="autoResize(this); if(!dbData.categoryComments) dbData.categoryComments={}; dbData.categoryComments['${cat}']=this.value" ${userRole==='teacher'?'disabled':''}>${comm}</textarea><div class="print-only text-sm italic mt-3 leading-relaxed text-slate-700 border-l-4 pl-4 font-print">${comm}</div></div></div>`;
             });
             container.innerHTML = html;
         }
 
-        // LOGIKA MAZÁNÍ
         function openDeleteModal(email) { deleteCandidateEmail = email; document.getElementById('delete-target-name').textContent = email; document.getElementById('delete-modal').classList.remove('hidden'); }
         function closeDeleteModal() { document.getElementById('delete-modal').classList.add('hidden'); deleteCandidateEmail = null; }
         async function confirmDelete() {
@@ -573,10 +562,9 @@
             if (dbData.colleagueObservations) delete dbData.colleagueObservations[email];
             if (dbData.teacherComments) delete dbData.teacherComments[email];
             await db.collection('evaluations').doc(currentTargetEmail).set(dbData, { merge: true });
-            closeDeleteModal(); renderSummary(); showToast(`Data od ${email} smazána.`);
+            closeDeleteModal(); renderSummary(); showToast(`Smazáno.`);
         }
 
-        // LOGIKA PROPSÁNÍ
         function applyAverages() {
             if (!isClassTeacher) return;
             const obs = dbData.colleagueObservations || {};
@@ -585,7 +573,7 @@
                 Object.values(obs).forEach(d => { if(d[q.id]!==undefined){ sum+=d[q.id]; tot++; } });
                 if (tot > 0) { if(!dbData.teacherScales) dbData.teacherScales={}; dbData.teacherScales[q.id] = Math.round(sum/tot); }
             });
-            renderTeacherScales(); showToast("Průměry škál byly propsány.");
+            renderTeacherScales(); showToast("Průměry škál propsány.");
         }
 
         function applyTextSummaries() {
@@ -594,10 +582,9 @@
             let combined = "";
             Object.values(comms).forEach(t => { if(t && t.trim()) combined += `${t}\n\n`; });
             const sIn = document.getElementById('summaryInput');
-            sIn.value = combined.trim(); autoResize(sIn); showToast("Texty kolegů byly sloučeny.");
+            sIn.value = combined.trim(); autoResize(sIn); showToast("Texty sloučeny.");
         }
 
-        // POMOCNÉ FUNKCE
         function setTeacherObservation(id, v) { 
             if(userRole === 'teacher'){ 
                 const email = auth.currentUser.email.toLowerCase();
@@ -618,16 +605,15 @@
                 const blob = new Blob([JSON.stringify(allData, null, 2)], {type : 'application/json'});
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a'); a.href = url; a.download = `zaloha_galaxie_${new Date().toISOString().slice(0,10)}.json`; a.click();
-                showToast("Kompletní záloha stažena.");
+                showToast("Záloha stažena.");
             } catch (e) { alert("Chyba zálohy: " + e.message); }
         }
 
         function showToast(msg) {
             const t = document.getElementById('toast');
             t.innerHTML = `<i data-lucide="check-circle-2" class="w-5 h-5"></i> ${msg}`;
-            t.style.transform = 'translateY(0)'; t.style.opacity = '1';
-            lucide.createIcons();
-            setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(24px)'; }, 3000);
+            t.style.transform = 'translateY(0)'; t.style.opacity = '1'; lucide.createIcons();
+            setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(24px)'; }, 2500);
         }
 
         async function saveData() {
@@ -642,7 +628,7 @@
                 dbData.teacherComments[email] = document.getElementById('myPersonalComment').value;
             }
             await db.collection('evaluations').doc(currentTargetEmail).set(dbData, { merge: true });
-            showToast("Změny úspěšně uloženy.");
+            showToast("Uloženo.");
             document.getElementById('schoolYearNoteDisplay').textContent = dbData.topNote;
             document.getElementById('summaryDisplay').textContent = dbData.bottomNote;
         }
