@@ -14,78 +14,23 @@
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap');
-        
-        body { 
-            font-family: 'Noto Sans', sans-serif; 
-            background-color: #f3f4f6; 
-            color: #1e293b; 
-        }
-        
+        body { font-family: 'Noto Sans', sans-serif; background-color: #f3f4f6; color: #1e293b; }
         .hidden { display: none !important; }
         .print-only { display: none; }
-        
-        textarea { 
-            resize: none; 
-            overflow: hidden; 
-            transition: height 0.1s ease; 
-            border: 1px solid #e2e8f0; 
-        }
-        
-        textarea:disabled { 
-            background-color: #f8fafc; 
-            color: #64748b; 
-            cursor: not-allowed; 
-        }
-        
-        .scale-btn { 
-            transition: all 0.2s; 
-            border: 1px solid #cbd5e1; 
-            font-size: 0.7rem; 
-            font-weight: 600; 
-            padding: 0.4rem 0.2rem; 
-            border-radius: 0.375rem; 
-            width: 100%; 
-        }
-        
-        .scale-btn:not(:disabled):hover { 
-            border-color: #3b82f6; 
-        }
-        
-        .scale-btn:active { 
-            transform: scale(0.95); 
-        }
+        textarea { resize: none; overflow: hidden; transition: height 0.1s ease; border: 1px solid #e2e8f0; }
+        textarea:disabled { background-color: #f8fafc; color: #64748b; cursor: not-allowed; }
+        .scale-btn { transition: all 0.2s; border: 1px solid #cbd5e1; font-size: 0.7rem; font-weight: 600; padding: 0.4rem 0.2rem; border-radius: 0.375rem; width: 100%; }
+        .scale-btn:not(:disabled):hover { border-color: #3b82f6; }
+        .scale-btn:active { transform: scale(0.95); }
 
         @media print {
             @page { size: A4; margin: 0; }
-            
-            html, body { 
-                background-color: white !important; 
-                margin: 0; 
-                padding: 0; 
-                font-size: 10pt; 
-                width: 100%; 
-                overflow: visible !important; 
-            }
-            
+            html, body { background-color: white !important; margin: 0; padding: 0; font-size: 10pt; width: 100%; overflow: visible !important; }
             .no-print { display: none !important; }
             .print-only { display: block !important; }
             .print-flex { display: flex !important; }
-            
-            #print-container { 
-                padding: 10mm 15mm !important; 
-                box-shadow: none !important; 
-                width: 100% !important; 
-                page-break-after: always; 
-                display: block !important; 
-            }
-            
-            #page-2-container { 
-                padding: 10mm 15mm !important; 
-                display: block !important; 
-                box-shadow: none !important; 
-                width: 100% !important; 
-            }
-            
+            #print-container { padding: 10mm 15mm !important; box-shadow: none !important; width: 100% !important; page-break-after: always; display: block !important; }
+            #page-2-container { padding: 10mm 15mm !important; display: block !important; box-shadow: none !important; width: 100% !important; }
             textarea { display: none !important; }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
         }
@@ -104,8 +49,8 @@
                 Smažete všechna data od: <br><span id="delete-target-name" class="font-bold text-slate-800"></span>.
             </p>
             <div class="flex gap-3">
-                <button onclick="closeDeleteModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 font-bold py-3 rounded-xl text-sm transition-colors text-slate-700">Zrušit</button>
-                <button onclick="confirmDelete()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl text-sm shadow-lg transition-colors">Ano, smazat</button>
+                <button onclick="closeDeleteModal()" class="flex-1 bg-slate-100 font-bold py-3 rounded-xl text-sm">Zrušit</button>
+                <button onclick="confirmDelete()" class="flex-1 bg-red-600 text-white font-bold py-3 rounded-xl text-sm shadow-lg">Ano, smazat</button>
             </div>
         </div>
     </div>
@@ -115,8 +60,7 @@
         <div class="bg-white p-10 rounded-2xl shadow-xl text-center max-w-md w-full border-t-8 border-blue-600">
             <img src="https://github.com/Knopak/hodnoceni/blob/main/logo.jpg?raw=true" alt="ZŠ Galaxie" class="mx-auto h-24 mb-8 object-contain">
             <h1 class="text-3xl font-extrabold mb-2 text-blue-900 uppercase">ZŠ Galaxie</h1>
-            <p class="text-slate-500 mb-8 font-medium">Informační systém hodnocení</p>
-            <button onclick="loginWithGoogle()" class="w-full bg-blue-600 text-white font-bold px-6 py-4 rounded-xl flex items-center justify-center gap-3 hover:bg-blue-700 transition-all shadow-lg active:scale-95">
+            <button onclick="loginWithGoogle()" class="w-full mt-6 bg-blue-600 text-white font-bold px-6 py-4 rounded-xl flex items-center justify-center gap-3 hover:bg-blue-700 shadow-lg active:scale-95">
                 <i data-lucide="log-in"></i> Přihlásit se školním Googlem
             </button>
         </div>
@@ -124,8 +68,6 @@
 
     <!-- APLIKACE -->
     <div id="app-screen" class="hidden">
-        
-        <!-- HORNÍ LIŠTA -->
         <div class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm px-4 py-3 no-print">
             <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4 text-sm font-bold">
                 <div id="controls-container" class="flex items-center gap-4">
@@ -136,13 +78,11 @@
                         <option value="">Vyberte žáka</option>
                     </select>
                 </div>
-                
                 <div id="student-notice" class="hidden text-blue-700 flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-lg border border-blue-100">
                     <i data-lucide="user-check"></i> Moje Sebehodnocení
                 </div>
-                
                 <div class="flex items-center gap-2">
-                    <button onclick="downloadAllData()" class="bg-slate-100 text-slate-700 px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-slate-200 shadow-sm" title="Záloha všech dat">
+                    <button onclick="downloadAllData()" class="bg-slate-100 text-slate-700 px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-slate-200" title="Záloha všech dat">
                         <i data-lucide="download" class="w-4 h-4"></i> Záloha
                     </button>
                     <button onclick="saveData()" class="bg-emerald-600 text-white px-5 py-2 rounded-lg flex items-center gap-2 shadow-md hover:bg-emerald-700 transition-colors">
@@ -156,26 +96,21 @@
             </div>
         </div>
 
-        <!-- SVODKA PRO TŘÍDNÍ -->
-        <div id="summary-panel" class="max-w-[210mm] mx-auto mt-4 no-print hidden px-4 md:px-0">
+        <!-- SVODKA -->
+        <div id="summary-panel" class="max-w-[210mm] mx-auto mt-4 no-print hidden">
             <div class="bg-blue-900 text-white p-6 rounded-2xl shadow-lg">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-                    <h3 class="text-lg font-bold flex items-center gap-2 uppercase tracking-wide text-blue-100">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-bold flex items-center gap-2 uppercase tracking-wide">
                         <i data-lucide="bar-chart-3"></i> Svodka od kolegů
                     </h3>
-                    <div class="flex flex-wrap gap-2">
-                        <button onclick="applyAverages()" class="bg-emerald-500 hover:bg-emerald-400 text-white px-4 py-2 rounded-lg font-bold text-xs shadow-sm flex items-center gap-2">
-                            <i data-lucide="copy-check" class="w-4 h-4"></i> Propsat průměry
-                        </button>
-                        <button onclick="applyTextSummaries()" class="bg-amber-500 hover:bg-amber-400 text-white px-4 py-2 rounded-lg font-bold text-xs shadow-sm flex items-center gap-2">
-                            <i data-lucide="message-square-plus" class="w-4 h-4"></i> Propsat texty
-                        </button>
+                    <div class="flex gap-2">
+                        <button onclick="applyAverages()" class="bg-emerald-500 hover:bg-emerald-400 text-white px-4 py-2 rounded-lg font-bold text-xs">Propsat průměry</button>
+                        <button onclick="applyTextSummaries()" class="bg-amber-500 hover:bg-amber-400 text-white px-4 py-2 rounded-lg font-bold text-xs">Propsat texty</button>
                     </div>
                 </div>
-                
                 <div id="contributor-list" class="flex flex-wrap gap-2 mb-6 border-b border-blue-800 pb-4"></div>
-                <div id="summary-stats" class="grid grid-cols-1 gap-1 text-[11px] mb-6 font-print"></div>
-                <div id="colleague-texts-list" class="grid grid-cols-1 gap-2 border-t border-blue-800 pt-4"></div>
+                <div id="summary-stats" class="grid grid-cols-1 gap-1 text-[11px] mb-6"></div>
+                <div id="colleague-texts-list" class="grid grid-cols-1 gap-2"></div>
             </div>
         </div>
 
@@ -184,69 +119,51 @@
             <div class="flex justify-center mb-6">
                 <img src="https://github.com/Knopak/hodnoceni/blob/main/logo.jpg?raw=true" alt="ZŠ Galaxie" class="h-16 object-contain">
             </div>
-            
             <div class="text-center mb-8">
                 <div class="inline-block border-[4px] border-blue-600 px-12 py-2 mb-4">
                     <span id="studentNameDisplay" class="text-3xl font-black text-black uppercase tracking-wider">Vyberte žáka</span>
                 </div>
-                <div class="flex justify-between items-center text-sm font-bold text-slate-700 px-4 mt-2 font-print uppercase tracking-tight">
+                <div class="flex justify-between items-center text-sm font-bold text-slate-700 px-4 mt-2 font-print uppercase">
                     <div>Školní rok: 2025/2026 - I. POLOLETÍ</div>
                     <div id="classNameDisplay">Třída: -</div>
                 </div>
                 <div class="w-full border-b-2 border-slate-300 my-6"></div>
-                
                 <div class="text-left bg-slate-50 p-4 rounded-xl border border-slate-100 no-print">
                     <label class="text-[10px] font-bold text-blue-800 uppercase block mb-1">Úvodní slovo třídního učitele:</label>
-                    <textarea id="schoolYearNoteInput" class="w-full p-3 border rounded-lg text-sm bg-white shadow-sm focus:ring-2 focus:ring-blue-500" rows="3"></textarea>
+                    <textarea id="schoolYearNoteInput" class="w-full p-3 border rounded-lg text-sm bg-white" rows="3"></textarea>
                 </div>
-                <div id="schoolYearNoteDisplay" class="print-only text-justify text-sm italic leading-tight text-slate-800 font-print"></div>
+                <div id="schoolYearNoteDisplay" class="print-only text-justify text-sm italic leading-tight text-slate-800"></div>
             </div>
-
-            <h2 class="text-xs font-bold mb-4 text-center uppercase tracking-widest border-b pb-2 text-slate-500 font-print">Hodnocení školy</h2>
-            
-            <!-- Kontejner pro škály učitelů -->
+            <h2 class="text-xs font-bold mb-4 text-center uppercase tracking-widest border-b pb-2 text-slate-500 uppercase">Hodnocení školy</h2>
             <div id="teacherSectionsContainer" class="grid grid-cols-3 gap-6 mt-2"></div>
-            
-            <!-- Osobní postřeh konkrétního učitele -->
             <div class="mt-8 p-4 bg-blue-50 rounded-xl border border-blue-100 no-print">
-                <label class="text-[10px] font-bold text-blue-800 uppercase block mb-1">Můj postřeh k žákovi (ostatní uvidí ve svodce):</label>
-                <textarea id="myPersonalComment" class="w-full p-3 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500" rows="3"></textarea>
+                <label class="text-[10px] font-bold text-blue-800 uppercase block mb-1">Můj osobní postřeh k žákovi:</label>
+                <textarea id="myPersonalComment" class="w-full p-3 border rounded-lg text-sm bg-white" rows="3"></textarea>
             </div>
-
-            <!-- Finální tisková zpětná vazba -->
             <div class="mt-10 flex-grow flex flex-col">
                 <label class="text-[10px] font-bold text-blue-800 uppercase no-print mb-1 ml-1 text-slate-400">Finální zpětná vazba pro tisk:</label>
-                <textarea id="summaryInput" class="w-full p-4 border border-slate-200 rounded-xl text-sm min-h-[300px] bg-yellow-50 focus:bg-white shadow-inner" placeholder="Tento text píše třídní učitel..."></textarea>
-                <div id="summaryDisplay" class="print-only text-justify text-sm leading-relaxed whitespace-pre-wrap border-t pt-4 font-print text-slate-800"></div>
+                <textarea id="summaryInput" class="w-full p-4 border border-slate-200 rounded-xl text-sm min-h-[300px] bg-yellow-50 focus:bg-white shadow-inner"></textarea>
+                <div id="summaryDisplay" class="print-only text-justify text-sm leading-relaxed whitespace-pre-wrap border-t pt-4"></div>
             </div>
         </div>
 
         <!-- STRANA 2 -->
         <div id="page-2-container" class="max-w-[210mm] mx-auto p-10 bg-white my-8 shadow-md flex flex-col hidden font-print">
             <h2 class="text-2xl font-black mb-8 text-center text-blue-900 uppercase border-b-4 border-blue-900 pb-3 tracking-wide">Sebehodnocení žáka</h2>
-            
-            <!-- Kontejner pro škály a texty žáka -->
-            <div id="studentSectionsContainer" class="space-y-10 font-print"></div>
-            
-            <div class="mt-auto pt-10 font-print">
+            <div id="studentSectionsContainer" class="space-y-10"></div>
+            <div class="mt-auto pt-10">
                 <div class="grid grid-cols-3 gap-8 text-[10px] text-slate-400 border-t border-slate-100 pt-6 italic">
-                    <div><span class="font-bold uppercase text-slate-600 block mb-1 not-italic font-print">Ve vztahu k sobě:</span>Vyjadřování myšlenek, pocity, chování, zpětná vazba.</div>
-                    <div><span class="font-bold uppercase text-slate-600 block mb-1 not-italic font-print">Ve vztahu k druhým:</span>Pravidla, spolupráce, bezpečné prostředí.</div>
-                    <div><span class="font-bold uppercase text-slate-600 block mb-1 not-italic font-print">Při učení:</span>Zodpovědnost, vytrvalost, porozumění textu.</div>
+                    <div><span class="font-bold uppercase text-slate-600 block mb-1">Ve vztahu k sobě:</span>Vyjadřování myšlenek, pocity, práce se zpětnou vazbou.</div>
+                    <div><span class="font-bold uppercase text-slate-600 block mb-1">Ve vztahu k druhým:</span>Pravidla, spolupráce, bezpečné prostředí.</div>
+                    <div><span class="font-bold uppercase text-slate-600 block mb-1">Při učení:</span>Zodpovědnost, vytrvalost, porozumění textu.</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- TOAST -->
     <div id="toast" class="fixed bottom-6 right-6 bg-emerald-600 text-white px-8 py-4 rounded-2xl shadow-2xl font-bold transform translate-y-24 opacity-0 transition-all duration-500 z-[100] flex items-center gap-3"></div>
 
     <script>
-        // GLOBÁLNÍ ZACHYTÁVÁNÍ CHYB (aby bylo hned jasné, proč se něco nenačetlo)
-        window.onerror = function(message) {
-            showToast("Chyba aplikace: " + message, true);
-        };
-
         const firebaseConfig = {
             apiKey: "AIzaSyDm0v4wviD36KgLr3WUDtkNZ-DPmXFDZbs",
             authDomain: "hodnocenigalaxie.firebaseapp.com",
@@ -256,12 +173,9 @@
             appId: "1:803231734039:web:027d443d60869288027f52",
             measurementId: "G-WDFNSPS8EX"
         };
-        
         firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+        const auth = firebase.auth(), db = firebase.firestore();
 
-        // Seznam učitelů
         const TEACHERS = {
             "barbora.bezdekova@skolagalaxie.cz": "",
             "eva.pancova@skolagalaxie.cz": "7. A",
@@ -283,7 +197,6 @@
             "nastenka@skolagalaxie.cz": ""
         };
 
-        // Seznam žáků
         const STUDENTS = {
             "antonin.anlauf@skolagalaxie.cz": { name: "Antonín Jaromír Anlauf", class: "1. A" },
             "emma.burgetova@skolagalaxie.cz": { name: "Emma Burgetová", class: "1. A" },
@@ -465,58 +378,31 @@
         ];
 
         const SCALE_LABELS = ['Ne', 'Sp. ne', 'Sp. ano', 'Ano'];
-        const ACTIVE_COLOR = '#1d4ed8'; 
-        const INACTIVE_COLOR = '#f1f5f9';
+        const ACTIVE_COLOR = '#1d4ed8', INACTIVE_COLOR = '#f1f5f9';
 
-        let userRole = null;
-        let isClassTeacher = false;
-        let currentTargetEmail = null;
-        let deleteCandidateEmail = null;
-        
-        let dbData = { 
-            teacherScales: {}, 
-            studentScales: {}, 
-            categoryComments: {}, 
-            colleagueObservations: {}, 
-            teacherComments: {}, 
-            topNote: "", 
-            bottomNote: "" 
-        };
+        let userRole = null, isClassTeacher = false, currentTargetEmail = null, deleteCandidateEmail = null;
+        let dbData = { teacherScales: {}, studentScales: {}, categoryComments: {}, colleagueObservations: {}, teacherComments: {}, topNote: "", bottomNote: "" };
 
         window.onload = () => {
-            try { lucide.createIcons(); } catch (e) { console.error("Lucide load error", e); }
+            try { lucide.createIcons(); } catch (e) {}
         };
 
-        // --- AUTENTIZACE ---
         auth.onAuthStateChanged(user => {
             if (user) {
-                const email = user.email ? user.email.toLowerCase() : "";
+                const email = user.email.toLowerCase();
                 document.getElementById('auth-screen').classList.add('hidden');
                 document.getElementById('app-screen').classList.remove('hidden');
-                
-                if (TEACHERS[email] !== undefined) { 
-                    userRole = 'teacher'; 
-                    setupTeacherUI(); 
-                } else if (STUDENTS[email]) { 
-                    userRole = 'student'; 
-                    setupStudentUI(email); 
-                } else { 
-                    showToast("Účet nebyl v systému školy nalezen.", true); 
-                    auth.signOut(); 
-                }
+                if (TEACHERS[email] !== undefined) { userRole = 'teacher'; setupTeacherUI(); }
+                else if (STUDENTS[email]) { userRole = 'student'; setupStudentUI(email); }
+                else { showToast("Účet nenalezen v systému.", true); auth.signOut(); }
             } else {
                 document.getElementById('auth-screen').classList.remove('hidden');
                 document.getElementById('app-screen').classList.add('hidden');
             }
         });
 
-        function loginWithGoogle() { 
-            auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(err => {
-                showToast("Chyba přihlášení: " + err.message, true);
-            }); 
-        }
+        function loginWithGoogle() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(err => { showToast("Chyba přihlášení: " + err.message, true); }); }
 
-        // --- NASTAVENÍ UI ---
         function setupTeacherUI() {
             const classes = [...new Set(Object.values(STUDENTS).map(s => s.class))].sort();
             const classSelect = document.getElementById('classSelect');
@@ -530,53 +416,36 @@
             const cls = document.getElementById('classSelect').value;
             const studentSelect = document.getElementById('studentSelect');
             studentSelect.innerHTML = '<option value="">Vyberte žáka</option>';
-            if (!cls) return;
-            
-            const filtered = Object.entries(STUDENTS).filter(([e, d]) => d.class === cls).sort((a,b) => a[1].name.localeCompare(b[1].name));
-            filtered.forEach(([e, d]) => studentSelect.add(new Option(d.name, e)));
+            if(!cls) return;
+            Object.entries(STUDENTS).filter(([e, d]) => d.class === cls).sort((a,b) => a[1].name.localeCompare(b[1].name))
+                .forEach(([e, d]) => studentSelect.add(new Option(d.name, e)));
         }
 
         function setupStudentUI(email) {
             document.getElementById('controls-container').classList.add('hidden');
             document.getElementById('student-notice').classList.remove('hidden');
             document.getElementById('printBtn').classList.add('hidden');
-            currentTargetEmail = email; 
-            loadStudentData(email);
+            currentTargetEmail = email; loadStudentData(email);
         }
 
-        // --- NAČÍTÁNÍ DAT ---
         async function loadStudentData(forcedEmail = null) {
-            try {
-                const email = forcedEmail || document.getElementById('studentSelect').value;
-                if (!email) return;
-                
-                currentTargetEmail = email;
-                const studentInfo = STUDENTS[email];
-                
-                const currUser = auth.currentUser;
-                if (!currUser) return;
-                const currentUserEmail = currUser.email ? currUser.email.toLowerCase() : "";
-                
-                isClassTeacher = (TEACHERS[currentUserEmail] === studentInfo.class);
+            const email = forcedEmail || document.getElementById('studentSelect').value;
+            if (!email) return;
+            currentTargetEmail = email;
+            const studentInfo = STUDENTS[email];
+            const currUser = auth.currentUser;
+            if(!currUser) return;
+            const currentUserEmail = currUser.email.toLowerCase();
+            isClassTeacher = (TEACHERS[currentUserEmail] === studentInfo.class);
 
-                document.getElementById('studentNameDisplay').textContent = studentInfo.name;
-                document.getElementById('classNameDisplay').textContent = "Třída: " + studentInfo.class;
-                
-                // Reset a pojistka pro prázdnou DB
-                dbData = { 
-                    teacherScales: {}, 
-                    studentScales: {}, 
-                    categoryComments: {}, 
-                    colleagueObservations: {}, 
-                    teacherComments: {}, 
-                    topNote: "", 
-                    bottomNote: "" 
-                };
-                
+            document.getElementById('studentNameDisplay').textContent = studentInfo.name;
+            document.getElementById('classNameDisplay').textContent = "Třída: " + studentInfo.class;
+            
+            dbData = { teacherScales: {}, studentScales: {}, categoryComments: {}, colleagueObservations: {}, teacherComments: {}, topNote: "", bottomNote: "" };
+            try {
                 const doc = await db.collection('evaluations').doc(email).get();
                 if (doc.exists) {
                     const data = doc.data();
-                    // Bezpečné sloučení s pojistkou proti null
                     dbData.teacherScales = data.teacherScales || {};
                     dbData.studentScales = data.studentScales || {};
                     dbData.categoryComments = data.categoryComments || {};
@@ -585,32 +454,24 @@
                     dbData.topNote = data.topNote || "";
                     dbData.bottomNote = data.bottomNote || "";
                 }
+            } catch (e) { showToast("Nepodařilo se načíst data.", true); }
 
-                renderForms(studentInfo.name);
-                renderSummary();
-            } catch (e) {
-                console.error(e);
-                showToast("Nepodařilo se načíst data žáka.", true);
-            }
+            renderForms(studentInfo.name);
+            renderSummary();
         }
 
         function renderForms(name) {
             const isStudent = userRole === 'student';
             const currUser = auth.currentUser;
-            const currUserEmail = (currUser && currUser.email) ? currUser.email.toLowerCase() : "";
+            const email = (currUser && currUser.email) ? currUser.email.toLowerCase() : "";
 
             document.getElementById('print-container').classList.toggle('hidden', isStudent);
             document.getElementById('page-2-container').classList.remove('hidden');
-            
-            document.getElementById('page2-title').innerHTML = isStudent 
-                ? `Moje sebehodnocení<br><span class="text-xl text-black font-black mt-2 inline-block">${name}</span>` 
-                : `Sebehodnocení žáka (Strana 2)<br><span class="text-xl text-black font-black mt-2 inline-block">${name}</span>`;
+            document.getElementById('page2-title').innerHTML = isStudent ? `Moje sebehodnocení<br><span class="text-xl text-black font-black mt-2 inline-block">${name}</span>` : `Sebehodnocení žáka (Strana 2)<br><span class="text-xl text-black font-black mt-2 inline-block">${name}</span>`;
             
             document.getElementById('schoolYearNoteInput').value = dbData.topNote || "";
             document.getElementById('summaryInput').value = dbData.bottomNote || "";
-            
-            const allComments = dbData.teacherComments || {};
-            document.getElementById('myPersonalComment').value = allComments[currUserEmail] || "";
+            document.getElementById('myPersonalComment').value = (dbData.teacherComments || {})[email] || "";
             
             document.getElementById('schoolYearNoteDisplay').textContent = dbData.topNote || "";
             document.getElementById('summaryDisplay').textContent = dbData.bottomNote || "";
@@ -619,205 +480,116 @@
                 document.getElementById('schoolYearNoteInput').disabled = !isClassTeacher;
                 document.getElementById('summaryInput').disabled = !isClassTeacher;
             }
-            
             autoResize(document.getElementById('schoolYearNoteInput'));
             autoResize(document.getElementById('summaryInput'));
             autoResize(document.getElementById('myPersonalComment'));
             
-            renderTeacherScales(); 
-            renderStudentScales();
+            renderTeacherScales(); renderStudentScales();
         }
 
-        // --- VYKRESLOVÁNÍ ŠKÁL ---
         function renderTeacherScales() {
-            try {
-                const container = document.getElementById('teacherSectionsContainer');
-                if (!container) return;
-                
-                const cats = [...new Set(COMPETENCIES.map(c => c.cat))];
-                const currUser = auth.currentUser;
-                const currEmail = (currUser && currUser.email) ? currUser.email.toLowerCase() : "";
-                
-                let finalHtml = "";
-                
-                cats.forEach(cat => {
-                    let htmlBlock = `<div class="bg-white border rounded p-3 break-inside-avoid"><h3 class="text-[10px] font-black text-center border-b mb-3 uppercase text-blue-900 font-print">${cat}</h3>`;
+            const container = document.getElementById('teacherSectionsContainer');
+            if(!container) return;
+            const cats = [...new Set(COMPETENCIES.map(c => c.cat))];
+            const currEmail = auth.currentUser?.email?.toLowerCase();
+            
+            let finalHtml = "";
+            cats.forEach(cat => {
+                let h = `<div class="bg-white border rounded p-3 break-inside-avoid"><h3 class="text-[10px] font-black text-center border-b mb-3 uppercase text-blue-900 font-print">${cat}</h3>`;
+                COMPETENCIES.filter(c => c.cat === cat).forEach(q => {
+                    const myObs = (dbData.colleagueObservations?.[currEmail] || {})[q.id];
+                    const finalVal = (dbData.teacherScales || {})[q.id];
                     
-                    COMPETENCIES.filter(c => c.cat === cat).forEach(q => {
-                        const allObservations = dbData.colleagueObservations || {};
-                        const myObservations = allObservations[currEmail] || {};
-                        const myObsValue = myObservations[q.id];
-                        
-                        const allTeacherScales = dbData.teacherScales || {};
-                        const finalPrintValue = allTeacherScales[q.id];
-                        
-                        let btns = '';
-                        let sqs = '';
-                        
-                        for(let i=0; i<4; i++) {
-                            const act = (myObsValue === i);
-                            btns += `<button onclick="setTeacherObservation('${q.id}', ${i})" class="scale-btn" style="background-color:${act ? ACTIVE_COLOR : INACTIVE_COLOR}; color:${act ? '#fff' : '#64748b'}; border-color:${act ? ACTIVE_COLOR : '#cbd5e1'}" ${userRole==='student' ? 'disabled' : ''}>${SCALE_LABELS[i]}</button>`;
-                            
-                            const printAct = (finalPrintValue === i);
-                            sqs += `<div class="w-2.5 h-2.5 border" style="background-color:${printAct ? ACTIVE_COLOR : INACTIVE_COLOR}; border-color:#94a3b8"></div>`;
-                        }
-                        
-                        htmlBlock += `<div class="mb-3 last:mb-0"><div class="text-[9px] font-bold leading-tight mb-2 text-slate-800 font-print">${q.text}</div><div class="grid grid-cols-4 gap-1 no-print">${btns}</div><div class="hidden print-flex gap-2 items-center justify-center">${sqs}</div></div>`;
-                    });
-                    
-                    finalHtml += htmlBlock + `</div>`;
+                    let btns = '', sqs = '';
+                    for(let i=0; i<4; i++) {
+                        const act = myObs === i;
+                        btns += `<button onclick="setTeacherObservation('${q.id}', ${i})" class="scale-btn" style="background-color:${act?ACTIVE_COLOR:INACTIVE_COLOR}; color:${act?'#fff':'#64748b'}; border-color:${act?ACTIVE_COLOR:'#cbd5e1'}" ${userRole==='student'?'disabled':''}>${SCALE_LABELS[i]}</button>`;
+                        const prn = finalVal === i;
+                        sqs += `<div class="w-2.5 h-2.5 border" style="background-color:${prn?ACTIVE_COLOR:INACTIVE_COLOR}; border-color:#94a3b8"></div>`;
+                    }
+                    h += `<div class="mb-3 last:mb-0"><div class="text-[9px] font-bold leading-tight mb-2 text-slate-800 font-print">${q.text}</div><div class="grid grid-cols-4 gap-1 no-print">${btns}</div><div class="hidden print-flex gap-2 items-center justify-center">${sqs}</div></div>`;
                 });
-                
-                container.innerHTML = finalHtml;
-            } catch (e) { console.error("Render error (teacher):", e); }
+                finalHtml += h + `</div>`;
+            });
+            container.innerHTML = finalHtml;
+        }
+
+        function renderSummary() {
+            const panel = document.getElementById('summary-panel'), statsDiv = document.getElementById('summary-stats'), textsDiv = document.getElementById('colleague-texts-list'), contributorDiv = document.getElementById('contributor-list');
+            const currEmail = auth.currentUser?.email?.toLowerCase();
+            if (!isClassTeacher || !currEmail) { panel.classList.add('hidden'); return; }
+            panel.classList.remove('hidden');
+            
+            const obs = dbData.colleagueObservations || {}, comments = dbData.teacherComments || {};
+            const allEmails = [...new Set([...Object.keys(obs), ...Object.keys(comments)])];
+            
+            let contrHtml = '<span class="text-xs font-bold text-blue-300 mr-2 uppercase self-center">Přispěli:</span>';
+            allEmails.forEach(e => { contrHtml += `<div class="flex items-center gap-1.5 bg-blue-800 px-3 py-1 rounded-full border border-blue-700 shadow-sm"><span class="text-[10px] font-medium">${e}</span><button onclick="openDeleteModal('${e}')" class="text-red-400 hover:text-red-200"><i data-lucide="x-circle" class="w-3.5 h-3.5"></i></button></div>`; });
+            contributorDiv.innerHTML = contrHtml || '<div class="text-xs opacity-50 italic">Žádné příspěvky od kolegů.</div>';
+
+            let sHtml = `<div class="grid grid-cols-12 gap-2 font-bold border-b border-blue-700 pb-2 mb-2 text-blue-200 uppercase font-print"><div class="col-span-5 text-[9px]">Kompetence</div><div class="col-span-1 text-center">Ne</div><div class="col-span-1 text-center">SpN</div><div class="col-span-1 text-center">SpA</div><div class="col-span-1 text-center">Ano</div><div class="col-span-1 text-center text-emerald-300">Průměr</div><div class="col-span-2 text-center text-blue-100 font-print">Můj postřeh</div></div>`;
+            COMPETENCIES.forEach(q => {
+                let cnt = [0,0,0,0], sum=0, tot=0;
+                Object.values(obs).forEach(d => { if(d && typeof d === 'object' && d[q.id]!==undefined){ cnt[d[q.id]]++; sum+=d[q.id]; tot++; } });
+                const avg = tot>0 ? (sum/tot).toFixed(1) : "-", myV = (obs[currEmail]||{})[q.id], myL = myV!==undefined ? SCALE_LABELS[myV] : "-";
+                sHtml += `<div class="grid grid-cols-12 gap-2 border-b border-blue-800 py-1 items-center font-print"><div class="col-span-5 opacity-90">${q.text}</div><div class="col-span-1 text-center font-bold ${cnt[0]>0?'text-white':'opacity-30'}">${cnt[0]}</div><div class="col-span-1 text-center font-bold ${cnt[1]>0?'text-white':'opacity-30'}">${cnt[1]}</div><div class="col-span-1 text-center font-bold ${cnt[2]>0?'text-white':'opacity-30'}">${cnt[2]}</div><div class="col-span-1 text-center font-bold ${cnt[3]>0?'text-white':'opacity-30'}">${cnt[3]}</div><div class="col-span-1 text-center text-emerald-400 font-black bg-blue-800 rounded py-0.5">${avg}</div><div class="col-span-2 text-center text-blue-200 font-bold italic">${myL}</div></div>`;
+            });
+            statsDiv.innerHTML = sHtml;
+
+            let tHtml = "";
+            Object.entries(comments).forEach(([e, t]) => { if(t && t.trim()){ tHtml += `<div class="bg-blue-800/50 p-3 rounded-lg border border-blue-700 font-print"><div class="text-[9px] font-bold text-blue-200 mb-1 uppercase">${e} píše:</div><div class="text-xs text-white whitespace-pre-wrap leading-relaxed">${t}</div></div>`; } });
+            textsDiv.innerHTML = tHtml || '<div class="text-xs opacity-50 italic font-print text-center">Zatím nejsou k dispozici žádné texty.</div>';
+            try { lucide.createIcons(); } catch (e) {}
         }
 
         function renderStudentScales() {
-            try {
-                const container = document.getElementById('studentSectionsContainer');
-                if (!container) return;
-                
-                const cats = [...new Set(COMPETENCIES.map(c => c.cat))];
-                let fullHtml = "";
-                
-                cats.forEach(cat => {
-                    let catHtml = `<div class="bg-white border-2 border-slate-100 p-6 rounded-3xl shadow-sm print:shadow-none print:p-0 print:border-0 font-print"><h3 class="text-lg font-black text-blue-900 uppercase mb-6 border-b pb-1">${cat}</h3><div class="space-y-8">`;
-                    
-                    COMPETENCIES.filter(c => c.cat === cat).forEach(q => {
-                        const allStudentScales = dbData.studentScales || {};
-                        const val = allStudentScales[q.id];
-                        
-                        let btns = '';
-                        let sqs = '';
-                        
-                        for(let i=0; i<4; i++) {
-                            const act = (val === i);
-                            btns += `<button onclick="setStudentScale('${q.id}', ${i})" class="scale-btn py-3 text-sm w-full" style="background-color:${act ? ACTIVE_COLOR : INACTIVE_COLOR}; color:${act ? '#fff' : '#64748b'}; border-color:${act ? ACTIVE_COLOR : '#cbd5e1'}" ${userRole==='teacher' ? 'disabled' : ''}>${SCALE_LABELS[i]}</button>`;
-                            sqs += `<div class="flex items-center gap-2 font-print"><div class="w-3 h-3 border" style="background-color:${act ? ACTIVE_COLOR : INACTIVE_COLOR}; border-color:#94a3b8"></div><span class="text-[9px] font-bold text-slate-500">${SCALE_LABELS[i]}</span></div>`;
-                        }
-                        
-                        catHtml += `<div class="font-print">
-                                <div class="text-sm font-bold text-slate-700 mb-3">${q.text}</div>
-                                <div class="grid grid-cols-4 gap-3 no-print">${btns}</div>
-                                <div class="hidden print-flex gap-5 mb-2 font-print">${sqs}</div>
-                              </div>`;
-                    });
-                    
-                    const allCatComments = dbData.categoryComments || {};
-                    const comm = allCatComments[cat] || "";
-                    
-                    // Bezpečné uložení textu přes inline JS volající pomocnou funkci
-                    catHtml += `</div><div class="mt-8 pt-5 border-t"><label class="text-[10px] font-bold text-slate-400 uppercase no-print block mb-1 font-print">Moje vyjádření k oblasti:</label><textarea id="cat-${cat}" class="w-full p-4 border rounded-2xl text-sm bg-blue-50 focus:bg-white focus:ring-4 focus:ring-blue-100 font-print" placeholder="Shrň své hodnocení..." rows="1" oninput="autoResize(this); updateCategoryComment('${cat}', this.value);" ${userRole==='teacher'?'disabled':''}>${comm}</textarea><div class="print-only text-sm italic mt-3 leading-relaxed text-slate-700 border-l-4 pl-4 font-print">${comm}</div></div></div>`;
-                    
-                    fullHtml += catHtml;
+            const container = document.getElementById('studentSectionsContainer');
+            if(!container) return;
+            const cats = [...new Set(COMPETENCIES.map(c => c.cat))];
+            let fullHtml = "";
+            cats.forEach(cat => {
+                let h = `<div class="bg-white border-2 border-slate-100 p-6 rounded-3xl shadow-sm print:shadow-none print:p-0 print:border-0 font-print"><h3 class="text-lg font-black text-blue-900 uppercase mb-6 border-b pb-1">${cat}</h3><div class="space-y-8">`;
+                COMPETENCIES.filter(c => c.cat === cat).forEach(q => {
+                    const val = (dbData.studentScales || {})[q.id];
+                    let btns = '', sqs = '';
+                    for(let i=0; i<4; i++) {
+                        const act = val === i;
+                        btns += `<button onclick="setStudentScale('${q.id}', ${i})" class="scale-btn py-3 text-sm w-full" style="background-color:${act?ACTIVE_COLOR:INACTIVE_COLOR}; color:${act?'#fff':'#64748b'}; border-color:${act?ACTIVE_COLOR:'#cbd5e1'}" ${userRole==='teacher'?'disabled':''}>${SCALE_LABELS[i]}</button>`;
+                        sqs += `<div class="flex items-center gap-2 font-print"><div class="w-3 h-3 border" style="background-color:${act?ACTIVE_COLOR:INACTIVE_COLOR}; border-color:#94a3b8"></div><span class="text-[9px] font-bold text-slate-500">${SCALE_LABELS[i]}</span></div>`;
+                    }
+                    h += `<div class="font-print"><div class="text-sm font-bold text-slate-700 mb-3">${q.text}</div><div class="grid grid-cols-4 gap-3 no-print">${btns}</div><div class="hidden print-flex gap-5 mb-2 font-print">${sqs}</div></div>`;
                 });
-                
-                container.innerHTML = fullHtml;
-                try { lucide.createIcons(); } catch (e) {}
-            } catch (e) { console.error("Render error (student):", e); }
+                const comm = (dbData.categoryComments || {})[cat] || "";
+                h += `</div><div class="mt-8 pt-5 border-t"><label class="text-[10px] font-bold text-slate-400 uppercase no-print block mb-1 font-print">Moje vyjádření k oblasti:</label><textarea id="cat-${cat}" class="w-full p-4 border rounded-2xl text-sm bg-blue-50 focus:bg-white focus:ring-4 focus:ring-blue-100 font-print" placeholder="Shrň své hodnocení..." rows="1" oninput="autoResize(this); updateCategoryComment('${cat}', this.value);" ${userRole==='teacher'?'disabled':''}>${comm}</textarea><div class="print-only text-sm italic mt-3 leading-relaxed text-slate-700 border-l-4 pl-4 font-print">${comm}</div></div></div>`;
+                fullHtml += h;
+            });
+            container.innerHTML = fullHtml;
+            try { lucide.createIcons(); } catch (e) {}
         }
 
-        // Pomocná funkce pro textarea žáka
         function updateCategoryComment(cat, val) {
             if (!dbData.categoryComments) dbData.categoryComments = {};
             dbData.categoryComments[cat] = val;
         }
 
-        // --- SVODKA (TŘÍDNÍ) ---
-        function renderSummary() {
-            try {
-                const panel = document.getElementById('summary-panel');
-                const statsDiv = document.getElementById('summary-stats');
-                const textsDiv = document.getElementById('colleague-texts-list');
-                const contributorDiv = document.getElementById('contributor-list');
-                
-                const currUser = auth.currentUser;
-                const currEmail = (currUser && currUser.email) ? currUser.email.toLowerCase() : "";
-                
-                if (!isClassTeacher || !currEmail) { 
-                    panel.classList.add('hidden'); 
-                    return; 
-                }
-                
-                panel.classList.remove('hidden');
-                
-                const obs = dbData.colleagueObservations || {};
-                const comments = dbData.teacherComments || {};
-                const allEmails = [...new Set([...Object.keys(obs), ...Object.keys(comments)])];
-                
-                let contrHtml = '<span class="text-xs font-bold text-blue-300 mr-2 uppercase self-center">Přispěli:</span>';
-                allEmails.forEach(e => { 
-                    contrHtml += `<div class="flex items-center gap-1.5 bg-blue-800 px-3 py-1 rounded-full border border-blue-700 shadow-sm"><span class="text-[10px] font-medium">${e}</span><button onclick="openDeleteModal('${e}')" class="text-red-400 hover:text-red-200"><i data-lucide="x-circle" class="w-3.5 h-3.5"></i></button></div>`; 
-                });
-                contributorDiv.innerHTML = contrHtml || '<div class="text-xs opacity-50 italic">Žádné příspěvky od kolegů.</div>';
-
-                let sHtml = `<div class="grid grid-cols-12 gap-2 font-bold border-b border-blue-700 pb-2 mb-2 text-blue-200 uppercase font-print"><div class="col-span-5 text-[9px]">Kompetence</div><div class="col-span-1 text-center">Ne</div><div class="col-span-1 text-center">SpN</div><div class="col-span-1 text-center">SpA</div><div class="col-span-1 text-center">Ano</div><div class="col-span-1 text-center text-emerald-300">Průměr</div><div class="col-span-2 text-center text-blue-100 font-print">Můj postřeh</div></div>`;
-                
-                COMPETENCIES.forEach(q => {
-                    let cnt = [0,0,0,0], sum=0, tot=0;
-                    Object.values(obs).forEach(d => { 
-                        if(d && typeof d === 'object' && d[q.id] !== undefined) { 
-                            cnt[d[q.id]]++; 
-                            sum += d[q.id]; 
-                            tot++; 
-                        } 
-                    });
-                    
-                    const avg = tot > 0 ? (sum/tot).toFixed(1) : "-";
-                    const myObsSafe = obs[currEmail] || {};
-                    const myV = myObsSafe[q.id];
-                    const myL = myV !== undefined ? SCALE_LABELS[myV] : "-";
-                    
-                    sHtml += `<div class="grid grid-cols-12 gap-2 border-b border-blue-800 py-1 items-center font-print"><div class="col-span-5 opacity-90">${q.text}</div><div class="col-span-1 text-center font-bold ${cnt[0]>0?'text-white':'opacity-30'}">${cnt[0]}</div><div class="col-span-1 text-center font-bold ${cnt[1]>0?'text-white':'opacity-30'}">${cnt[1]}</div><div class="col-span-1 text-center font-bold ${cnt[2]>0?'text-white':'opacity-30'}">${cnt[2]}</div><div class="col-span-1 text-center font-bold ${cnt[3]>0?'text-white':'opacity-30'}">${cnt[3]}</div><div class="col-span-1 text-center text-emerald-400 font-black bg-blue-800 rounded py-0.5">${avg}</div><div class="col-span-2 text-center text-blue-200 font-bold italic font-print">${myL}</div></div>`;
-                });
-                statsDiv.innerHTML = sHtml;
-
-                let tHtml = "";
-                Object.entries(comments).forEach(([e, t]) => { 
-                    if(typeof t === 'string' && t.trim() !== ""){ 
-                        tHtml += `<div class="bg-blue-800/50 p-3 rounded-lg border border-blue-700 font-print"><div class="text-[9px] font-bold text-blue-200 mb-1 uppercase">${e} píše:</div><div class="text-xs text-white whitespace-pre-wrap leading-relaxed">${t}</div></div>`; 
-                    } 
-                });
-                textsDiv.innerHTML = tHtml || '<div class="text-xs opacity-50 italic font-print text-center">Zatím nejsou k dispozici žádné texty.</div>';
-                
-                try { lucide.createIcons(); } catch (e) {}
-            } catch (e) { console.error("Render summary error:", e); }
-        }
-
-        // --- MAZÁNÍ DAT ---
-        function openDeleteModal(email) { 
-            deleteCandidateEmail = email; 
-            document.getElementById('delete-target-name').textContent = email; 
-            document.getElementById('delete-modal').classList.remove('hidden'); 
-        }
-        
-        function closeDeleteModal() { 
-            document.getElementById('delete-modal').classList.add('hidden'); 
-            deleteCandidateEmail = null; 
-        }
+        function openDeleteModal(email) { deleteCandidateEmail = email; document.getElementById('delete-target-name').textContent = email; document.getElementById('delete-modal').classList.remove('hidden'); }
+        function closeDeleteModal() { document.getElementById('delete-modal').classList.add('hidden'); deleteCandidateEmail = null; }
         
         async function confirmDelete() {
             if (!deleteCandidateEmail || !currentTargetEmail) return;
             const email = deleteCandidateEmail;
             
-            // Odstranění z lokálního paměťového objektu
-            if (dbData.colleagueObservations && dbData.colleagueObservations[email]) {
-                delete dbData.colleagueObservations[email];
-            }
-            if (dbData.teacherComments && dbData.teacherComments[email]) {
-                delete dbData.teacherComments[email];
-            }
+            if (dbData.colleagueObservations) delete dbData.colleagueObservations[email];
+            if (dbData.teacherComments) delete dbData.teacherComments[email];
             
             try {
-                // Bezpečné ostranění přímo ve Firestore
                 await db.collection('evaluations').doc(currentTargetEmail).update({
                     [`colleagueObservations.${email}`]: firebase.firestore.FieldValue.delete(),
                     [`teacherComments.${email}`]: firebase.firestore.FieldValue.delete()
                 });
-                showToast(`Data smazána.`);
+                showToast(`Data od ${email} smazána.`);
             } catch (e) {
-                // Pokud ještě dokument není v DB, vyřeší to lokální smazání a následný "Uložit"
-                console.warn("Chyba přímého mazání, smazáno lokálně.", e);
+                console.warn("Chyba přímého mazání ve Firebase, smazáno lokálně.", e);
                 showToast(`Data smazána lokálně.`);
             }
 
@@ -826,7 +598,6 @@
             renderTeacherScales(); 
         }
 
-        // --- PROPSÁNÍ ---
         function applyAverages() {
             if (!isClassTeacher) return;
             const obs = dbData.colleagueObservations || {};
@@ -834,15 +605,8 @@
             
             COMPETENCIES.forEach(q => {
                 let sum = 0, tot = 0;
-                Object.values(obs).forEach(d => { 
-                    if(d && typeof d === 'object' && d[q.id] !== undefined) { 
-                        sum += d[q.id]; 
-                        tot++; 
-                    } 
-                });
-                if (tot > 0) { 
-                    dbData.teacherScales[q.id] = Math.round(sum/tot); 
-                }
+                Object.values(obs).forEach(d => { if(d && typeof d === 'object' && d[q.id] !== undefined) { sum += d[q.id]; tot++; } });
+                if (tot > 0) { dbData.teacherScales[q.id] = Math.round(sum/tot); }
             });
             renderTeacherScales(); 
             showToast("Průměry škál propsány.");
@@ -852,25 +616,16 @@
             if (!isClassTeacher) return;
             const comms = dbData.teacherComments || {};
             let combined = "";
-            Object.values(comms).forEach(t => { 
-                if(typeof t === 'string' && t.trim() !== "") {
-                    combined += `${t}\n\n`; 
-                }
-            });
+            Object.values(comms).forEach(t => { if(typeof t === 'string' && t.trim() !== "") { combined += `${t}\n\n`; } });
             const sIn = document.getElementById('summaryInput');
-            if (sIn) {
-                sIn.value = combined.trim(); 
-                autoResize(sIn); 
-                showToast("Texty sloučeny.");
-            }
+            if (sIn) { sIn.value = combined.trim(); autoResize(sIn); showToast("Texty sloučeny."); }
         }
 
-        // --- NASTAVENÍ HODNOT ---
         function setTeacherObservation(id, v) { 
             if(userRole === 'teacher'){ 
                 const currUser = auth.currentUser;
                 if(!currUser) return;
-                const email = currUser.email ? currUser.email.toLowerCase() : "";
+                const email = currUser.email.toLowerCase();
                 
                 if (!dbData.colleagueObservations) dbData.colleagueObservations = {};
                 if (!dbData.colleagueObservations[email]) dbData.colleagueObservations[email] = {};
@@ -889,13 +644,8 @@
             } 
         }
         
-        function autoResize(el) { 
-            if(!el) return; 
-            el.style.height = 'auto'; 
-            el.style.height = el.scrollHeight + 'px'; 
-        }
+        function autoResize(el) { if(!el) return; el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; }
 
-        // --- ZÁLOHA A ULOŽENÍ ---
         async function downloadAllData() {
             try {
                 const snap = await db.collection('evaluations').get();
@@ -909,9 +659,7 @@
                 a.download = `zaloha_galaxie_${new Date().toISOString().slice(0,10)}.json`; 
                 a.click();
                 showToast("Kompletní záloha stažena.");
-            } catch (e) { 
-                showToast("Chyba zálohy: " + e.message, true); 
-            }
+            } catch (e) { showToast("Chyba zálohy: " + e.message, true); }
         }
 
         function showToast(msg, isError = false) {
@@ -930,17 +678,14 @@
             t.style.opacity = '1'; 
             try { lucide.createIcons(); } catch(e) {}
             
-            setTimeout(() => { 
-                t.style.opacity = '0'; 
-                t.style.transform = 'translateY(24px)'; 
-            }, 3000);
+            setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(24px)'; }, 3000);
         }
 
         async function saveData() {
             if(!currentTargetEmail) return;
             const currUser = auth.currentUser;
             if(!currUser) return;
-            const email = currUser.email ? currUser.email.toLowerCase() : "";
+            const email = currUser.email.toLowerCase();
             
             if(userRole === 'teacher') { 
                 if(isClassTeacher) {
