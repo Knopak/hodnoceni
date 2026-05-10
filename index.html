@@ -19,11 +19,9 @@
         .print-only { display: none; }
         textarea { resize: none; overflow: hidden; transition: height 0.1s ease; border: 1px solid #e2e8f0; }
         textarea:disabled { background-color: #f8fafc; color: #64748b; cursor: not-allowed; }
-        .scale-btn { transition: all 0.2s; border: 1px solid #cbd5e1; font-size: 0.75rem; font-weight: 600; padding: 0.5rem 0.25rem; border-radius: 0.375rem; }
-        .scale-btn:not(:disabled):hover { border-color: #0ea5e9; }
+        .scale-btn { transition: all 0.2s; border: 1px solid #cbd5e1; font-size: 0.7rem; font-weight: 600; padding: 0.4rem 0.2rem; border-radius: 0.375rem; }
+        .scale-btn:not(:disabled):hover { border-color: #3b82f6; }
         .scale-btn:active { transform: scale(0.95); }
-
-        .print-legend { color: #0ea5e9; }
 
         @media print {
             @page { size: A4; margin: 0; }
@@ -31,14 +29,6 @@
             .no-print { display: none !important; }
             .print-only { display: block !important; }
             .print-flex { display: flex !important; }
-            
-            .print-legend {
-                display: flex !important;
-                color: #0ea5e9 !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-
             #print-container { padding: 10mm 15mm !important; box-shadow: none !important; width: 100% !important; page-break-after: always; display: block !important; }
             #page-2-container { padding: 10mm 15mm !important; display: block !important; box-shadow: none !important; width: 100% !important; }
             textarea { display: none !important; }
@@ -50,7 +40,7 @@
 
     <div id="auth-screen" class="min-h-screen flex flex-col items-center justify-center p-4">
         <div class="bg-white p-10 rounded-2xl shadow-xl text-center max-w-md w-full border-t-8 border-blue-600">
-            <img src="https://github.com/Knopak/hodnoceni/blob/main/logo.jpg?raw=true" alt="ZŠ Galaxie" class="mx-auto h-28 mb-8 object-contain">
+            <img src="https://github.com/Knopak/hodnoceni/blob/main/logo.jpg?raw=true" alt="ZŠ Galaxie" class="mx-auto h-24 mb-8 object-contain">
             <h1 class="text-3xl font-extrabold mb-2 text-blue-900">ZŠ Galaxie</h1>
             <button onclick="loginWithGoogle()" class="w-full mt-6 bg-blue-600 text-white font-bold px-6 py-4 rounded-xl flex items-center justify-center gap-3 hover:bg-blue-700 transition-all shadow-lg active:scale-95">
                 Přihlásit se školním Googlem
@@ -60,45 +50,61 @@
 
     <div id="app-screen" class="hidden">
         <div class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm px-4 py-3 no-print">
-            <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+            <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4 text-sm">
                 <div id="controls-container" class="flex items-center gap-4">
-                    <select id="classSelect" onchange="onClassChange()" class="bg-slate-50 font-bold text-sm px-4 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none">
+                    <select id="classSelect" onchange="onClassChange()" class="bg-slate-50 font-bold px-3 py-1.5 rounded-lg border focus:ring-2 focus:ring-blue-500">
                         <option value="">Třída</option>
                     </select>
-                    <select id="studentSelect" onchange="loadStudentData()" class="bg-slate-50 font-bold text-sm px-4 py-2 rounded-lg border border-slate-200 w-[240px] focus:ring-2 focus:ring-blue-500 outline-none">
+                    <select id="studentSelect" onchange="loadStudentData()" class="bg-slate-50 font-bold px-3 py-1.5 rounded-lg border w-[240px] focus:ring-2 focus:ring-blue-500">
                         <option value="">Vyberte žáka</option>
                     </select>
-                    
-                    <div id="offline-indicator" class="hidden items-center gap-2 px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-bold border border-red-200">
-                        <i data-lucide="wifi-off" class="w-3 h-3"></i> Offline (ukládám lokálně)
+                </div>
+                <div id="student-notice" class="hidden text-blue-700 font-bold flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-lg border border-blue-100">
+                    <i data-lucide="user-check"></i> Moje Sebehodnocení
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="saveData()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-lg font-bold flex items-center gap-2 shadow-md">
+                        <i data-lucide="save"></i> Uložit data
+                    </button>
+                    <button id="printBtn" onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-bold flex items-center gap-2 shadow-md">
+                        <i data-lucide="printer"></i> Tisk
+                    </button>
+                    <button onclick="auth.signOut()" class="bg-slate-100 text-slate-600 px-4 py-2 rounded-lg font-bold">Odhlásit</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SVODKA PRO TŘÍDNÍ -->
+        <div id="summary-panel" class="max-w-[210mm] mx-auto mt-4 no-print hidden">
+            <div class="bg-blue-900 text-white p-6 rounded-2xl shadow-lg">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-bold flex items-center gap-2 uppercase tracking-wide">
+                        <i data-lucide="bar-chart-3"></i> Svodka hodnocení od kolegů
+                    </h3>
+                    <div class="flex gap-2">
+                        <button onclick="applyAverages()" class="bg-emerald-500 hover:bg-emerald-400 text-white px-4 py-2 rounded-lg font-bold text-xs flex items-center gap-2">
+                            <i data-lucide="copy-check"></i> Propsat průměry
+                        </button>
+                        <button onclick="applyTextSummaries()" class="bg-amber-500 hover:bg-amber-400 text-white px-4 py-2 rounded-lg font-bold text-xs flex items-center gap-2">
+                            <i data-lucide="message-square-plus"></i> Propsat texty kolegů
+                        </button>
                     </div>
                 </div>
-                
-                <div id="student-notice" class="hidden text-blue-700 font-bold flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-lg border border-blue-100">
-                    <i data-lucide="user-check" class="w-5 h-5"></i> Moje Sebehodnocení
+                <div id="summary-stats" class="grid grid-cols-1 gap-2 text-[11px] mb-6">
+                    <!-- Tabulka hlasů -->
                 </div>
-                
-                <div class="flex items-center gap-3">
-                    <button onclick="saveData()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center gap-2 shadow-md transition-colors">
-                        <i data-lucide="save" class="w-4 h-4"></i> Uložit
-                    </button>
-                    <button id="reloadNotesBtn" onclick="reloadTeacherNotes()" class="hidden bg-amber-500 hover:bg-amber-600 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center gap-2 shadow-md transition-colors">
-                        <i data-lucide="refresh-cw" class="w-4 h-4"></i> Načíst od kolegů
-                    </button>
-                    <button id="svodkaBtn" onclick="openSvodka()" class="hidden bg-violet-600 hover:bg-violet-700 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center gap-2 shadow-md transition-colors">
-                        <i data-lucide="table-2" class="w-4 h-4"></i> Svodka
-                    </button>
-                    <button id="printBtn" onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center gap-2 shadow-md transition-colors">
-                        <i data-lucide="printer" class="w-4 h-4"></i> Tisk
-                    </button>
-                    <button onclick="auth.signOut()" class="bg-slate-100 text-slate-600 hover:bg-red-50 hover:text-red-600 px-4 py-2 rounded-lg text-sm font-bold transition-all ml-2">Odhlásit</button>
+                <div id="colleague-texts" class="border-t border-blue-800 pt-4 space-y-3">
+                    <h4 class="text-xs font-bold uppercase text-blue-300">Textové postřehy kolegů:</h4>
+                    <div id="colleague-texts-list" class="grid grid-cols-1 gap-2">
+                        <!-- Seznam textů -->
+                    </div>
                 </div>
             </div>
         </div>
 
         <div id="print-container" class="max-w-[210mm] mx-auto p-10 bg-white my-8 shadow-md flex flex-col hidden">
             <div class="flex justify-center mb-6">
-                <img src="https://github.com/Knopak/hodnoceni/blob/main/logo.jpg?raw=true" alt="ZŠ Galaxie" class="h-20 object-contain">
+                <img src="https://github.com/Knopak/hodnoceni/blob/main/logo.jpg?raw=true" alt="ZŠ Galaxie" class="h-16 object-contain">
             </div>
             <div class="text-center mb-8">
                 <div class="inline-block border-[4px] border-blue-600 px-12 py-2 mb-4">
@@ -113,55 +119,36 @@
                     <label class="text-[10px] font-bold text-blue-800 uppercase block mb-1">Úvodní slovo třídního učitele:</label>
                     <textarea id="schoolYearNoteInput" class="w-full p-3 border rounded-lg text-sm bg-white shadow-sm focus:ring-2 focus:ring-blue-500" rows="3"></textarea>
                 </div>
-                <div id="schoolYearNoteDisplay" class="print-only text-justify text-sm italic leading-relaxed text-slate-800 px-2"></div>
-            </div>
-            
-            <div id="teacherSectionsContainer" class="grid grid-cols-3 gap-6 mt-2"></div>
-            
-            <div class="flex justify-center gap-6 mt-4 print-legend legend-text">
-                <span class="flex items-center gap-1.5 text-[10px] font-bold"><div class="w-2.5 h-2.5 border border-[#0ea5e9]"></div> 1. Ne</span>
-                <span class="flex items-center gap-1.5 text-[10px] font-bold"><div class="w-2.5 h-2.5 border border-[#0ea5e9]"></div> 2. Spíše ne</span>
-                <span class="flex items-center gap-1.5 text-[10px] font-bold"><div class="w-2.5 h-2.5 border border-[#0ea5e9]"></div> 3. Spíše ano</span>
-                <span class="flex items-center gap-1.5 text-[10px] font-bold"><div class="w-2.5 h-2.5 border border-[#0ea5e9]"></div> 4. Ano</span>
+                <div id="schoolYearNoteDisplay" class="print-only text-justify text-sm italic leading-tight text-slate-800 px-2"></div>
             </div>
 
+            <h2 class="text-xs font-bold mb-4 text-center uppercase tracking-[0.2em] border-b pb-2 text-slate-500">Hodnocení školy</h2>
+            <div id="teacherSectionsContainer" class="grid grid-cols-3 gap-6 mt-2"></div>
+            
+            <!-- Moje osobní poznámka (Sběr dat od každého učitele) -->
+            <div class="mt-8 p-4 bg-blue-50 rounded-xl border border-blue-100 no-print" id="personal-note-section">
+                <label class="text-[10px] font-bold text-blue-800 uppercase block mb-1">Můj postřeh k žákovi (ostatní uvidí ve svodce):</label>
+                <textarea id="myPersonalComment" class="w-full p-3 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500" rows="3" placeholder="Sem pište své postřehy. Třídní je pak uvidí a může je použít do finálního textu..."></textarea>
+            </div>
+
+            <!-- Finální tisková zpětná vazba -->
             <div class="mt-10 flex-grow flex flex-col">
-                <label class="text-[10px] font-bold text-blue-800 uppercase no-print mb-2 ml-1">Zpětná vazba od vyučujících:</label>
-                <textarea id="summaryInput" class="w-full p-4 border border-slate-200 rounded-xl text-sm min-h-[300px] bg-yellow-50 focus:bg-white shadow-inner"></textarea>
+                <label class="text-[10px] font-bold text-blue-800 uppercase no-print mb-2 ml-1">Zpětná vazba vyučujících (Tiskne se):</label>
+                <textarea id="summaryInput" class="w-full p-4 border border-slate-200 rounded-xl text-sm min-h-[300px] bg-yellow-50 focus:bg-white shadow-inner" placeholder="Tento text píše třídní učitel jako finální výstup..."></textarea>
                 <div id="summaryDisplay" class="print-only text-justify text-sm leading-relaxed whitespace-pre-wrap font-print text-slate-900 border-t pt-4"></div>
             </div>
         </div>
 
-        <div id="page-2-container" class="max-w-[210mm] mx-auto p-10 bg-white my-8 shadow-md flex flex-col hidden">
-            <h2 id="page2-title" class="text-2xl font-black mb-8 text-center text-blue-900 uppercase border-b-4 border-blue-900 pb-3 tracking-wide">Sebehodnocení žáka</h2>
-            
-            <div id="studentSectionsContainer" class="space-y-3"></div>
-            
-            <div class="mt-6 pt-4 border-t-2 border-slate-200">
-                <div class="flex justify-center gap-6 print-legend legend-text">
-                    <span class="text-[10px] font-bold uppercase tracking-wide mr-1">Význam škály:</span>
-                    <span class="flex items-center gap-1.5 text-[10px] font-bold"><div class="w-2.5 h-2.5 border border-[#0ea5e9]"></div> 1. Ne</span>
-                    <span class="flex items-center gap-1.5 text-[10px] font-bold"><div class="w-2.5 h-2.5 border border-[#0ea5e9]"></div> 2. Spíše ne</span>
-                    <span class="flex items-center gap-1.5 text-[10px] font-bold"><div class="w-2.5 h-2.5 border border-[#0ea5e9]"></div> 3. Spíše ano</span>
-                    <span class="flex items-center gap-1.5 text-[10px] font-bold"><div class="w-2.5 h-2.5 border border-[#0ea5e9]"></div> 4. Ano</span>
+        <!-- STRANA 2: ŽÁK -->
+        <div id="page-2-container" class="max-w-[210mm] mx-auto p-10 bg-white my-8 shadow-md flex flex-col hidden font-print">
+            <h2 class="text-2xl font-black mb-8 text-center text-blue-900 uppercase border-b-4 border-blue-900 pb-3 tracking-wide">Sebehodnocení žáka</h2>
+            <div id="studentSectionsContainer" class="space-y-10"></div>
+            <div class="mt-auto pt-10">
+                <div class="grid grid-cols-3 gap-8 text-[10px] text-slate-400 border-t border-slate-100 pt-6 font-print italic">
+                    <div><span class="font-bold uppercase text-slate-600 block mb-1">Ve vztahu k sobě:</span>Vyjadřování myšlenek, pocity, práce se zpětnou vazbou.</div>
+                    <div><span class="font-bold uppercase text-slate-600 block mb-1">Ve vztahu k druhým:</span>Pravidla, spolupráce, bezpečné prostředí.</div>
+                    <div><span class="font-bold uppercase text-slate-600 block mb-1">Při učení:</span>Zodpovědnost, vytrvalost, porozumění textu.</div>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="svodka-modal" class="hidden fixed inset-0 bg-black/50 z-[200] flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-6xl w-full max-h-[90vh] flex flex-col">
-            <div class="flex items-center justify-between px-6 py-4 border-b">
-                <div>
-                    <h2 class="text-xl font-black text-violet-900">Svodka hodnocení</h2>
-                    <p id="svodka-student-name" class="text-sm text-slate-500 font-medium mt-0.5"></p>
-                </div>
-                <button onclick="closeSvodka()" class="text-slate-400 hover:text-red-500 transition-colors">
-                    <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
-            </div>
-            <div class="overflow-auto flex-1 p-4">
-                <div id="svodka-content"></div>
             </div>
         </div>
     </div>
@@ -181,14 +168,8 @@
             measurementId: "G-WDFNSPS8EX"
         };
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const auth = firebase.auth();
+        const auth = firebase.auth(), db = firebase.firestore();
 
-        db.enablePersistence({ synchronizeTabs: true }).catch(function(err) {
-            console.warn("Offline persistence se nepodařilo aktivovat:", err.code);
-        });
-
-        // AKTUALIZOVANÝ SEZNAM UČITELŮ
         const TEACHERS = {
             "barbora.bezdekova@skolagalaxie.cz": "",
             "eva.pancova@skolagalaxie.cz": "7. A",
@@ -206,32 +187,8 @@
             "ondrej.cervenka@skolagalaxie.cz": "3. A",
             "pavlina.bittnerova@skolagalaxie.cz": "5. A",
             "skola@skolagalaxie.cz": "",
-            "vojtech.zajicek@skolagalaxie.cz": "",
             "tereza.malirova@skolagalaxie.cz": "2. A",
-            "nastenka@skolagalaxie.cz": ""
-        };
-
-        // AKTUALIZOVANÝ SEZNAM PŘEZDÍVEK
-        const TEACHER_NICKNAMES = {
-            "barbora.bezdekova@skolagalaxie.cz": "Bára",
-            "eva.pancova@skolagalaxie.cz": "Eva",
-            "frantisek.knop@skolagalaxie.cz": "František",
-            "hana.svobodova@skolagalaxie.cz": "Hana",
-            "jana.skrabalova@skolagalaxie.cz": "Jana",
-            "jesse.courtemanche@skolagalaxie.cz": "Jesse",
-            "jitka.zakova@skolagalaxie.cz": "Jitka",
-            "linda.vyvleckova@skolagalaxie.cz": "Linda",
-            "lucie.haslerova@skolagalaxie.cz": "Lucie",
-            "lukas.vrobel@skolagalaxie.cz": "Lukáš",
-            "martin.kopecky@skolagalaxie.cz": "Martin",
-            "michaela.raskova@skolagalaxie.cz": "Míša",
-            "olga.orlitova@skolagalaxie.cz": "Olga",
-            "ondrej.cervenka@skolagalaxie.cz": "Ondřej",
-            "pavlina.bittnerova@skolagalaxie.cz": "Pavlína",
-            "skola@skolagalaxie.cz": "Dan",
-            "vojtech.zajicek@skolagalaxie.cz": "Vojta",
-            "tereza.malirova@skolagalaxie.cz": "Terka",
-            "nastenka@skolagalaxie.cz": "test"
+            "nastenka@skolagalaxie.cz": "" 
         };
 
         const STUDENTS = {
@@ -414,38 +371,21 @@
             { id: "l4", cat: "Při učení", text: "Dokážeš srozumitelně prezentovat." }
         ];
 
-        const COMPETENCY_DETAILS = {
-            "s1": "Umím říct, co si myslím nebo jak se cítím. Vím, kdy je čas na vtipkování a kdy je potřeba mluvit vážně.",
-            "s2": "Poznám, co se v danou chvíli sluší a co ne. Když mě někdo provokuje, dokážu se ovládnout a reagovat správně.",
-            "s3": "Když mi učitel nebo spolužák řekne, co dělám dobře a co mi nejde, neurazím se a zamyslím se, jak radu využít.",
-            "o1": "Respektuji pravidla třídy a školy. Nikdo mě nemusí napomínat, abych dělal/a to, na čem jsme se jako skupina dohodli.",
-            "o2": "Dokážu se domluvit na společném postupu a splnit svou část úkolu. Uznávám práci ostatních a přispívám svým názorem.",
-            "o3": "Umím spolužáka konkrétně ocenit, dát mu radu či doporučení.",
-            "o4": "Ostatní se v mé přítomnosti cítí dobře a beze strachu. Nikoho neshazuji ani nevyčleňuji z kolektivu.",
-            "l1": "Do školy přicházím připravený/á, mám v pořádku pomůcky, dávám pozor a snažím se plnit úkoly včas.",
-            "l2": "Když mi něco nejde hned napoprvé, nevzdávám se. Zkusím hledat řešení a nebojím se požádat o pomoc.",
-            "l3": "Když si přečtu text nebo zadání úkolu, dokážu vlastními slovy říct, o čem to bylo a co mám udělat.",
-            "l4": "Umím ostatním ukázat a vysvětlit, co jsem vytvořil/a. Mluvím dostatečně hlasitě, udržuji oční kontakt a volím vhodná slova."
-        };
-
         const SCALE_LABELS = ['Ne', 'Sp. ne', 'Sp. ano', 'Ano'];
-        const ACTIVE_COLOR = '#0ea5e9'; 
-        const INACTIVE_COLOR = '#f1f5f9';
+        const ACTIVE_COLOR = '#1d4ed8', INACTIVE_COLOR = '#f1f5f9';
 
         let userRole = null, isClassTeacher = false, currentTargetEmail = null;
-        let dbData = { teacherScales: {}, studentScales: {}, categoryComments: {}, topNote: "", bottomNote: "", teacherNotes: {} };
-
-        window.addEventListener('online',  () => document.getElementById('offline-indicator').classList.add('hidden'));
-        window.addEventListener('offline', () => document.getElementById('offline-indicator').classList.remove('hidden'));
-
-        window.onload = () => {
-            lucide.createIcons();
-            window.addEventListener('beforeunload', () => { saveToCache(); });
-            document.addEventListener('visibilitychange', () => {
-                if (document.visibilityState === 'hidden') saveToCache();
-            });
-            if (!navigator.onLine) document.getElementById('offline-indicator').classList.remove('hidden');
+        let dbData = { 
+            teacherScales: {}, 
+            studentScales: {}, 
+            categoryComments: {}, 
+            colleagueObservations: {}, 
+            teacherComments: {}, // Nové pole pro textové postřehy jednotlivých učitelů
+            topNote: "", 
+            bottomNote: "" // Finální tiskový text
         };
+
+        window.onload = () => lucide.createIcons();
 
         auth.onAuthStateChanged(user => {
             if (user) {
@@ -470,17 +410,14 @@
             classes.forEach(c => classSelect.add(new Option(c, c)));
             document.getElementById('controls-container').classList.remove('hidden');
             document.getElementById('student-notice').classList.add('hidden');
-            document.getElementById('printBtn').classList.remove('hidden');
         }
 
         function onClassChange() {
             const cls = document.getElementById('classSelect').value;
             const studentSelect = document.getElementById('studentSelect');
             studentSelect.innerHTML = '<option value="">Vyberte žáka</option>';
-            if (!cls) return;
-            Object.entries(STUDENTS)
-                .filter(([e, d]) => d.class === cls)
-                .sort((a, b) => a[1].name.localeCompare(b[1].name))
+            if(!cls) return;
+            Object.entries(STUDENTS).filter(([e, d]) => d.class === cls).sort((a,b) => a[1].name.localeCompare(b[1].name))
                 .forEach(([e, d]) => studentSelect.add(new Option(d.name, e)));
         }
 
@@ -488,406 +425,230 @@
             document.getElementById('controls-container').classList.add('hidden');
             document.getElementById('student-notice').classList.remove('hidden');
             document.getElementById('printBtn').classList.add('hidden');
-            currentTargetEmail = email;
-            loadStudentData(email);
+            currentTargetEmail = email; loadStudentData(email);
         }
 
-        async function loadStudentData(forcedEmail) {
+        async function loadStudentData(forcedEmail = null) {
             const email = forcedEmail || document.getElementById('studentSelect').value;
             if (!email) return;
             currentTargetEmail = email;
             const studentInfo = STUDENTS[email];
-            
-            const myEmail = auth.currentUser.email.toLowerCase();
-            isClassTeacher = (userRole === 'teacher' && TEACHERS[myEmail] === studentInfo.class);
-            
+            const currentUserEmail = auth.currentUser.email.toLowerCase();
+            isClassTeacher = (TEACHERS[currentUserEmail] === studentInfo.class);
+
             document.getElementById('studentNameDisplay').textContent = studentInfo.name;
             document.getElementById('classNameDisplay').textContent = "Třída: " + studentInfo.class;
-            dbData = { teacherScales: {}, studentScales: {}, categoryComments: {}, topNote: "", bottomNote: "", teacherNotes: {} };
             
-            const cached = loadFromCache();
+            dbData = { teacherScales: {}, studentScales: {}, categoryComments: {}, colleagueObservations: {}, teacherComments: {}, topNote: "", bottomNote: "" };
             const doc = await db.collection('evaluations').doc(email).get();
-            const serverData = doc.exists ? doc.data() : {};
+            if (doc.exists) dbData = { ...dbData, ...doc.data() };
             
-            if (cached && cached.ts > (serverData._savedAt || 0)) {
-                dbData = { ...dbData, ...cached, teacherNotes: { ...(serverData.teacherNotes || {}), ...(cached.teacherNotes || {}) } };
-            } else {
-                dbData = { ...dbData, ...serverData };
-            }
             renderForms(studentInfo.name);
-            attachAutosaveListeners();
+            renderSummary();
         }
 
         function renderForms(name) {
             const isStudent = userRole === 'student';
-
+            const email = auth.currentUser.email.toLowerCase();
             document.getElementById('print-container').classList.toggle('hidden', isStudent);
             document.getElementById('page-2-container').classList.remove('hidden');
-
-            document.getElementById('page2-title').innerHTML = isStudent
-                ? `Moje sebehodnocení<br><span class="text-xl text-black font-black mt-2 inline-block">${name}</span>`
-                : `Sebehodnocení žáka<br><span class="text-xl text-black font-black mt-2 inline-block">${name}</span>`;
-
-            if (!isStudent) {
-                document.getElementById('schoolYearNoteInput').value = dbData.topNote || "";
-                document.getElementById('schoolYearNoteDisplay').textContent = dbData.topNote || "";
+            document.getElementById('page2-title').innerHTML = isStudent ? `Moje sebehodnocení<br><span class="text-xl text-black font-black mt-2 inline-block">${name}</span>` : `Sebehodnocení žáka (Strana 2)<br><span class="text-xl text-black font-black mt-2 inline-block">${name}</span>`;
+            
+            document.getElementById('schoolYearNoteInput').value = dbData.topNote || "";
+            document.getElementById('summaryInput').value = dbData.bottomNote || "";
+            document.getElementById('myPersonalComment').value = dbData.teacherComments?.[email] || "";
+            
+            document.getElementById('schoolYearNoteDisplay').textContent = dbData.topNote || "";
+            document.getElementById('summaryDisplay').textContent = dbData.bottomNote || "";
+            
+            if (userRole === 'teacher') {
                 document.getElementById('schoolYearNoteInput').disabled = !isClassTeacher;
-                const myEmail = auth.currentUser.email.toLowerCase();
-                
-                if (isClassTeacher) {
-                    const notes = dbData.teacherNotes || {};
-                    const combined = Object.entries(notes)
-                        .filter(([, v]) => v && v.trim())
-                        .map(([email, note]) => {
-                            const nick = TEACHER_NICKNAMES[email] || email.split('.')[0];
-                            return nick + ':\n' + note.trim();
-                        })
-                        .join('\n\n---\n\n');
-                    const finalText = dbData.bottomNote || combined;
-                    document.getElementById('summaryInput').value = finalText;
-                    document.getElementById('summaryDisplay').textContent = finalText;
-                    document.getElementById('summaryInput').disabled = false;
-                } else {
-                    const myNote = (dbData.teacherNotes || {})[myEmail] || "";
-                    document.getElementById('summaryInput').value = myNote;
-                    document.getElementById('summaryDisplay').textContent = myNote;
-                    document.getElementById('summaryInput').disabled = false;
-                }
-                autoResize(document.getElementById('schoolYearNoteInput'));
-                autoResize(document.getElementById('summaryInput'));
-                renderTeacherScales();
+                document.getElementById('summaryInput').disabled = !isClassTeacher;
+                document.getElementById('myPersonalComment').disabled = false;
             }
-
-            renderStudentScales();
-
-            const svodkaBtn = document.getElementById('svodkaBtn');
-            if (svodkaBtn) svodkaBtn.classList.toggle('hidden', userRole !== 'teacher');
-            const reloadBtn = document.getElementById('reloadNotesBtn');
-            if (reloadBtn) reloadBtn.classList.toggle('hidden', !isClassTeacher);
-        }
-
-        function computeAveragedScales(data) {
-            const teacherKeys = Object.keys(data).filter(k => k.startsWith('teacherScales_'));
-            if (teacherKeys.length === 0) return data.teacherScales || {};
-            const sums = {}, counts = {};
-            teacherKeys.forEach(key => {
-                const scales = data[key] || {};
-                Object.entries(scales).forEach(([id, val]) => {
-                    if (val !== undefined && val !== null) {
-                        sums[id] = (sums[id] || 0) + val;
-                        counts[id] = (counts[id] || 0) + 1;
-                    }
-                });
-            });
-            const avg = {};
-            Object.keys(sums).forEach(id => { avg[id] = Math.round(sums[id] / counts[id]); });
-            return avg;
+            autoResize(document.getElementById('schoolYearNoteInput'));
+            autoResize(document.getElementById('summaryInput'));
+            autoResize(document.getElementById('myPersonalComment'));
+            
+            renderTeacherScales(); renderStudentScales();
         }
 
         function renderTeacherScales() {
-            const container = document.getElementById('teacherSectionsContainer');
-            container.innerHTML = '';
-            const avgScales = computeAveragedScales(dbData);
+            const container = document.getElementById('teacherSectionsContainer'); container.innerHTML = '';
             const cats = [...new Set(COMPETENCIES.map(c => c.cat))];
+            const currentUserEmail = auth.currentUser.email.toLowerCase();
+            
             cats.forEach(cat => {
-                let h = `<div class="bg-white border rounded p-3"><h3 class="text-[10px] font-black text-center border-b mb-3 uppercase tracking-wider text-blue-900">${cat}</h3>`;
+                let h = `<div class="bg-white border rounded p-3"><h3 class="text-[10px] font-black text-center border-b mb-3 uppercase text-blue-900">${cat}</h3>`;
                 COMPETENCIES.filter(c => c.cat === cat).forEach(q => {
-                    const val = avgScales[q.id];
+                    const myObservation = dbData.colleagueObservations?.[currentUserEmail]?.[q.id];
+                    const finalPrintValue = dbData.teacherScales[q.id];
+                    
                     let btns = '', sqs = '';
-                    for (let i = 0; i < 4; i++) {
-                        const act = val === i;
-                        btns += `<button onclick="setTeacherScale('${q.id}', ${i})" class="scale-btn" style="background-color:${act ? ACTIVE_COLOR : INACTIVE_COLOR}; color:${act ? '#fff' : '#64748b'}; border-color:${act ? ACTIVE_COLOR : '#cbd5e1'}" ${userRole === 'student' ? 'disabled' : ''}>${SCALE_LABELS[i]}</button>`;
-                        sqs += `<div class="w-2.5 h-2.5 border" style="background-color:${act ? ACTIVE_COLOR : INACTIVE_COLOR}; border-color:${act ? ACTIVE_COLOR : '#94a3b8'}"></div>`;
+                    for(let i=0; i<4; i++) {
+                        const act = myObservation === i;
+                        btns += `<button onclick="setTeacherObservation('${q.id}', ${i})" class="scale-btn" style="background-color:${act?ACTIVE_COLOR:INACTIVE_COLOR}; color:${act?'#fff':'#64748b'}; border-color:${act?ACTIVE_COLOR:'#cbd5e1'}" ${userRole==='student'?'disabled':''}>${SCALE_LABELS[i]}</button>`;
+                        const printAct = finalPrintValue === i;
+                        sqs += `<div class="w-2.5 h-2.5 border" style="background-color:${printAct?ACTIVE_COLOR:INACTIVE_COLOR}; border-color:#94a3b8"></div>`;
                     }
-                    h += `<div class="mb-3"><div class="text-[9px] font-bold leading-tight mb-2 text-slate-800">${q.text}</div><div class="grid grid-cols-4 gap-1 no-print">${btns}</div><div class="hidden print-flex gap-2 items-center justify-center">${sqs}</div></div>`;
+                    h += `<div class="mb-3 last:mb-0">
+                                <div class="text-[9px] font-bold leading-tight mb-2 text-slate-800">${q.text}</div>
+                                <div class="grid grid-cols-4 gap-1 no-print">${btns}</div>
+                                <div class="hidden print-flex gap-2 items-center justify-center">${sqs}</div>
+                             </div>`;
                 });
                 container.innerHTML += h + `</div>`;
             });
         }
 
+        function renderSummary() {
+            const panel = document.getElementById('summary-panel');
+            const statsDiv = document.getElementById('summary-stats');
+            const textsDiv = document.getElementById('colleague-texts-list');
+            
+            if (!isClassTeacher) { panel.classList.add('hidden'); return; }
+            panel.classList.remove('hidden');
+            
+            // 1. Tabulka škál
+            let statsHtml = `<div class="grid grid-cols-12 gap-2 font-bold border-b border-blue-700 pb-2 mb-2 text-blue-200">
+                <div class="col-span-5 uppercase">Kompetence</div>
+                <div class="col-span-1 text-center">Ne</div>
+                <div class="col-span-1 text-center">SpN</div>
+                <div class="col-span-1 text-center">SpA</div>
+                <div class="col-span-1 text-center">Ano</div>
+                <div class="col-span-1 text-center text-emerald-300">Průměr</div>
+                <div class="col-span-2 text-center text-blue-100">Můj postřeh</div>
+            </div>`;
+
+            COMPETENCIES.forEach(q => {
+                let counts = [0, 0, 0, 0], sum = 0, total = 0;
+                const obs = dbData.colleagueObservations || {};
+                Object.values(obs).forEach(teacherData => {
+                    const val = teacherData[q.id];
+                    if (val !== undefined) { counts[val]++; sum += val; total++; }
+                });
+                const avg = total > 0 ? (sum / total).toFixed(1) : "-";
+                const myVal = obs[auth.currentUser.email.toLowerCase()]?.[q.id];
+                const myLabel = myVal !== undefined ? SCALE_LABELS[myVal] : "-";
+
+                statsHtml += `<div class="grid grid-cols-12 gap-2 border-b border-blue-800 py-1 items-center">
+                    <div class="col-span-5 opacity-90">${q.text}</div>
+                    <div class="col-span-1 text-center font-bold ${counts[0]>0?'text-white':'opacity-30'}">${counts[0]}</div>
+                    <div class="col-span-1 text-center font-bold ${counts[1]>0?'text-white':'opacity-30'}">${counts[1]}</div>
+                    <div class="col-span-1 text-center font-bold ${counts[2]>0?'text-white':'opacity-30'}">${counts[2]}</div>
+                    <div class="col-span-1 text-center font-bold ${counts[3]>0?'text-white':'opacity-30'}">${counts[3]}</div>
+                    <div class="col-span-1 text-center text-emerald-400 font-black text-xs bg-blue-800 rounded py-0.5">${avg}</div>
+                    <div class="col-span-2 text-center text-blue-200 font-bold italic">${myLabel}</div>
+                </div>`;
+            });
+            statsDiv.innerHTML = statsHtml;
+
+            // 2. Seznam textů kolegů
+            let textsHtml = "";
+            const comments = dbData.teacherComments || {};
+            Object.entries(comments).forEach(([email, text]) => {
+                if (text && text.trim().length > 0) {
+                    textsHtml += `<div class="bg-blue-800/50 p-3 rounded-lg border border-blue-700">
+                        <div class="text-[9px] font-bold text-blue-200 mb-1 uppercase">${email} píše:</div>
+                        <div class="text-xs text-white whitespace-pre-wrap">${text}</div>
+                    </div>`;
+                }
+            });
+            textsDiv.innerHTML = textsHtml || '<div class="text-xs opacity-50 italic">Zatím žádné textové postřehy od kolegů.</div>';
+        }
+
+        function applyAverages() {
+            if (!isClassTeacher) return;
+            const obs = dbData.colleagueObservations || {};
+            COMPETENCIES.forEach(q => {
+                let sum = 0, total = 0;
+                Object.values(obs).forEach(teacherData => {
+                    const val = teacherData[q.id];
+                    if (val !== undefined) { sum += val; total++; }
+                });
+                if (total > 0) dbData.teacherScales[q.id] = Math.round(sum / total);
+            });
+            renderTeacherScales();
+            showToast("Průměry škál byly propsány.");
+        }
+
+        function applyTextSummaries() {
+            if (!isClassTeacher) return;
+            const comments = dbData.teacherComments || {};
+            let combined = "";
+            Object.entries(comments).forEach(([email, text]) => {
+                if (text && text.trim().length > 0) {
+                    combined += `${text}\n\n`;
+                }
+            });
+            const summaryInput = document.getElementById('summaryInput');
+            summaryInput.value = combined.trim();
+            autoResize(summaryInput);
+            showToast("Texty kolegů byly sloučeny do finální kolonky.");
+        }
+
+        function setTeacherObservation(id, v) { 
+            if(userRole === 'teacher'){ 
+                const email = auth.currentUser.email.toLowerCase();
+                if (!dbData.colleagueObservations) dbData.colleagueObservations = {};
+                if (!dbData.colleagueObservations[email]) dbData.colleagueObservations[email] = {};
+                dbData.colleagueObservations[email][id] = v;
+                renderTeacherScales();
+                renderSummary();
+            } 
+        }
+
         function renderStudentScales() {
-            const container = document.getElementById('studentSectionsContainer');
-            container.innerHTML = '';
+            const container = document.getElementById('studentSectionsContainer'); container.innerHTML = '';
             const cats = [...new Set(COMPETENCIES.map(c => c.cat))];
             cats.forEach(cat => {
-                let h = `<div class="bg-white border-2 border-slate-100 p-4 rounded-2xl shadow-sm print:shadow-none print:p-0 print:border-0 mb-4">
-                    <h3 class="text-base font-black text-blue-900 uppercase mb-3 border-b pb-1">${cat}</h3>
-                    <div class="space-y-4">`;
-
+                let h = `<div class="bg-white border-2 border-slate-100 p-6 rounded-3xl shadow-sm print:shadow-none print:p-0 print:border-0"><h3 class="text-lg font-black text-blue-900 uppercase mb-6 border-b pb-1 font-print">${cat}</h3><div class="space-y-8">`;
                 COMPETENCIES.filter(c => c.cat === cat).forEach(q => {
                     const val = dbData.studentScales[q.id];
                     let btns = '', sqs = '';
-                    for (let i = 0; i < 4; i++) {
+                    for(let i=0; i<4; i++) {
                         const act = val === i;
-                        btns += `<button onclick="setStudentScale('${q.id}', ${i})" class="scale-btn py-3 text-sm" style="background-color:${act ? ACTIVE_COLOR : INACTIVE_COLOR}; color:${act ? '#fff' : '#64748b'}; border-color:${act ? ACTIVE_COLOR : '#cbd5e1'}" ${userRole === 'teacher' ? 'disabled' : ''}>${SCALE_LABELS[i]}</button>`;
-                        sqs += `<div class="w-3 h-3 border" style="background-color:${act ? ACTIVE_COLOR : INACTIVE_COLOR}; border-color:${act ? ACTIVE_COLOR : '#94a3b8'}"></div>`;
+                        btns += `<button onclick="setStudentScale('${q.id}', ${i})" class="scale-btn py-3 text-sm" style="background-color:${act?ACTIVE_COLOR:INACTIVE_COLOR}; color:${act?'#fff':'#64748b'}; border-color:${act?ACTIVE_COLOR:'#cbd5e1'}" ${userRole==='teacher'?'disabled':''}>${SCALE_LABELS[i]}</button>`;
+                        sqs += `<div class="flex items-center gap-2"><div class="w-3 h-3 border" style="background-color:${act?ACTIVE_COLOR:INACTIVE_COLOR}; border-color:#94a3b8"></div><span class="text-[9px] font-bold text-slate-500">${SCALE_LABELS[i]}</span></div>`;
                     }
-                    h += `<div class="flex flex-row gap-4 items-center">
-                            <div class="w-1/2">
-                                <div class="text-[11px] font-bold text-slate-700 mb-1 leading-tight">${q.text}</div>
-                                <div class="grid grid-cols-4 gap-2 no-print">${btns}</div>
-                                <div class="hidden print-flex gap-2 mb-1">${sqs}</div>
-                            </div>
-                            <div class="w-1/2 pl-4 border-l border-slate-100 text-[9px] text-slate-500 italic">
-                                ${COMPETENCY_DETAILS[q.id]}
-                            </div>
-                          </div>`;
+                    h += `<div><div class="text-sm font-bold text-slate-700 mb-3 font-print">${q.text}</div><div class="grid grid-cols-4 gap-3 no-print">${btns}</div><div class="hidden print-flex gap-5 mb-2">${sqs}</div></div>`;
                 });
-
                 const comm = dbData.categoryComments[cat] || "";
-                const disabledAttr = userRole === 'teacher' ? 'disabled' : '';
-
-                h += `  </div>
-                    <div class="mt-3 pt-3 border-t border-slate-200">
-                        <label class="text-[10px] font-bold text-slate-400 uppercase no-print block mb-1">Moje vyjádření k oblasti:</label>
-                        <textarea
-                            id="cat-${cat}"
-                            data-cat="${cat}"
-                            class="w-full p-2 border rounded-xl text-xs bg-blue-50 focus:bg-white focus:ring-2 focus:ring-blue-100"
-                            placeholder="Shrň své hodnocení..."
-                            rows="1"
-                            oninput="autoResize(this); dbData.categoryComments[this.dataset.cat] = this.value"
-                            ${disabledAttr}>${comm}</textarea>
-                        <div class="print-only text-sm italic mt-3 leading-relaxed text-slate-700 border-l-4 pl-4 font-print" style="border-color: #0ea5e9;">${comm}</div>
-                    </div>
-                </div>`;
+                h += `</div><div class="mt-8 pt-5 border-t"><label class="text-[10px] font-bold text-slate-400 uppercase no-print block mb-1">Moje vyjádření k oblasti:</label><textarea id="cat-${cat}" class="w-full p-4 border rounded-2xl text-sm bg-blue-50 focus:bg-white focus:ring-4 focus:ring-blue-100" placeholder="Shrň své hodnocení..." rows="1" oninput="autoResize(this); dbData.categoryComments['${cat}']=this.value" ${userRole==='teacher'?'disabled':''}>${comm}</textarea><div class="print-only text-sm italic mt-3 leading-relaxed text-slate-700 border-l-4 pl-4 font-print">${comm}</div></div></div>`;
                 container.innerHTML += h;
             });
         }
 
-        function setTeacherScale(id, v) {
-            if (userRole === 'teacher') {
-                const myEmail = auth.currentUser.email.toLowerCase();
-                const key = 'teacherScales_' + myEmail;
-                if (!dbData[key]) dbData[key] = {};
-                dbData[key][id] = v;
-                dbData.teacherScales = computeAveragedScales(dbData);
-                renderTeacherScales();
-            }
+        function setStudentScale(id, v) { if(userRole === 'student'){ dbData.studentScales[id] = v; renderStudentScales(); } }
+        function autoResize(el) { if(!el) return; el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.style.transform = 'translateY(0)';
+            t.style.opacity = '1';
+            setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(24px)'; }, 3000);
         }
 
-        function setStudentScale(id, v) {
-            if (userRole === 'student') { dbData.studentScales[id] = v; renderStudentScales(); }
-        }
-
-        function autoResize(el) {
-            el.style.height = 'auto';
-            el.style.height = el.scrollHeight + 'px';
-        }
-
-        let localCacheTimer = null;
-        let serverSyncTimer = null;
-        const CACHE_PREFIX = 'galaxie_cache_';
-
-        function getCacheKey() {
-            const userEmail = auth.currentUser ? auth.currentUser.email.toLowerCase() : 'guest';
-            return CACHE_PREFIX + userEmail + '_' + (currentTargetEmail || 'none');
-        }
-
-        function saveToCache() {
-            if (!currentTargetEmail) return;
-            try {
-                if (userRole === 'teacher') {
-                    if (isClassTeacher) {
-                        dbData.topNote = document.getElementById('schoolYearNoteInput').value;
-                        dbData.bottomNote = document.getElementById('summaryInput').value;
-                    } else {
-                        const myEmail = auth.currentUser.email.toLowerCase();
-                        if (!dbData.teacherNotes) dbData.teacherNotes = {};
-                        dbData.teacherNotes[myEmail] = document.getElementById('summaryInput').value;
-                    }
-                }
-                const payload = JSON.stringify({ data: dbData, ts: Date.now() });
-                localStorage.setItem(getCacheKey(), payload);
-            } catch(e) { console.warn('Cache write failed', e); }
-        }
-
-        function loadFromCache() {
-            try {
-                const raw = localStorage.getItem(getCacheKey());
-                if (!raw) return null;
-                const parsed = JSON.parse(raw);
-                if (Date.now() - parsed.ts > 86400000) { localStorage.removeItem(getCacheKey()); return null; }
-                return parsed.data;
-            } catch(e) { return null; }
-        }
-
-        function clearCache() {
-            try { localStorage.removeItem(getCacheKey()); } catch(e) {}
-        }
-
-        function scheduleAutosave() {
-            clearTimeout(localCacheTimer);
-            localCacheTimer = setTimeout(() => { saveToCache(); }, 3000); 
-
-            clearTimeout(serverSyncTimer);
-            serverSyncTimer = setTimeout(async () => { await saveData(true); }, 15000);
-        }
-
-        function attachAutosaveListeners() {
-            ['summaryInput', 'schoolYearNoteInput'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.addEventListener('input', scheduleAutosave);
-            });
-            document.addEventListener('click', e => {
-                if (e.target.classList.contains('scale-btn')) scheduleAutosave();
-            });
-        }
-
-        async function reloadTeacherNotes() {
-            if (!currentTargetEmail || !isClassTeacher) return;
-            const btn = document.getElementById('reloadNotesBtn');
-            btn.disabled = true;
-            btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Načítám...';
-            lucide.createIcons();
-            try {
-                const doc = await db.collection('evaluations').doc(currentTargetEmail).get();
-                const freshData = doc.exists ? doc.data() : {};
-                dbData.teacherNotes = freshData.teacherNotes || {};
-                const notes = dbData.teacherNotes;
-                const combined = Object.entries(notes)
-                    .filter(([, v]) => v && v.trim())
-                    .map(([email, note]) => {
-                        const nick = TEACHER_NICKNAMES[email] || email.split('.')[0];
-                        return nick + ':\n' + note.trim();
-                    })
-                    .join('\n\n---\n\n');
-                document.getElementById('summaryInput').value = combined;
-                dbData.bottomNote = combined;
-                autoResize(document.getElementById('summaryInput'));
-                saveToCache();
-                const t = document.getElementById('toast');
-                t.innerHTML = '<i data-lucide="refresh-cw" class="w-5 h-5"></i> Poznámky načteny';
-                t.style.transform = 'translateY(0)'; t.style.opacity = '1';
-                setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(24px)'; t.innerHTML = '<i data-lucide="check-circle-2"></i> Úspěšně uloženo'; }, 2500);
-            } catch(e) { alert('Chyba při načítání: ' + e.message); }
-            btn.disabled = false;
-            btn.innerHTML = '<i data-lucide="refresh-cw" class="w-4 h-4"></i> Načíst od kolegů';
-            lucide.createIcons();
-        }
-
-        function closeSvodka() { document.getElementById('svodka-modal').classList.add('hidden'); }
-        async function openSvodka() {
-            if (!currentTargetEmail) return;
-            const studentInfo = STUDENTS[currentTargetEmail];
-            document.getElementById('svodka-student-name').textContent = studentInfo.name + ' – ' + studentInfo.class;
-
-            const doc = await db.collection('evaluations').doc(currentTargetEmail).get();
-            const data = doc.exists ? doc.data() : {};
-
-            const teacherKeys = Object.keys(data).filter(k => k.startsWith('teacherScales_'));
-            const teacherEmails = teacherKeys.map(k => k.replace('teacherScales_', ''));
-            const hasShared = data.teacherScales && Object.keys(data.teacherScales).length > 0;
-
-            const cats = [...new Set(COMPETENCIES.map(c => c.cat))];
-            const CAT_ICONS = {
-                'Ve vztahu k sobě': '🌱',
-                'Ve vztahu k druhým': '🤝',
-                'Při učení': '📚'
-            };
-            const SCALE_COLORS = ['#ef4444','#f97316','#0ea5e9','#22c55e'];
-            const SCALE_SHORT = ['Ne','Sp.ne','Sp.ano','Ano'];
-
-            function scaleBoxes(val) {
-                let html = '<div class="flex gap-0.5 justify-center">';
-                for (let i = 0; i < 4; i++) {
-                    const filled = val !== undefined && val !== null && i <= val;
-                    html += `<div style="width:12px;height:12px;border-radius:2px;border:1px solid #cbd5e1;background:${filled ? SCALE_COLORS[val] : '#f1f5f9'};opacity:${filled ? 1 : 0.4}"></div>`;
-                }
-                html += '</div>';
-                if (val !== undefined && val !== null) {
-                    html += `<div style="font-size:9px;color:#64748b;text-align:center;margin-top:1px">${SCALE_SHORT[val]}</div>`;
-                }
-                return html;
-            }
-
-            const columns = [];
-            if (hasShared) columns.push({ label: 'Aktuální<br>(výsledek)', scales: data.teacherScales, isResult: true });
-            teacherEmails.forEach(email => {
-                const nick = TEACHER_NICKNAMES[email] || email.split('.')[0];
-                columns.push({ label: nick, scales: data[`teacherScales_${email}`] || {}, isResult: false });
-            });
-
-            if (columns.length === 0) {
-                document.getElementById('svodka-content').innerHTML = '<p class="text-slate-400 text-center py-12">Zatím žádné hodnocení od učitelů.</p>';
-                document.getElementById('svodka-modal').classList.remove('hidden');
-                lucide.createIcons();
-                return;
-            }
-
-            let html = '<table class="w-full text-xs border-collapse">';
-            html += '<thead><tr>';
-            html += '<th class="text-left py-2 px-3 text-slate-500 uppercase text-[10px] tracking-wide font-bold border-b-2 border-slate-200 w-48">Kompetence</th>';
-            columns.forEach(col => {
-                const bg = col.isResult ? 'bg-violet-50' : 'bg-slate-50';
-                const fw = col.isResult ? 'font-black text-violet-800' : 'font-bold text-slate-600';
-                html += `<th class="py-2 px-2 text-center border-b-2 border-slate-200 ${bg} ${fw} text-[10px] uppercase tracking-wide min-w-[70px]">${col.label}</th>`;
-            });
-            html += '</tr></thead><tbody>';
-
-            cats.forEach(cat => {
-                const icon = CAT_ICONS[cat] || '';
-                html += `<tr><td colspan="${columns.length + 1}" class="py-2 px-3 font-black text-[11px] uppercase tracking-wider text-slate-700 bg-slate-50 border-t border-slate-200">${icon} ${cat}</td></tr>`;
-                COMPETENCIES.filter(c => c.cat === cat).forEach((q, qi) => {
-                    const rowBg = qi % 2 === 0 ? '' : 'bg-slate-50/50';
-                    html += `<tr class="${rowBg}">`;
-                    html += `<td class="py-2 px-3 text-slate-700 font-medium leading-tight border-b border-slate-100">${q.text}</td>`;
-                    columns.forEach(col => {
-                        const val = col.scales[q.id];
-                        const bg = col.isResult ? 'bg-violet-50/50' : '';
-                        let highlight = '';
-                        if (!col.isResult && columns.length > 2) {
-                            const others = columns.filter(c => !c.isResult && c !== col).map(c => c.scales[q.id]).filter(v => v !== undefined);
-                            if (others.length > 0 && val !== undefined) {
-                                const avg = others.reduce((a,b) => a+b, 0) / others.length;
-                                if (Math.abs(val - avg) >= 1.5) highlight = 'ring-2 ring-orange-400 rounded';
-                            }
-                        }
-                        html += `<td class="py-2 px-2 text-center border-b border-slate-100 ${bg}"><div class="${highlight}">${val !== undefined ? scaleBoxes(val) : '<span class="text-slate-300">–</span>'}</div></td>`;
-                    });
-                    html += '</tr>';
-                });
-            });
-
-            html += '</tbody></table>';
-            html += '<p class="text-[10px] text-slate-400 mt-3 px-1">* Orámované buňky značí odchylku ≥ 1,5 bodu od průměru ostatních učitelů.</p>';
-
-            document.getElementById('svodka-content').innerHTML = html;
-            document.getElementById('svodka-modal').classList.remove('hidden');
-            lucide.createIcons();
-        }
-
-        async function saveData(silent = false) {
-            if (!currentTargetEmail) return;
-            if (userRole === 'teacher') {
-                if (isClassTeacher) {
-                    dbData.topNote = document.getElementById('schoolYearNoteInput').value;
-                    document.getElementById('schoolYearNoteDisplay').textContent = dbData.topNote || "";
-                    dbData.bottomNote = document.getElementById('summaryInput').value;
-                    document.getElementById('summaryDisplay').textContent = dbData.bottomNote || "";
-                } else {
-                    const myEmail = auth.currentUser.email.toLowerCase();
-                    if (!dbData.teacherNotes) dbData.teacherNotes = {};
-                    dbData.teacherNotes[myEmail] = document.getElementById('summaryInput').value;
-                }
-                dbData.teacherScales = computeAveragedScales(dbData);
-            }
-            dbData._savedAt = Date.now();
+        async function saveData() {
+            if(!currentTargetEmail) return;
+            const email = auth.currentUser.email.toLowerCase();
             
-            try {
-                await db.collection('evaluations').doc(currentTargetEmail).set(dbData, { merge: true });
-                clearCache();
-                
-                if (!silent) {
-                    const t = document.getElementById('toast');
-                    t.innerHTML = '<i data-lucide="check-circle-2"></i> Úspěšně uloženo';
-                    t.style.transform = 'translateY(0)';
-                    t.style.opacity = '1';
-                    setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(24px)'; }, 2000);
+            if(userRole === 'teacher') { 
+                // Ukládáme finální data (jen třídní)
+                if(isClassTeacher) {
+                    dbData.bottomNote = document.getElementById('summaryInput').value; 
+                    dbData.topNote = document.getElementById('schoolYearNoteInput').value; 
                 }
-            } catch (err) {
-                if (!silent) alert("Nepodařilo se uložit na server. Data jsou uložena v počítači a odešlou se po připojení.");
+                // Ukládáme můj osobní textový postřeh (každý učitel)
+                if(!dbData.teacherComments) dbData.teacherComments = {};
+                dbData.teacherComments[email] = document.getElementById('myPersonalComment').value;
             }
+            
+            await db.collection('evaluations').doc(currentTargetEmail).set(dbData, { merge: true });
+            showToast("Uloženo do databáze");
+            document.getElementById('schoolYearNoteDisplay').textContent = dbData.topNote;
+            document.getElementById('summaryDisplay').textContent = dbData.bottomNote;
         }
     </script>
 </body>
