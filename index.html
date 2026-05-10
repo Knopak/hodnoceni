@@ -104,8 +104,8 @@
                 Smažete všechna data od: <br><span id="delete-target-name" class="font-bold text-slate-800"></span>.
             </p>
             <div class="flex gap-3">
-                <button onclick="closeDeleteModal()" class="flex-1 bg-slate-100 font-bold py-3 rounded-xl text-sm">Zrušit</button>
-                <button onclick="confirmDelete()" class="flex-1 bg-red-600 text-white font-bold py-3 rounded-xl text-sm shadow-lg">Ano, smazat</button>
+                <button onclick="closeDeleteModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 font-bold py-3 rounded-xl text-sm transition-colors text-slate-700">Zrušit</button>
+                <button onclick="confirmDelete()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl text-sm shadow-lg transition-colors">Ano, smazat</button>
             </div>
         </div>
     </div>
@@ -174,9 +174,7 @@
                 </div>
                 
                 <div id="contributor-list" class="flex flex-wrap gap-2 mb-6 border-b border-blue-800 pb-4"></div>
-                
                 <div id="summary-stats" class="grid grid-cols-1 gap-1 text-[11px] mb-6 font-print"></div>
-                
                 <div id="colleague-texts-list" class="grid grid-cols-1 gap-2 border-t border-blue-800 pt-4"></div>
             </div>
         </div>
@@ -469,7 +467,6 @@
         let currentTargetEmail = null;
         let deleteCandidateEmail = null;
         
-        // Záchranný objekt pro případ prázdné databáze
         let dbData = { 
             teacherScales: {}, 
             studentScales: {}, 
@@ -484,7 +481,6 @@
             lucide.createIcons();
         };
 
-        // --- AUTENTIZACE ---
         auth.onAuthStateChanged(user => {
             if (user) {
                 const email = user.email ? user.email.toLowerCase() : "";
@@ -514,7 +510,6 @@
             }); 
         }
 
-        // --- NASTAVENÍ UI ---
         function setupTeacherUI() {
             const classes = [...new Set(Object.values(STUDENTS).map(s => s.class))].sort();
             const classSelect = document.getElementById('classSelect');
@@ -542,7 +537,6 @@
             loadStudentData(email);
         }
 
-        // --- NAČÍTÁNÍ DAT ---
         async function loadStudentData(forcedEmail = null) {
             const email = forcedEmail || document.getElementById('studentSelect').value;
             if (!email) return;
@@ -559,7 +553,6 @@
             document.getElementById('studentNameDisplay').textContent = studentInfo.name;
             document.getElementById('classNameDisplay').textContent = "Třída: " + studentInfo.class;
             
-            // Reset dat před načtením
             dbData = { 
                 teacherScales: {}, 
                 studentScales: {}, 
@@ -617,7 +610,6 @@
             renderStudentScales();
         }
 
-        // --- VYKRESLOVÁNÍ ŠKÁL ---
         function renderTeacherScales() {
             const container = document.getElementById('teacherSectionsContainer');
             if (!container) return;
@@ -692,7 +684,7 @@
                 const allCatComments = dbData.categoryComments || {};
                 const comm = allCatComments[cat] || "";
                 
-                catHtml += `</div><div class="mt-8 pt-5 border-t"><label class="text-[10px] font-bold text-slate-400 uppercase no-print block mb-1 font-print">Moje vyjádření k oblasti:</label><textarea id="cat-${cat}" class="w-full p-4 border rounded-2xl text-sm bg-blue-50 focus:bg-white focus:ring-4 focus:ring-blue-100 font-print" placeholder="Shrň své hodnocení..." rows="1" oninput="autoResize(this); if(!dbData.categoryComments) dbData.categoryComments={}; dbData.categoryComments['${cat}']=this.value" ${userRole==='teacher'?'disabled':''}>${comm}</textarea><div class="print-only text-sm italic mt-3 leading-relaxed text-slate-700 border-l-4 pl-4 font-print">${comm}</div></div></div>`;
+                catHtml += `</div><div class="mt-8 pt-5 border-t"><label class="text-[10px] font-bold text-slate-400 uppercase no-print block mb-1 font-print">Moje vyjádření k oblasti:</label><textarea id="cat-${cat}" class="w-full p-4 border rounded-2xl text-sm bg-blue-50 focus:bg-white focus:ring-4 focus:ring-blue-100 font-print" placeholder="Shrň své hodnocení..." rows="1" oninput="autoResize(this); setCategoryComment('${cat}', this.value)" ${userRole==='teacher'?'disabled':''}>${comm}</textarea><div class="print-only text-sm italic mt-3 leading-relaxed text-slate-700 border-l-4 pl-4 font-print">${comm}</div></div></div>`;
                 
                 fullHtml += catHtml;
             });
@@ -701,7 +693,6 @@
             lucide.createIcons();
         }
 
-        // --- SVODKA (TŘÍDNÍ) ---
         function renderSummary() {
             const panel = document.getElementById('summary-panel');
             const statsDiv = document.getElementById('summary-stats');
@@ -759,7 +750,13 @@
             lucide.createIcons();
         }
 
-        // --- MAZÁNÍ DAT ---
+        function setCategoryComment(cat, val) {
+            if (userRole === 'student') {
+                if (!dbData.categoryComments) dbData.categoryComments = {};
+                dbData.categoryComments[cat] = val;
+            }
+        }
+
         function openDeleteModal(email) { 
             deleteCandidateEmail = email; 
             document.getElementById('delete-target-name').textContent = email; 
@@ -778,14 +775,22 @@
             if (dbData.colleagueObservations) delete dbData.colleagueObservations[email];
             if (dbData.teacherComments) delete dbData.teacherComments[email];
             
-            await db.collection('evaluations').doc(currentTargetEmail).set(dbData, { merge: true });
+            try {
+                // Přímý zápis přes update a FieldValue.delete() zajistí reálné odstranění z databáze
+                await db.collection('evaluations').doc(currentTargetEmail).update({
+                    [`colleagueObservations.${email}`]: firebase.firestore.FieldValue.delete(),
+                    [`teacherComments.${email}`]: firebase.firestore.FieldValue.delete()
+                });
+            } catch (e) {
+                // Pokud dokument neexistuje nebo položka chybí, ignorujeme
+            }
+
             closeDeleteModal(); 
             renderSummary(); 
             renderTeacherScales(); 
             showToast(`Smazáno.`);
         }
 
-        // --- PROPSÁNÍ ---
         function applyAverages() {
             if (!isClassTeacher) return;
             const obs = dbData.colleagueObservations || {};
@@ -821,7 +826,6 @@
             showToast("Texty sloučeny.");
         }
 
-        // --- NASTAVENÍ HODNOT ---
         function setTeacherObservation(id, v) { 
             if(userRole === 'teacher'){ 
                 const currUser = auth.currentUser;
@@ -851,7 +855,6 @@
             el.style.height = el.scrollHeight + 'px'; 
         }
 
-        // --- ZÁLOHA A ULOŽENÍ ---
         async function downloadAllData() {
             try {
                 const snap = await db.collection('evaluations').get();
@@ -910,3 +913,4 @@
     </script>
 </body>
 </html>
+```
