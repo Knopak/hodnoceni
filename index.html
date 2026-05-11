@@ -552,8 +552,15 @@
         });
 
         function loginWithGoogle() { 
-            auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(err => {
-                showToast("Chyba přihlášení: " + err.message, true);
+            showToast("Otevírám přihlášení...");
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider).catch(err => {
+                console.error("Detailní chyba Firebase Auth:", err);
+                if (err.code === 'auth/popup-blocked') {
+                    showToast("Prohlížeč zablokoval vyskakovací okno. Povolte pop-upy pro tento web.", true);
+                } else {
+                    showToast("Chyba přihlášení: " + err.message, true);
+                }
             }); 
         }
 
@@ -606,18 +613,6 @@
 
                 setText('studentNameDisplay', studentInfo.name);
                 setText('classNameDisplay', "Třída: " + studentInfo.class);
-                
-                dbData = { 
-                    teacherScales: {}, 
-                    studentScales: {}, 
-                    categoryComments: {}, 
-                    colleagueObservations: {}, 
-                    teacherComments: {}, 
-                    schoolYear: "2025/2026",
-                    term: "I. POLOLETÍ",
-                    topNote: "", 
-                    bottomNote: "" 
-                };
                 
                 try {
                     const doc = await db.collection('evaluations').doc(email).get();
@@ -842,7 +837,6 @@
                 let fullHtml = "";
                 
                 cats.forEach(cat => {
-                cats.forEach(cat => {
                     let catHtml = `<div class="bg-white border-2 border-slate-100 p-4 print:p-0 rounded-3xl shadow-sm print:shadow-none print:border-0 font-print mb-4 print:mb-2 break-inside-avoid"><h3 class="text-lg print:text-base font-black text-blue-900 uppercase mb-3 print:mb-1 border-b pb-1">${cat}</h3>
                     <div class="flex flex-col md:flex-row print:flex-row gap-4 print:gap-2">
                         <div class="w-full md:w-7/12 print:w-7/12 space-y-4 print:space-y-1.5">`;
@@ -955,7 +949,7 @@
                     
                     sHtml += `<div class="grid grid-cols-12 gap-2 border-b border-blue-800 py-1 items-center font-print"><div class="col-span-5 opacity-90">${q.textTeacher}</div><div class="col-span-1 text-center font-bold ${cnt[0]>0?'text-white':'opacity-30'}">${cnt[0]}</div><div class="col-span-1 text-center font-bold ${cnt[1]>0?'text-white':'opacity-30'}">${cnt[1]}</div><div class="col-span-1 text-center font-bold ${cnt[2]>0?'text-white':'opacity-30'}">${cnt[2]}</div><div class="col-span-1 text-center font-bold ${cnt[3]>0?'text-white':'opacity-30'}">${cnt[3]}</div><div class="col-span-1 text-center text-emerald-400 font-black bg-blue-800 rounded py-0.5">${avg}</div><div class="col-span-2 text-center text-blue-200 font-bold italic font-print">${myL}</div></div>`;
                 });
-                statsDiv.innerHTML = sHtml;
+                setHTML('summary-stats', sHtml);
 
                 let tHtml = "";
                 Object.entries(comments).forEach(([e, t]) => { 
@@ -1120,8 +1114,8 @@
             try {
                 await db.collection('evaluations').doc(currentTargetEmail).set(studentDocData, { merge: true });
                 showToast("Změny úspěšně uloženy.");
-                document.getElementById('schoolYearNoteDisplay').textContent = dbData.topNote;
-                document.getElementById('summaryDisplay').textContent = dbData.bottomNote;
+                setText('schoolYearNoteDisplay', dbData.topNote);
+                setText('summaryDisplay', dbData.bottomNote);
             } catch (e) {
                 showToast("Nelze uložit! Zkontrolujte Firebase pravidla (Rules). Chyba: " + e.message, true);
             }
