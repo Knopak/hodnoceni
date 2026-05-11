@@ -91,6 +91,9 @@
                 </div>
                 
                 <div class="flex items-center gap-2">
+                    <button id="summaryToggleBtn" onclick="toggleSummary()" class="hidden bg-indigo-100 text-indigo-800 px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-indigo-200 shadow-sm transition-colors" title="Zobrazit svodku">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4"></i> <span class="hidden md:inline">Svodka</span>
+                    </button>
                     <button onclick="downloadAllData()" class="bg-slate-100 text-slate-700 px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-slate-200 shadow-sm" title="Záloha všech dat">
                         <i data-lucide="download" class="w-4 h-4"></i> Záloha
                     </button>
@@ -107,7 +110,7 @@
 
         <!-- SVODKA PRO TŘÍDNÍ -->
         <div id="summary-panel" class="max-w-[210mm] mx-auto mt-4 no-print hidden px-4 md:px-0">
-            <div class="bg-blue-900 text-white p-6 rounded-2xl shadow-lg">
+            <div class="bg-blue-900 text-white p-6 rounded-2xl shadow-lg border border-blue-800">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                     <h3 class="text-lg font-bold flex items-center gap-2 uppercase tracking-wide text-blue-100">
                         <i data-lucide="bar-chart-3"></i> Svodka od kolegů
@@ -287,7 +290,6 @@
             "ondrej.cervenka@skolagalaxie.cz": "3. A",
             "pavlina.bittnerova@skolagalaxie.cz": "5. A",
             "skola@skolagalaxie.cz": "",
-            "vojtech.zajicek@skolagalaxie.cz": "",
             "tereza.malirova@skolagalaxie.cz": "2. A",
             "nastenka@skolagalaxie.cz": ""
         };
@@ -480,6 +482,7 @@
         let isClassTeacher = false;
         let currentTargetEmail = null;
         let deleteCandidateEmail = null;
+        let isSummaryVisible = false;
         
         let dbData = { 
             teacherScales: {}, 
@@ -613,7 +616,7 @@
             const currUser = auth.currentUser;
             const currUserEmail = (currUser && currUser.email) ? currUser.email.toLowerCase() : "";
 
-            toggleEl('print-container', !isStudent); // OPRAVENO: Žák nesmí vidět první stranu. Učitel ano.
+            toggleEl('print-container', !isStudent); 
             showEl('page-2-container');
             
             const p2Title = isStudent 
@@ -770,9 +773,15 @@
             dbData.categoryComments[cat] = val;
         }
 
+        function toggleSummary() {
+            isSummaryVisible = !isSummaryVisible;
+            renderSummary();
+        }
+
         function renderSummary() {
             try {
                 const panel = document.getElementById('summary-panel');
+                const toggleBtn = document.getElementById('summaryToggleBtn');
                 const statsDiv = document.getElementById('summary-stats');
                 const textsDiv = document.getElementById('colleague-texts-list');
                 const contributorDiv = document.getElementById('contributor-list');
@@ -782,10 +791,18 @@
                 
                 if (!isClassTeacher || !currEmail) { 
                     hideEl('summary-panel'); 
+                    if(toggleBtn) toggleBtn.classList.add('hidden');
                     return; 
                 }
                 
-                showEl('summary-panel');
+                if(toggleBtn) toggleBtn.classList.remove('hidden');
+                
+                if (isSummaryVisible) {
+                    showEl('summary-panel');
+                } else {
+                    hideEl('summary-panel');
+                    return; // Ušetříme výkon, pokud je svodka skrytá
+                }
                 
                 const obs = dbData.colleagueObservations || {};
                 const comments = dbData.teacherComments || {};
@@ -930,12 +947,6 @@
             } 
         }
         
-        function autoResize(el) { 
-            if(!el) return; 
-            el.style.height = 'auto'; 
-            el.style.height = el.scrollHeight + 'px'; 
-        }
-
         async function downloadAllData() {
             try {
                 const snap = await db.collection('evaluations').get();
@@ -952,28 +963,6 @@
             } catch (e) { 
                 showToast("Chyba zálohy: Nemáte povolen přístup ve Firebase Rules.", true); 
             }
-        }
-
-        function showToast(msg, isError = false) {
-            const t = document.getElementById('toast');
-            if (!t) return;
-            
-            if (isError) {
-                t.className = "fixed bottom-6 right-6 bg-red-600 text-white px-8 py-4 rounded-2xl shadow-2xl font-bold transform translate-y-24 opacity-0 transition-all duration-500 z-[100] flex items-center gap-3";
-                setHTML('toast', `<i data-lucide="alert-circle" class="w-5 h-5"></i> ${msg}`);
-            } else {
-                t.className = "fixed bottom-6 right-6 bg-emerald-600 text-white px-8 py-4 rounded-2xl shadow-2xl font-bold transform translate-y-24 opacity-0 transition-all duration-500 z-[100] flex items-center gap-3";
-                setHTML('toast', `<i data-lucide="check-circle-2" class="w-5 h-5"></i> ${msg}`);
-            }
-            
-            t.style.transform = 'translateY(0)'; 
-            t.style.opacity = '1'; 
-            try { lucide.createIcons(); } catch(e) {}
-            
-            setTimeout(() => { 
-                t.style.opacity = '0'; 
-                t.style.transform = 'translateY(24px)'; 
-            }, 5000);
         }
 
         async function saveData() {
