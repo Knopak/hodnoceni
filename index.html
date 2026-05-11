@@ -29,12 +29,12 @@
 
         @media print {
             @page { size: A4; margin: 0; }
-            html, body { background-color: white !important; margin: 0; padding: 0; font-size: 10pt; width: 100%; overflow: visible !important; }
+            html, body { background-color: white !important; margin: 0 !important; padding: 0 !important; font-size: 10pt; width: 100%; height: auto !important; }
             .no-print { display: none !important; }
             .print-only { display: block !important; }
             .print-flex { display: flex !important; }
-            #print-container { padding: 10mm 15mm !important; box-shadow: none !important; width: 100% !important; page-break-after: always; display: block !important; }
-            #page-2-container { padding: 10mm 15mm !important; display: block !important; box-shadow: none !important; width: 100% !important; }
+            #print-container { margin: 0 !important; padding: 10mm 15mm !important; box-shadow: none !important; width: 100% !important; page-break-after: always; display: block !important; border: none !important; }
+            #page-2-container { margin: 0 !important; padding: 10mm 15mm !important; display: block !important; box-shadow: none !important; width: 100% !important; page-break-after: avoid; border: none !important; }
             textarea { display: none !important; }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
         }
@@ -43,7 +43,7 @@
 <body>
 
     <!-- MODAL PRO SMAZÁNÍ -->
-    <div id="delete-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[200] hidden flex items-center justify-center p-4">
+    <div id="delete-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[200] hidden flex items-center justify-center p-4 no-print">
         <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8 text-center">
             <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
                 <i data-lucide="alert-triangle"></i>
@@ -60,7 +60,7 @@
     </div>
 
     <!-- MODAL PRO NASTAVENÍ ROKU A POLOLETÍ -->
-    <div id="settings-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[200] hidden flex items-center justify-center p-4">
+    <div id="settings-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[200] hidden flex items-center justify-center p-4 no-print">
         <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8 text-center">
             <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
                 <i data-lucide="calendar-days" class="w-8 h-8"></i>
@@ -94,7 +94,7 @@
     </div>
 
     <!-- PŘIHLÁŠENÍ -->
-    <div id="auth-screen" class="min-h-screen flex flex-col items-center justify-center p-4">
+    <div id="auth-screen" class="min-h-screen flex flex-col items-center justify-center p-4 no-print">
         <div class="bg-white p-10 rounded-2xl shadow-xl text-center max-w-md w-full border-t-8 border-blue-600">
             <img src="https://github.com/Knopak/hodnoceni/blob/main/logo.jpg?raw=true" alt="ZŠ Galaxie" class="mx-auto h-24 mb-8 object-contain">
             <h1 class="text-3xl font-extrabold mb-2 text-blue-900 uppercase">ZŠ Galaxie</h1>
@@ -220,7 +220,7 @@
     </div>
 
     <!-- TOAST (CHYBOVÁ HLÁŠENÍ) -->
-    <div id="toast" class="fixed bottom-6 right-6 bg-emerald-600 text-white px-8 py-4 rounded-2xl shadow-2xl font-bold transform translate-y-24 opacity-0 transition-all duration-500 z-[100] flex items-center gap-3"></div>
+    <div id="toast" class="fixed bottom-6 right-6 bg-emerald-600 text-white px-8 py-4 rounded-2xl shadow-2xl font-bold transform translate-y-24 opacity-0 transition-all duration-500 z-[100] flex items-center gap-3 no-print"></div>
 
     <script>
         // BEZPEČNOSTNÍ POMOCNÉ FUNKCE PROTI PÁDŮM SKRIPTU
@@ -273,10 +273,10 @@
             if (!t) return;
             
             if (isError) {
-                t.className = "fixed bottom-6 right-6 bg-red-600 text-white px-8 py-4 rounded-2xl shadow-2xl font-bold transform translate-y-24 opacity-0 transition-all duration-500 z-[100] flex items-center gap-3";
+                t.className = "fixed bottom-6 right-6 bg-red-600 text-white px-8 py-4 rounded-2xl shadow-2xl font-bold transform translate-y-24 opacity-0 transition-all duration-500 z-[100] flex items-center gap-3 no-print";
                 setHTML('toast', `<i data-lucide="alert-circle" class="w-5 h-5"></i> ${msg}`);
             } else {
-                t.className = "fixed bottom-6 right-6 bg-emerald-600 text-white px-8 py-4 rounded-2xl shadow-2xl font-bold transform translate-y-24 opacity-0 transition-all duration-500 z-[100] flex items-center gap-3";
+                t.className = "fixed bottom-6 right-6 bg-emerald-600 text-white px-8 py-4 rounded-2xl shadow-2xl font-bold transform translate-y-24 opacity-0 transition-all duration-500 z-[100] flex items-center gap-3 no-print";
                 setHTML('toast', `<i data-lucide="check-circle-2" class="w-5 h-5"></i> ${msg}`);
             }
             
@@ -498,17 +498,17 @@
         };
 
         const COMPETENCIES = [
-            { id: "s1", cat: "Ve vztahu k sobě", text: "Vyjadřuji své myšlenky a pocity přiměřeně situaci." },
-            { id: "s2", cat: "Ve vztahu k sobě", text: "Rozpoznám vhodné a nevhodné chování a jednám podle toho." },
-            { id: "s3", cat: "Ve vztahu k sobě", text: "Umím přijmout zpětnou vazbu a dál s ní pracovat." },
-            { id: "o1", cat: "Ve vztahu k druhým", text: "Dodržuji stanovená pravidla." },
-            { id: "o2", cat: "Ve vztahu k druhým", text: "Spolupracuji s ostatními." },
-            { id: "o3", cat: "Ve vztahu k druhým", text: "Dokážu poskytovat účelnou zpětnou vazbu." },
-            { id: "o4", cat: "Ve vztahu k druhým", text: "Přispívám k vytváření bezpečného prostředí a atmosféry." },
-            { id: "l1", cat: "Při učení", text: "Zodpovědně přistupuji k učení." },
-            { id: "l2", cat: "Při učení", text: "Vytrvám v práci na obtížných úkolech." },
-            { id: "l3", cat: "Při učení", text: "Čtu s porozuměním." },
-            { id: "l4", cat: "Při učení", text: "Dokážu srozumitelně prezentovat výsledky své práce." }
+            { id: "s1", cat: "Ve vztahu k sobě", textTeacher: "Vyjadřuješ své myšlenky a pocity přiměřeně situaci.", textStudent: "Vyjadřuji své myšlenky a pocity přiměřeně situaci." },
+            { id: "s2", cat: "Ve vztahu k sobě", textTeacher: "Rozpoznáš vhodné a nevhodné chování a jednáš podle toho.", textStudent: "Rozpoznám vhodné a nevhodné chování a jednám podle toho." },
+            { id: "s3", cat: "Ve vztahu k sobě", textTeacher: "Umíš přijmout zpětnou vazbu a dál s ní pracovat.", textStudent: "Umím přijmout zpětnou vazbu a dál s ní pracovat." },
+            { id: "o1", cat: "Ve vztahu k druhým", textTeacher: "Dodržuješ stanovená pravidla.", textStudent: "Dodržuji stanovená pravidla." },
+            { id: "o2", cat: "Ve vztahu k druhým", textTeacher: "Spolupracuješ s ostatními.", textStudent: "Spolupracuji s ostatními." },
+            { id: "o3", cat: "Ve vztahu k druhým", textTeacher: "Dokážeš poskytovat účelnou zpětnou vazbu.", textStudent: "Dokážu poskytovat účelnou zpětnou vazbu." },
+            { id: "o4", cat: "Ve vztahu k druhým", textTeacher: "Přispíváš k vytváření bezpečného prostředí a atmosféry.", textStudent: "Přispívám k vytváření bezpečného prostředí a atmosféry." },
+            { id: "l1", cat: "Při učení", textTeacher: "Zodpovědně přistupuješ k učení.", textStudent: "Zodpovědně přistupuji k učení." },
+            { id: "l2", cat: "Při učení", textTeacher: "Vytrváš v práci na obtížných úkolech.", textStudent: "Vytrvám v práci na obtížných úkolech." },
+            { id: "l3", cat: "Při učení", textTeacher: "Čteš s porozuměním.", textStudent: "Čtu s porozuměním." },
+            { id: "l4", cat: "Při učení", textTeacher: "Dokážeš srozumitelně prezentovat výsledky své práce.", textStudent: "Dokážu srozumitelně prezentovat výsledky své práce." }
         ];
 
         const SCALE_LABELS = ['Ne', 'Sp. ne', 'Sp. ano', 'Ano'];
@@ -789,7 +789,7 @@
                             sqs += `<div class="w-2.5 h-2.5 border" style="background-color:${printAct ? ACTIVE_COLOR : INACTIVE_COLOR}; border-color:#94a3b8"></div>`;
                         }
                         
-                        htmlBlock += `<div class="mb-3 last:mb-0"><div class="text-[9px] font-bold leading-tight mb-2 text-slate-800 font-print">${q.text}</div><div class="grid grid-cols-4 gap-1 no-print">${btns}</div><div class="print-flex gap-2 items-center justify-center">${sqs}</div></div>`;
+                        htmlBlock += `<div class="mb-3 last:mb-0"><div class="text-[9px] font-bold leading-tight mb-2 text-slate-800 font-print">${q.textTeacher}</div><div class="grid grid-cols-4 gap-1 no-print">${btns}</div><div class="print-flex gap-2 items-center justify-center">${sqs}</div></div>`;
                     });
                     
                     finalHtml += htmlBlock + `</div>`;
@@ -847,7 +847,7 @@
                         }
                         
                         catHtml += `<div class="font-print">
-                                <div class="text-sm font-bold text-slate-700 mb-3">${q.text}</div>
+                                <div class="text-sm font-bold text-slate-700 mb-3">${q.textStudent}</div>
                                 <div class="grid grid-cols-4 gap-3 no-print">${btns}</div>
                                 <div class="print-flex gap-5 mb-2 font-print">${sqs}</div>
                               </div>`;
@@ -890,6 +890,9 @@
             try {
                 const panel = document.getElementById('summary-panel');
                 const toggleBtn = document.getElementById('summaryToggleBtn');
+                const statsDiv = document.getElementById('summary-stats');
+                const textsDiv = document.getElementById('colleague-texts-list');
+                const contributorDiv = document.getElementById('contributor-list');
                 
                 const currUser = auth.currentUser;
                 const currEmail = (currUser && currUser.email) ? currUser.email.toLowerCase() : "";
@@ -936,9 +939,9 @@
                     const myV = myObsSafe[q.id];
                     const myL = myV !== undefined ? SCALE_LABELS[myV] : "-";
                     
-                    sHtml += `<div class="grid grid-cols-12 gap-2 border-b border-blue-800 py-1 items-center font-print"><div class="col-span-5 opacity-90">${q.text}</div><div class="col-span-1 text-center font-bold ${cnt[0]>0?'text-white':'opacity-30'}">${cnt[0]}</div><div class="col-span-1 text-center font-bold ${cnt[1]>0?'text-white':'opacity-30'}">${cnt[1]}</div><div class="col-span-1 text-center font-bold ${cnt[2]>0?'text-white':'opacity-30'}">${cnt[2]}</div><div class="col-span-1 text-center font-bold ${cnt[3]>0?'text-white':'opacity-30'}">${cnt[3]}</div><div class="col-span-1 text-center text-emerald-400 font-black bg-blue-800 rounded py-0.5">${avg}</div><div class="col-span-2 text-center text-blue-200 font-bold italic font-print">${myL}</div></div>`;
+                    sHtml += `<div class="grid grid-cols-12 gap-2 border-b border-blue-800 py-1 items-center font-print"><div class="col-span-5 opacity-90">${q.textTeacher}</div><div class="col-span-1 text-center font-bold ${cnt[0]>0?'text-white':'opacity-30'}">${cnt[0]}</div><div class="col-span-1 text-center font-bold ${cnt[1]>0?'text-white':'opacity-30'}">${cnt[1]}</div><div class="col-span-1 text-center font-bold ${cnt[2]>0?'text-white':'opacity-30'}">${cnt[2]}</div><div class="col-span-1 text-center font-bold ${cnt[3]>0?'text-white':'opacity-30'}">${cnt[3]}</div><div class="col-span-1 text-center text-emerald-400 font-black bg-blue-800 rounded py-0.5">${avg}</div><div class="col-span-2 text-center text-blue-200 font-bold italic font-print">${myL}</div></div>`;
                 });
-                setHTML('summary-stats', sHtml);
+                statsDiv.innerHTML = sHtml;
 
                 let tHtml = "";
                 Object.entries(comments).forEach(([e, t]) => { 
@@ -984,6 +987,7 @@
                 });
                 showToast(`Data od ${email} smazána z databáze.`);
             } catch (e) {
+                console.warn("Update selhal, zkouším klasický set.", e);
                 await db.collection('evaluations').doc(currentTargetEmail).set(studentDocData);
                 showToast(`Data smazána lokálně.`);
             }
@@ -1102,10 +1106,10 @@
             try {
                 await db.collection('evaluations').doc(currentTargetEmail).set(studentDocData, { merge: true });
                 showToast("Změny úspěšně uloženy.");
-                setText('schoolYearNoteDisplay', dbData.topNote);
-                setText('summaryDisplay', dbData.bottomNote);
+                document.getElementById('schoolYearNoteDisplay').textContent = dbData.topNote;
+                document.getElementById('summaryDisplay').textContent = dbData.bottomNote;
             } catch (e) {
-                showToast("Nelze uložit! Zkontrolujte Firebase pravidla (Rules).", true);
+                showToast("Nelze uložit! Zkontrolujte Firebase pravidla (Rules). Chyba: " + e.message, true);
             }
         }
     </script>
