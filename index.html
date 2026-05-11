@@ -14,11 +14,10 @@
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap');
-        
         body { font-family: 'Noto Sans', sans-serif; background-color: #f3f4f6; color: #1e293b; }
         .hidden { display: none !important; }
-        .print-only { display: none; }
-        
+        .print-only { display: none !important; }
+        .print-flex { display: none !important; }
         textarea { resize: none; overflow: hidden; transition: height 0.1s ease; border: 1px solid #e2e8f0; }
         textarea:disabled { background-color: #f8fafc; color: #64748b; cursor: not-allowed; }
         
@@ -171,7 +170,8 @@
 
         <!-- STRANA 2 -->
         <div id="page-2-container" class="max-w-[210mm] mx-auto p-10 bg-white my-8 shadow-md flex flex-col hidden font-print">
-            <h2 class="text-2xl font-black mb-8 text-center text-blue-900 uppercase border-b-4 border-blue-900 pb-3 tracking-wide">Sebehodnocení žáka</h2>
+            <!-- OPRAVENÉ ID TADY DOLE -->
+            <h2 id="page2-title" class="text-2xl font-black mb-8 text-center text-blue-900 uppercase border-b-4 border-blue-900 pb-3 tracking-wide">Sebehodnocení žáka</h2>
             
             <!-- Kontejner pro škály a texty žáka -->
             <div id="studentSectionsContainer" class="space-y-10 font-print"></div>
@@ -190,6 +190,11 @@
     <div id="toast" class="fixed bottom-6 right-6 bg-emerald-600 text-white px-8 py-4 rounded-2xl shadow-2xl font-bold transform translate-y-24 opacity-0 transition-all duration-500 z-[100] flex items-center gap-3"></div>
 
     <script>
+        // ZACHYTÁVÁNÍ CHYB
+        window.onerror = function(message) {
+            showToast("Chyba aplikace: " + message, true);
+        };
+
         const firebaseConfig = {
             apiKey: "AIzaSyDm0v4wviD36KgLr3WUDtkNZ-DPmXFDZbs",
             authDomain: "hodnocenigalaxie.firebaseapp.com",
@@ -603,7 +608,7 @@
                             sqs += `<div class="w-2.5 h-2.5 border" style="background-color:${printAct ? ACTIVE_COLOR : INACTIVE_COLOR}; border-color:#94a3b8"></div>`;
                         }
                         
-                        htmlBlock += `<div class="mb-3 last:mb-0"><div class="text-[9px] font-bold leading-tight mb-2 text-slate-800 font-print">${q.text}</div><div class="grid grid-cols-4 gap-1 no-print">${btns}</div><div class="hidden print-flex gap-2 items-center justify-center">${sqs}</div></div>`;
+                        htmlBlock += `<div class="mb-3 last:mb-0"><div class="text-[9px] font-bold leading-tight mb-2 text-slate-800 font-print">${q.text}</div><div class="grid grid-cols-4 gap-1 no-print">${btns}</div><div class="print-flex gap-2 items-center justify-center">${sqs}</div></div>`;
                     });
                     
                     finalHtml += htmlBlock + `</div>`;
@@ -640,7 +645,7 @@
                         catHtml += `<div class="font-print">
                                 <div class="text-sm font-bold text-slate-700 mb-3">${q.text}</div>
                                 <div class="grid grid-cols-4 gap-3 no-print">${btns}</div>
-                                <div class="hidden print-flex gap-5 mb-2 font-print">${sqs}</div>
+                                <div class="print-flex gap-5 mb-2 font-print">${sqs}</div>
                               </div>`;
                     });
                     
@@ -751,7 +756,7 @@
                 });
                 showToast(`Data od ${email} smazána z databáze.`);
             } catch (e) {
-                console.warn("Update selhal, ukládám bez těchto dat lokálně.", e);
+                console.warn("Update selhal, zkouším klasický set.", e);
                 await db.collection('evaluations').doc(currentTargetEmail).set(dbData);
                 showToast(`Data smazána lokálně.`);
             }
@@ -889,7 +894,7 @@
                 document.getElementById('schoolYearNoteDisplay').textContent = dbData.topNote;
                 document.getElementById('summaryDisplay').textContent = dbData.bottomNote;
             } catch (e) {
-                showToast("Nelze uložit! Zkontrolujte Firebase pravidla (Rules).", true);
+                showToast("Nelze uložit! Zkontrolujte Firebase pravidla (Rules). Chyba: " + e.message, true);
             }
         }
     </script>
