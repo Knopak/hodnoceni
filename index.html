@@ -42,6 +42,7 @@
 </head>
 <body>
 
+    <!-- MODAL PRO SMAZÁNÍ -->
     <div id="delete-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[200] hidden flex items-center justify-center p-4 no-print">
         <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8 text-center">
             <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -58,6 +59,7 @@
         </div>
     </div>
 
+    <!-- MODAL PRO NASTAVENÍ ROKU A POLOLETÍ -->
     <div id="settings-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[200] hidden flex items-center justify-center p-4 no-print">
         <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8 text-center">
             <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -91,6 +93,7 @@
         </div>
     </div>
 
+    <!-- PŘIHLÁŠENÍ -->
     <div id="auth-screen" class="min-h-screen flex flex-col items-center justify-center p-4 no-print">
         <div class="bg-white p-10 rounded-2xl shadow-xl text-center max-w-md w-full border-t-8 border-blue-600">
             <img src="https://github.com/Knopak/hodnoceni/blob/main/logo.jpg?raw=true" alt="ZŠ Galaxie" class="mx-auto h-24 mb-8 object-contain">
@@ -102,8 +105,10 @@
         </div>
     </div>
 
+    <!-- APLIKACE -->
     <div id="app-screen" class="hidden">
         
+        <!-- HORNÍ LIŠTA -->
         <div class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm px-4 py-3 no-print">
             <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4 text-sm font-bold">
                 <div id="controls-container" class="flex items-center gap-4">
@@ -140,6 +145,7 @@
             </div>
         </div>
 
+        <!-- SVODKA PRO TŘÍDNÍ -->
         <div id="summary-panel" class="max-w-[210mm] mx-auto mt-4 no-print hidden px-4 md:px-0">
             <div class="bg-blue-900 text-white p-6 rounded-2xl shadow-lg border border-blue-800">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
@@ -162,6 +168,7 @@
             </div>
         </div>
 
+        <!-- STRANA 1: HODNOCENÍ ŠKOLY -->
         <div id="print-container" class="max-w-[210mm] mx-auto p-10 bg-white my-8 shadow-md flex flex-col hidden">
             <div class="flex justify-center mb-6">
                 <img src="https://github.com/Knopak/hodnoceni/blob/main/logo.jpg?raw=true" alt="ZŠ Galaxie" class="h-16 object-contain">
@@ -186,13 +193,24 @@
 
             <h2 class="text-xs font-bold mb-4 text-center uppercase tracking-widest border-b pb-2 text-slate-500 font-print">Hodnocení školy</h2>
             
+            <!-- Kontejner pro škály učitelů -->
             <div id="teacherSectionsContainer" class="grid grid-cols-3 gap-6 mt-2"></div>
             
+            <!-- Legenda pro tisk (Učitel) -->
+            <div class="hidden print-flex justify-center gap-8 mt-6 text-[8pt] text-slate-500 font-print font-bold">
+                <div class="flex items-center gap-1.5"><div class="w-2.5 h-2.5 border border-slate-400"></div> Ne</div>
+                <div class="flex items-center gap-1.5"><div class="w-2.5 h-2.5 border border-slate-400"></div> Spíše ne</div>
+                <div class="flex items-center gap-1.5"><div class="w-2.5 h-2.5 border border-slate-400"></div> Spíše ano</div>
+                <div class="flex items-center gap-1.5"><div class="w-2.5 h-2.5 border border-slate-400 bg-[#1d4ed8]"></div> Ano</div>
+            </div>
+
+            <!-- Osobní postřeh konkrétního učitele -->
             <div class="mt-8 p-4 bg-blue-50 rounded-xl border border-blue-100 no-print">
                 <label class="text-[10px] font-bold text-blue-800 uppercase block mb-1">Můj postřeh k žákovi (ostatní uvidí ve svodce):</label>
                 <textarea id="myPersonalComment" class="w-full p-3 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500" rows="3"></textarea>
             </div>
 
+            <!-- Finální tisková zpětná vazba -->
             <div class="mt-10 flex-grow flex flex-col">
                 <label class="text-[10px] font-bold text-blue-800 uppercase no-print mb-1 ml-1 text-slate-400">Finální zpětná vazba pro tisk:</label>
                 <textarea id="summaryInput" class="w-full p-4 border border-slate-200 rounded-xl text-sm min-h-[300px] bg-yellow-50 focus:bg-white shadow-inner" placeholder="Tento text píše třídní učitel..."></textarea>
@@ -200,13 +218,24 @@
             </div>
         </div>
 
+        <!-- STRANA 2: SEBEHODNOCENÍ -->
         <div id="page-2-container" class="max-w-[210mm] mx-auto p-10 bg-white my-8 shadow-md flex flex-col hidden font-print">
             <h2 id="page2-title" class="text-2xl font-black mb-8 text-center text-blue-900 uppercase border-b-4 border-blue-900 pb-3 tracking-wide">Sebehodnocení žáka</h2>
             
+            <!-- Kontejner pro škály a texty žáka -->
             <div id="studentSectionsContainer" class="space-y-4 font-print"></div>
+            
+            <!-- Legenda pro tisk (Žák) -->
+            <div class="hidden print-flex justify-center gap-8 mt-6 pt-4 border-t border-slate-200 text-[8pt] text-slate-500 font-print font-bold">
+                <div class="flex items-center gap-1.5"><div class="w-3 h-3 border border-slate-400"></div> Ne</div>
+                <div class="flex items-center gap-1.5"><div class="w-3 h-3 border border-slate-400"></div> Spíše ne</div>
+                <div class="flex items-center gap-1.5"><div class="w-3 h-3 border border-slate-400"></div> Spíše ano</div>
+                <div class="flex items-center gap-1.5"><div class="w-3 h-3 border border-slate-400 bg-[#1d4ed8]"></div> Ano</div>
+            </div>
         </div>
     </div>
 
+    <!-- TOAST (CHYBOVÁ HLÁŠENÍ) -->
     <div id="toast" class="fixed bottom-6 right-6 bg-emerald-600 text-white px-8 py-4 rounded-2xl shadow-2xl font-bold transform translate-y-24 opacity-0 transition-all duration-500 z-[100] flex items-center gap-3 no-print"></div>
 
     <script>
@@ -498,7 +527,7 @@
             { id: "l4", cat: "Při učení", textTeacher: "Dokážeš srozumitelně prezentovat výsledky své práce.", textStudent: "Dokážu srozumitelně prezentovat výsledky své práce." }
         ];
 
-        const SCALE_LABELS = ['Ne', 'Sp. ne', 'Sp. ano', 'Ano'];
+        const SCALE_LABELS = ['Ne', 'Spíše ne', 'Spíše ano', 'Ano'];
         const ACTIVE_COLOR = '#1d4ed8'; 
         const INACTIVE_COLOR = '#f1f5f9';
 
@@ -861,13 +890,13 @@
                         for(let i=0; i<4; i++) {
                             const act = (val === i);
                             btns += `<button onclick="setStudentScale('${q.id}', ${i})" class="scale-btn py-2 text-[11px] w-full" style="background-color:${act ? ACTIVE_COLOR : INACTIVE_COLOR}; color:${act ? '#fff' : '#64748b'}; border-color:${act ? ACTIVE_COLOR : '#cbd5e1'}" ${userRole==='teacher' ? 'disabled' : ''}>${SCALE_LABELS[i]}</button>`;
-                            sqs += `<div class="flex items-center gap-2 font-print"><div class="w-3 h-3 border" style="background-color:${act ? ACTIVE_COLOR : INACTIVE_COLOR}; border-color:#94a3b8"></div><span class="text-[9px] print:text-[7pt] font-bold text-slate-500">${SCALE_LABELS[i]}</span></div>`;
+                            sqs += `<div class="w-3 h-3 border" style="background-color:${act ? ACTIVE_COLOR : INACTIVE_COLOR}; border-color:#94a3b8"></div>`;
                         }
                         
                         catHtml += `<div class="font-print">
                                 <div class="text-[13px] print:text-[9pt] font-bold text-slate-700 mb-2 print:mb-0.5">${q.textStudent}</div>
                                 <div class="grid grid-cols-4 gap-3 no-print">${btns}</div>
-                                <div class="print-flex gap-5 mb-2 print:mb-1 font-print">${sqs}</div>
+                                <div class="print-flex gap-2 mb-2 print:mb-1 font-print">${sqs}</div>
                               </div>`;
                     });
                     
@@ -875,6 +904,7 @@
                     const comm = allCatComments[cat] || "";
                     
                     catHtml += `</div>
+                        <!-- Legenda -->
                         <div class="w-full md:w-5/12 print:w-5/12 bg-slate-50 print:bg-transparent p-3 print:p-0 rounded-2xl md:border-l-2 print:border-l-2 border-slate-200 print:border-slate-300 print:pl-3">
                             <h4 class="text-[9px] font-bold text-slate-400 uppercase mb-2 no-print">Vysvětlení pojmů:</h4>
                             <div class="text-[8px] print:text-[7pt] print:leading-tight text-slate-600 print:text-slate-800 font-print text-left">
@@ -889,6 +919,25 @@
                 });
                 
                 container.innerHTML = fullHtml;
+                
+                // Přidání centrální legendy pro tisk na spodek 2. stránky
+                const printLegendHtml = `
+                <div class="hidden print-flex justify-center gap-8 mt-4 text-[8pt] text-slate-500 font-print font-bold">
+                    <div class="flex items-center gap-2"><div class="w-3 h-3 border border-slate-400"></div> Ne</div>
+                    <div class="flex items-center gap-2"><div class="w-3 h-3 border border-slate-400"></div> Spíše ne</div>
+                    <div class="flex items-center gap-2"><div class="w-3 h-3 border border-slate-400"></div> Spíše ano</div>
+                    <div class="flex items-center gap-2"><div class="w-3 h-3 border border-slate-400 bg-[#1d4ed8]"></div> Ano</div>
+                </div>`;
+                
+                // Bezpečné vložení legendy přímo do kontejneru 2. stránky
+                const page2 = document.getElementById('page-2-container');
+                if (page2 && !document.getElementById('student-print-legend')) {
+                    const legendDiv = document.createElement('div');
+                    legendDiv.id = 'student-print-legend';
+                    legendDiv.innerHTML = printLegendHtml;
+                    page2.appendChild(legendDiv);
+                }
+                
                 try { lucide.createIcons(); } catch (e) {}
             } catch (e) { console.error("Render error (student):", e); }
         }
@@ -958,7 +1007,7 @@
                     
                     sHtml += `<div class="grid grid-cols-12 gap-2 border-b border-blue-800 py-1 items-center font-print"><div class="col-span-5 opacity-90">${q.textTeacher}</div><div class="col-span-1 text-center font-bold ${cnt[0]>0?'text-white':'opacity-30'}">${cnt[0]}</div><div class="col-span-1 text-center font-bold ${cnt[1]>0?'text-white':'opacity-30'}">${cnt[1]}</div><div class="col-span-1 text-center font-bold ${cnt[2]>0?'text-white':'opacity-30'}">${cnt[2]}</div><div class="col-span-1 text-center font-bold ${cnt[3]>0?'text-white':'opacity-30'}">${cnt[3]}</div><div class="col-span-1 text-center text-emerald-400 font-black bg-blue-800 rounded py-0.5">${avg}</div><div class="col-span-2 text-center text-blue-200 font-bold italic font-print">${myL}</div></div>`;
                 });
-                setHTML('summary-stats', sHtml);
+                statsDiv.innerHTML = sHtml;
 
                 let tHtml = "";
                 Object.entries(comments).forEach(([e, t]) => { 
