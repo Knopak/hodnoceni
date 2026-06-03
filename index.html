@@ -920,24 +920,6 @@
                 
                 container.innerHTML = fullHtml;
                 
-                // Přidání centrální legendy pro tisk na spodek 2. stránky
-                const printLegendHtml = `
-                <div class="hidden print-flex justify-center gap-8 mt-4 text-[8pt] text-slate-500 font-print font-bold">
-                    <div class="flex items-center gap-2"><div class="w-3 h-3 border border-slate-400"></div> Ne</div>
-                    <div class="flex items-center gap-2"><div class="w-3 h-3 border border-slate-400"></div> Spíše ne</div>
-                    <div class="flex items-center gap-2"><div class="w-3 h-3 border border-slate-400"></div> Spíše ano</div>
-                    <div class="flex items-center gap-2"><div class="w-3 h-3 border border-slate-400 bg-[#1d4ed8]"></div> Ano</div>
-                </div>`;
-                
-                // Bezpečné vložení legendy přímo do kontejneru 2. stránky
-                const page2 = document.getElementById('page-2-container');
-                if (page2 && !document.getElementById('student-print-legend')) {
-                    const legendDiv = document.createElement('div');
-                    legendDiv.id = 'student-print-legend';
-                    legendDiv.innerHTML = printLegendHtml;
-                    page2.appendChild(legendDiv);
-                }
-                
                 try { lucide.createIcons(); } catch (e) {}
             } catch (e) { console.error("Render error (student):", e); }
         }
@@ -1088,11 +1070,14 @@
             if (!isClassTeacher) return;
             const comms = dbData.teacherComments || {};
             let combined = "";
-            Object.values(comms).forEach(t => { 
-                if(typeof t === 'string' && t.trim() !== "") {
-                    combined += `${t}\n\n`; 
+            
+            // Propisuje se pouze text, striktně bez jména učitele
+            Object.values(comms).forEach(text => { 
+                if(typeof text === 'string' && text.trim() !== "") {
+                    combined += `${text.trim()}\n\n`; 
                 }
             });
+            
             const sIn = document.getElementById('summaryInput');
             if (sIn) {
                 sIn.value = combined.trim(); 
