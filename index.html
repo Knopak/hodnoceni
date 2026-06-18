@@ -152,7 +152,7 @@
                     <h3 class="text-lg font-bold flex items-center gap-2 uppercase tracking-wide text-blue-100">
                         <i data-lucide="bar-chart-3"></i> Svodka od kolegů
                     </h3>
-                    <div class="flex flex-wrap gap-2">
+                    <div id="summary-actions" class="flex flex-wrap gap-2">
                         <button onclick="applyAverages()" class="bg-emerald-500 hover:bg-emerald-400 text-white px-4 py-2 rounded-lg font-bold text-xs shadow-sm flex items-center gap-2">
                             <i data-lucide="copy-check" class="w-4 h-4"></i> Propsat průměry
                         </button>
@@ -340,10 +340,11 @@
             "martin.kopecky@skolagalaxie.cz": "",
             "michaela.raskova@skolagalaxie.cz": "6. A",
             "olga.orlitova@skolagalaxie.cz": "",
-            "vojtech.zajicek@skolagalaxie.cz": "",
             "ondrej.cervenka@skolagalaxie.cz": "3. A",
             "pavlina.bittnerova@skolagalaxie.cz": "5. A",
             "skola@skolagalaxie.cz": "",
+             "vojtech.zajicek@skolagalaxie.cz": "",
+             "lucie.dulakova@skolagalaxie.cz": "",
             "tereza.malirova@skolagalaxie.cz": "2. A",
             "nastenka@skolagalaxie.cz": ""
         };
@@ -472,7 +473,7 @@
             "leo.kelnar@skolagalaxie.cz": { name: "Leo Kelnar", class: "7. A" },
             "vojtech.kolman@skolagalaxie.cz": { name: "Vojtěch Kolman", class: "7. A" },
             "evelina.konopacova@skolagalaxie.cz": { name: "Evelina Konopáčová", class: "7. A" },
-            "ema.kuzdralova@skolagalaxie.cz": { name: "Emma Kuzdřálová", class: "7. A" },
+            "emma.kuzdralova@skolagalaxie.cz": { name: "Emma Kuzdřálová", class: "7. A" },
             "jan.novak@skolagalaxie.cz": { name: "Jan Novák", class: "7. A" },
             "simon.prada@skolagalaxie.cz": { name: "Šimon Přáda", class: "7. A" },
             "julie.sklenarova@skolagalaxie.cz": { name: "Julie Anna Sklenářová", class: "7. A" },
@@ -709,7 +710,7 @@
             
             if (userRole === 'teacher') {
                 disableEl('schoolYearNoteInput', !isClassTeacher);
-                disableEl('summaryInput', !isClassTeacher);
+                disableEl('summaryInput', false); // Tímto odemkneme finální text všem učitelům
                 if (isClassTeacher) {
                     showEl('settingsBtn');
                 } else {
@@ -717,6 +718,7 @@
                 }
             } else {
                 hideEl('settingsBtn');
+                disableEl('summaryInput', true); // Žák má pole zamčené
             }
             
             autoResize(document.getElementById('schoolYearNoteInput'));
@@ -946,6 +948,7 @@
                 const currUser = auth.currentUser;
                 const currEmail = (currUser && currUser.email) ? currUser.email.toLowerCase() : "";
                 
+                // Změna zpět: Svodku vidí OPĚT POUZE třídní učitel
                 if (!isClassTeacher || !currEmail) { 
                     hideEl('summary-panel'); 
                     if(toggleBtn) toggleBtn.classList.add('hidden');
@@ -960,6 +963,13 @@
                     hideEl('summary-panel');
                     return; 
                 }
+
+                // Skrytí tlačítek pro propisování průměrů/textů, pokud učitel není třídní
+                if (isClassTeacher) {
+                    showEl('summary-actions');
+                } else {
+                    hideEl('summary-actions');
+                }
                 
                 const obs = dbData.colleagueObservations || {};
                 const comments = dbData.teacherComments || {};
@@ -967,7 +977,12 @@
                 
                 let contrHtml = '<span class="text-xs font-bold text-blue-300 mr-2 uppercase self-center">Přispěli:</span>';
                 allEmails.forEach(e => { 
-                    contrHtml += `<div class="flex items-center gap-1.5 bg-blue-800 px-3 py-1 rounded-full border border-blue-700 shadow-sm"><span class="text-[10px] font-medium">${e}</span><button onclick="openDeleteModal('${e}')" class="text-red-400 hover:text-red-200"><i data-lucide="x-circle" class="w-3.5 h-3.5"></i></button></div>`; 
+                    contrHtml += `<div class="flex items-center gap-1.5 bg-blue-800 px-3 py-1 rounded-full border border-blue-700 shadow-sm"><span class="text-[10px] font-medium">${e}</span>`;
+                    // Křížek pro smazání se ukáže jen třídnímu učiteli
+                    if (isClassTeacher) {
+                        contrHtml += `<button onclick="openDeleteModal('${e}')" class="text-red-400 hover:text-red-200"><i data-lucide="x-circle" class="w-3.5 h-3.5"></i></button>`;
+                    }
+                    contrHtml += `</div>`; 
                 });
                 setHTML('contributor-list', contrHtml || '<div class="text-xs opacity-50 italic">Žádné příspěvky od kolegů.</div>');
 
@@ -1141,10 +1156,13 @@
             const email = currUser.email.toLowerCase();
             
             if(userRole === 'teacher') { 
+                // Finální pole pro tisk ukládají a upravují všichni učitelé
+                const bNote = document.getElementById('summaryInput');
+                if (bNote) dbData.bottomNote = bNote.value;
+                
+                // Úvodní slovo může měnit jen třídní
                 if(isClassTeacher) {
-                    const bNote = document.getElementById('summaryInput');
                     const tNote = document.getElementById('schoolYearNoteInput');
-                    if (bNote) dbData.bottomNote = bNote.value;
                     if (tNote) dbData.topNote = tNote.value; 
                 }
                 if(!dbData.teacherComments) dbData.teacherComments = {};
