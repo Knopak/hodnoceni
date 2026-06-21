@@ -325,6 +325,9 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
+        // Administrátoři, kteří mají práva třídního učitele pro všechny třídy
+        const ADMIN_EMAILS = ["frantisek.knop@skolagalaxie.cz"];
+
         // SEZNAM UČITELŮ
         const TEACHERS = {
             "aneta.hanzelkova@skolagalaxie.cz": "",
@@ -343,9 +346,9 @@
             "ondrej.cervenka@skolagalaxie.cz": "3. A",
             "pavlina.bittnerova@skolagalaxie.cz": "5. A",
             "skola@skolagalaxie.cz": "",
-             "vojtech.zajicek@skolagalaxie.cz": "",
+            "vojtech.zajicek@skolagalaxie.cz": "",
             "lenka.kosarkova@skolagalaxie.cz": "",
-             "lucie.dulakova@skolagalaxie.cz": "",
+            "lucie.dulakova@skolagalaxie.cz": "",
             "tereza.malirova@skolagalaxie.cz": "2. A",
             "nastenka@skolagalaxie.cz": ""
         };
@@ -627,7 +630,8 @@
                 if (!currUser) return;
                 const currentUserEmail = currUser.email ? currUser.email.toLowerCase() : "";
                 
-                isClassTeacher = (TEACHERS[currentUserEmail] === studentInfo.class);
+                const isAdmin = ADMIN_EMAILS.includes(currentUserEmail);
+                isClassTeacher = (TEACHERS[currentUserEmail] === studentInfo.class) || isAdmin;
 
                 setText('studentNameDisplay', studentInfo.name);
                 setText('classNameDisplay', "Třída: " + studentInfo.class);
@@ -753,19 +757,19 @@
                 
                 const currUser = auth.currentUser;
                 if (!currUser) return;
-                const teacherEmail = currUser.email.toLowerCase();
-                const teacherClass = TEACHERS[teacherEmail];
                 
-                if (!teacherClass) {
-                    showToast("Nejste přiřazen/a k žádné třídě.", true);
+                if (!currentTargetEmail || !STUDENTS[currentTargetEmail]) {
+                    showToast("Chyba: Není vybrán žádný žák.", true);
                     closeSettingsModal();
                     return;
                 }
 
-                showToast("Aktualizuji data pro celou třídu...");
+                // Bereme třídu podle aktuálně otevřeného žáka (nutné pro admina)
+                const currentStudentClass = STUDENTS[currentTargetEmail].class;
+                showToast(`Aktualizuji data pro celou třídu ${currentStudentClass}...`);
 
                 const classStudents = Object.entries(STUDENTS)
-                    .filter(([email, data]) => data.class === teacherClass)
+                    .filter(([email, data]) => data.class === currentStudentClass)
                     .map(([email]) => email);
 
                 try {
@@ -1097,9 +1101,22 @@
             
             const sIn = document.getElementById('summaryInput');
             if (sIn) {
-                sIn.value = combined.trim(); 
-                autoResize(sIn); 
-                showToast("Texty sloučeny.");
+                const existingContent = sIn.value.trim();
+                const newContent = combined.trim();
+                
+                if (newContent) {
+                    if (existingContent) {
+                        // Pokud už tam něco je, přidáme nové texty na konec s mezerou
+                        sIn.value = existingContent + "\n\n" + newContent;
+                    } else {
+                        // Pokud je to prázdné, rovnou to vložíme
+                        sIn.value = newContent;
+                    }
+                    autoResize(sIn); 
+                    showToast("Texty přidány ke stávajícímu obsahu.");
+                } else {
+                    showToast("Zatím nejsou žádné texty k propsání.");
+                }
             }
         }
 
