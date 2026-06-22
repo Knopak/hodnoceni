@@ -222,6 +222,12 @@
         <div id="page-2-container" class="max-w-[210mm] mx-auto p-10 bg-white my-8 shadow-md flex flex-col hidden font-print">
             <h2 id="page2-title" class="text-2xl font-black mb-8 text-center text-blue-900 uppercase border-b-4 border-blue-900 pb-3 tracking-wide">Sebehodnocení žáka</h2>
             
+            <div id="admin-clear-student-btn" class="text-center mb-6 hidden no-print">
+                <button onclick="clearStudentSelfEval()" class="text-red-500 hover:text-red-700 text-xs font-bold border border-red-200 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors shadow-sm">
+                    Vymazat sebehodnocení žáka
+                </button>
+            </div>
+
             <!-- Kontejner pro škály a texty žáka -->
             <div id="studentSectionsContainer" class="space-y-4 font-print"></div>
             
@@ -347,7 +353,6 @@
             "pavlina.bittnerova@skolagalaxie.cz": "5. A",
             "skola@skolagalaxie.cz": "",
             "vojtech.zajicek@skolagalaxie.cz": "",
-            "vendula.ticha@skolagalaxie.cz": "",
             "lenka.kosarkova@skolagalaxie.cz": "",
             "lucie.dulakova@skolagalaxie.cz": "",
             "tereza.malirova@skolagalaxie.cz": "2. A",
@@ -543,6 +548,7 @@
         let currentTargetEmail = null;
         let deleteCandidateEmail = null;
         let isSummaryVisible = false;
+        let isAdmin = false;
         
         let studentDocData = {};
         let dbData = {}; 
@@ -554,6 +560,8 @@
         auth.onAuthStateChanged(user => {
             if (user) {
                 const email = user.email ? user.email.toLowerCase() : "";
+                isAdmin = ADMIN_EMAILS.includes(email);
+                
                 hideEl('auth-screen');
                 showEl('app-screen');
                 
@@ -633,7 +641,6 @@
                 if (!currUser) return;
                 const currentUserEmail = currUser.email ? currUser.email.toLowerCase() : "";
                 
-                const isAdmin = ADMIN_EMAILS.includes(currentUserEmail);
                 isClassTeacher = (TEACHERS[currentUserEmail] === studentInfo.class) || isAdmin;
 
                 setText('classNameDisplay', "Třída: " + studentInfo.class);
@@ -730,6 +737,12 @@
             } else {
                 hideEl('settingsBtn');
                 disableEl('summaryInput', true); // Žák má pole zamčené
+            }
+
+            if (isAdmin || isClassTeacher) {
+                showEl('admin-clear-student-btn');
+            } else {
+                hideEl('admin-clear-student-btn');
             }
             
             autoResize(document.getElementById('schoolYearNoteInput'));
@@ -866,6 +879,7 @@
                 if (!container) return;
                 
                 const cats = [...new Set(COMPETENCIES.map(c => c.cat))];
+                const canEditStudent = (userRole === 'student' || isAdmin || isClassTeacher);
                 
                 const CAT_LEGENDS = {
                     "Ve vztahu k sobě": `
@@ -903,7 +917,7 @@
                         
                         for(let i=0; i<4; i++) {
                             const act = (val === i);
-                            btns += `<button onclick="setStudentScale('${q.id}', ${i})" class="scale-btn py-2 text-[11px] w-full" style="background-color:${act ? ACTIVE_COLOR : INACTIVE_COLOR}; color:${act ? '#fff' : '#64748b'}; border-color:${act ? ACTIVE_COLOR : '#cbd5e1'}" ${userRole==='teacher' ? 'disabled' : ''}>${SCALE_LABELS[i]}</button>`;
+                            btns += `<button onclick="setStudentScale('${q.id}', ${i})" class="scale-btn py-2 text-[11px] w-full" style="background-color:${act ? ACTIVE_COLOR : INACTIVE_COLOR}; color:${act ? '#fff' : '#64748b'}; border-color:${act ? ACTIVE_COLOR : '#cbd5e1'}" ${!canEditStudent ? 'disabled' : ''}>${SCALE_LABELS[i]}</button>`;
                             sqs += `<div class="w-3 h-3 border" style="background-color:${act ? ACTIVE_COLOR : INACTIVE_COLOR}; border-color:#94a3b8"></div>`;
                         }
                         
@@ -927,7 +941,7 @@
                         </div>
                     </div>`;
 
-                    catHtml += `<div class="mt-4 print:mt-1.5 pt-3 print:pt-1.5 border-t"><label class="text-[9px] font-bold text-slate-400 uppercase no-print block mb-1 font-print">Moje vyjádření k oblasti:</label><textarea id="cat-${cat}" class="w-full p-3 border rounded-xl text-sm bg-blue-50 focus:bg-white focus:ring-4 focus:ring-blue-100 font-print" placeholder="Shrň své hodnocení..." rows="1" oninput="autoResize(this); updateCategoryComment('${cat}', this.value);" ${userRole==='teacher'?'disabled':''}>${comm}</textarea><div class="print-only text-[11px] print:text-[8pt] italic mt-2 print:mt-1 leading-relaxed print:leading-normal text-slate-700 border-l-4 pl-3 print:pl-2 font-print">${comm}</div></div></div>`;
+                    catHtml += `<div class="mt-4 print:mt-1.5 pt-3 print:pt-1.5 border-t"><label class="text-[9px] font-bold text-slate-400 uppercase no-print block mb-1 font-print">Moje vyjádření k oblasti:</label><textarea id="cat-${cat}" class="w-full p-3 border rounded-xl text-sm bg-blue-50 focus:bg-white focus:ring-4 focus:ring-blue-100 font-print" placeholder="Shrň své hodnocení..." rows="1" oninput="autoResize(this); updateCategoryComment('${cat}', this.value);" ${!canEditStudent ? 'disabled' : ''}>${comm}</textarea><div class="print-only text-[11px] print:text-[8pt] italic mt-2 print:mt-1 leading-relaxed print:leading-normal text-slate-700 border-l-4 pl-3 print:pl-2 font-print">${comm}</div></div></div>`;
                     
                     fullHtml += catHtml;
                 });
@@ -1142,11 +1156,23 @@
         }
 
         function setStudentScale(id, v) { 
-            if(userRole === 'student'){ 
+            if(userRole === 'student' || isAdmin || isClassTeacher){ 
                 if(!dbData.studentScales) dbData.studentScales = {}; 
-                dbData.studentScales[id] = v; 
+                if (dbData.studentScales[id] === v) {
+                    delete dbData.studentScales[id]; // Odkliknutí hodnoty
+                } else {
+                    dbData.studentScales[id] = v; 
+                }
                 renderStudentScales(); 
             } 
+        }
+
+        function clearStudentSelfEval() {
+            if (!confirm("Opravdu vymazat celé sebehodnocení tohoto žáka?")) return;
+            dbData.studentScales = {};
+            dbData.categoryComments = {};
+            renderStudentScales();
+            showToast("Sebehodnocení vymazáno. Nezapomeňte kliknout na Uložit.");
         }
         
         function autoResize(el) { 
