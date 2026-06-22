@@ -347,6 +347,7 @@
             "pavlina.bittnerova@skolagalaxie.cz": "5. A",
             "skola@skolagalaxie.cz": "",
             "vojtech.zajicek@skolagalaxie.cz": "",
+            "vendula.ticha@skolagalaxie.cz": "",
             "lenka.kosarkova@skolagalaxie.cz": "",
             "lucie.dulakova@skolagalaxie.cz": "",
             "tereza.malirova@skolagalaxie.cz": "2. A",
@@ -613,7 +614,6 @@
             hideEl('controls-container');
             showEl('student-notice');
             hideEl('printBtn');
-            currentTargetEmail = email; 
             loadStudentData(email);
         }
 
@@ -623,7 +623,10 @@
                 const email = forcedEmail || (studentSelect ? studentSelect.value : null);
                 if (!email) return;
                 
-                currentTargetEmail = email;
+                // 1. BEZPEČNOSTNÍ ZÁMEK: Zabránění křížení dat (race condition)
+                currentTargetEmail = null;
+                setText('studentNameDisplay', "Načítám data...");
+                
                 const studentInfo = STUDENTS[email];
                 
                 const currUser = auth.currentUser;
@@ -633,7 +636,6 @@
                 const isAdmin = ADMIN_EMAILS.includes(currentUserEmail);
                 isClassTeacher = (TEACHERS[currentUserEmail] === studentInfo.class) || isAdmin;
 
-                setText('studentNameDisplay', studentInfo.name);
                 setText('classNameDisplay', "Třída: " + studentInfo.class);
                 
                 try {
@@ -681,6 +683,10 @@
                 dbData.schoolYear = currentYear;
                 dbData.term = currentTerm;
 
+                // 2. ODEMČENÍ ZÁMKU: Jakmile jsou data bezpečně v paměti
+                currentTargetEmail = email;
+                setText('studentNameDisplay', studentInfo.name);
+
                 renderForms(studentInfo.name);
                 renderSummary();
             } catch (e) {
@@ -699,7 +705,7 @@
             
             const p2Title = isStudent 
                 ? `Moje sebehodnocení<br><span class="text-xl text-black font-black mt-2 inline-block">${name}</span>` 
-                : `Sebehodnocení žáka <br><span class="text-xl text-black font-black mt-2 inline-block">${name}</span>`;
+                : `Sebehodnocení žáka (Strana 2)<br><span class="text-xl text-black font-black mt-2 inline-block">${name}</span>`;
             setHTML('page2-title', p2Title);
             
             setText('schoolYearTermDisplay', `Školní rok: ${dbData.schoolYear} - ${dbData.term}`);
