@@ -179,7 +179,7 @@
                     <span id="studentNameDisplay" class="text-3xl font-black text-black uppercase tracking-wider">Vyberte žáka</span>
                 </div>
                 <div class="flex justify-between items-center text-sm font-bold text-slate-700 px-4 mt-2 font-print uppercase tracking-tight">
-                    <div id="schoolYearTermDisplay">Školní rok: 2025/2026 - I. POLOLETÍ</div>
+                    <div id="schoolYearTermDisplay">Školní rok: -</div>
                     <div id="classNameDisplay">Třída: -</div>
                 </div>
                 <div class="w-full border-b-2 border-slate-300 my-6"></div>
@@ -562,7 +562,17 @@
         let isAdmin = false;
         
         let studentDocData = {};
-        let dbData = {}; 
+        let dbData = { 
+            teacherScales: {}, 
+            studentScales: {}, 
+            categoryComments: {}, 
+            colleagueObservations: {}, 
+            teacherComments: {}, 
+            topNote: "", 
+            bottomNote: "" 
+        };
+
+        const ADMIN_EMAILS = ["frantisek.knop@skolagalaxie.cz"];
 
         window.onload = () => {
             try { lucide.createIcons(); } catch (e) { console.error("Lucide init error", e); }
@@ -630,21 +640,19 @@
         }
 
         function setupStudentUI(email) {
-            hideEl('controls-container');
-            showEl('student-notice');
-            hideEl('printBtn');
+            document.getElementById('controls-container').classList.add('hidden');
+            document.getElementById('student-notice').classList.remove('hidden');
+            document.getElementById('printBtn').classList.add('hidden');
             loadStudentData(email);
         }
 
         async function loadStudentData(forcedEmail = null) {
             try {
-                const studentSelect = document.getElementById('studentSelect');
-                const email = forcedEmail || (studentSelect ? studentSelect.value : null);
+                const email = forcedEmail || document.getElementById('studentSelect').value;
                 if (!email) return;
                 
-                // 1. BEZPEČNOSTNÍ ZÁMEK: Zabránění křížení dat (race condition)
                 currentTargetEmail = null;
-                setText('studentNameDisplay', "Načítám data...");
+                document.getElementById('studentNameDisplay').textContent = "Načítám data...";
                 
                 const studentInfo = STUDENTS[email];
                 
@@ -652,16 +660,16 @@
                 if (!currUser) return;
                 const currentUserEmail = currUser.email ? currUser.email.toLowerCase() : "";
                 
+                isAdmin = ADMIN_EMAILS.includes(currentUserEmail);
                 isClassTeacher = (TEACHERS[currentUserEmail] === studentInfo.class) || isAdmin;
 
-                setText('classNameDisplay', "Třída: " + studentInfo.class);
+                document.getElementById('classNameDisplay').textContent = "Třída: " + studentInfo.class;
                 
                 try {
                     const doc = await db.collection('evaluations').doc(email).get();
                     if (doc.exists) {
                         studentDocData = doc.data();
                         
-                        // Migrace starých dat z kořenového adresáře
                         if (!studentDocData.periods) {
                             studentDocData.periods = {};
                             studentDocData.periods["2025/2026_I. POLOLETÍ"] = {
@@ -689,7 +697,6 @@
                 const currentTerm = studentDocData.activeTerm || "I. POLOLETÍ";
                 const periodKey = `${currentYear}_${currentTerm}`;
 
-                if (!studentDocData.periods) studentDocData.periods = {};
                 if (!studentDocData.periods[periodKey]) {
                     studentDocData.periods[periodKey] = {
                         teacherScales: {}, studentScales: {}, categoryComments: {}, 
@@ -701,9 +708,8 @@
                 dbData.schoolYear = currentYear;
                 dbData.term = currentTerm;
 
-                // 2. ODEMČENÍ ZÁMKU: Jakmile jsou data bezpečně v paměti
                 currentTargetEmail = email;
-                setText('studentNameDisplay', studentInfo.name);
+                document.getElementById('studentNameDisplay').textContent = studentInfo.name;
 
                 renderForms(studentInfo.name);
                 renderSummary();
@@ -723,7 +729,9 @@
             
             document.getElementById('page2-title').innerHTML = isStudent 
                 ? `Moje sebehodnocení<br><span class="text-xl text-black font-black mt-2 inline-block">${name}</span>` 
-                : `Sebehodnocení žáka (Strana 2)<br><span class="text-xl text-black font-black mt-2 inline-block">${name}</span>`;
+                : `Sebehodnocení žáka<br><span class="text-xl text-black font-black mt-2 inline-block">${name}</span>`;
+            
+            document.getElementById('schoolYearTermDisplay').textContent = `Školní rok: ${dbData.schoolYear} - ${dbData.term}`;
             
             document.getElementById('schoolYearNoteInput').value = dbData.topNote || "";
             document.getElementById('summaryInput').value = dbData.bottomNote || "";
@@ -736,105 +744,95 @@
             
             if (userRole === 'teacher') {
                 document.getElementById('schoolYearNoteInput').disabled = !isClassTeacher;
-                disableEl('schoolYearNoteInput', !isClassTeacher);
-                disableEl('summaryInput', false); // Tímto odemkneme finální text všem učitelům
-                if (isClassTeacher) {
-                    showEl('settingsBtn');
-                } else {
-                    hideEl('settingsBtn');
+                document.getElementById('summaryInput').disabled = false;
+                
+                const settingsBtn = document.getElementById('settingsBtn');
+                if (settingsBtn) {
+                    if (isClassTeacher) settingsBtn.classList.remove('hidden');
+                    else settingsBtn.classList.add('hidden');
                 }
             } else {
-                hideEl('settingsBtn');
-                disableEl('summaryInput', true); // Žák má pole zamčené
-            }
-
-            if (isAdmin || isClassTeacher) {
-                showEl('admin-clear-student-btn');
-            } else {
-                hideEl('admin-clear-student-btn');
+                document.getElementById('summaryInput').disabled = true;
             }
             
             autoResize(document.getElementById('schoolYearNoteInput'));
             autoResize(document.getElementById('summaryInput'));
             autoResize(document.getElementById('myPersonalComment'));
             
-            if (!isStudent) {
-                renderTeacherScales();
-            }
+            renderTeacherScales(); 
             renderStudentScales();
         }
 
+        function toggleSummary() {
+            isSummaryVisible = !isSummaryVisible;
+            renderSummary();
+        }
+
         function openSettingsModal() {
-            setVal('yearSelect', dbData.schoolYear || "2025/2026");
-            setVal('termSelect', dbData.term || "I. POLOLETÍ");
-            showEl('settings-modal');
+            document.getElementById('yearSelect').value = dbData.schoolYear || "2025/2026";
+            document.getElementById('termSelect').value = dbData.term || "I. POLOLETÍ";
+            document.getElementById('settings-modal').classList.remove('hidden');
         }
 
         function closeSettingsModal() {
-            hideEl('settings-modal');
+            document.getElementById('settings-modal').classList.add('hidden');
         }
 
         async function saveSettings() {
-            const yearSel = document.getElementById('yearSelect');
-            const termSel = document.getElementById('termSelect');
+            const newYear = document.getElementById('yearSelect').value;
+            const newTerm = document.getElementById('termSelect').value;
+            const periodKey = `${newYear}_${newTerm}`;
             
-            if (yearSel && termSel) {
-                const newYear = yearSel.value;
-                const newTerm = termSel.value;
-                const periodKey = `${newYear}_${newTerm}`;
-                
-                const currUser = auth.currentUser;
-                if (!currUser) return;
-                
-                if (!currentTargetEmail || !STUDENTS[currentTargetEmail]) {
-                    showToast("Chyba: Není vybrán žádný žák.", true);
-                    closeSettingsModal();
-                    return;
-                }
+            const currUser = auth.currentUser;
+            if (!currUser) return;
+            
+            if (!currentTargetEmail || !STUDENTS[currentTargetEmail]) {
+                showToast("Chyba: Není vybrán žádný žák.", true);
+                closeSettingsModal();
+                return;
+            }
 
-                // Bereme třídu podle aktuálně otevřeného žáka (nutné pro admina)
-                const currentStudentClass = STUDENTS[currentTargetEmail].class;
-                showToast(`Aktualizuji data pro celou třídu ${currentStudentClass}...`);
+            const currentStudentClass = STUDENTS[currentTargetEmail].class;
+            showToast(`Aktualizuji data pro celou třídu ${currentStudentClass}...`);
 
-                const classStudents = Object.entries(STUDENTS)
-                    .filter(([email, data]) => data.class === currentStudentClass)
-                    .map(([email]) => email);
+            const classStudents = Object.entries(STUDENTS)
+                .filter(([email, data]) => data.class === currentStudentClass)
+                .map(([email]) => email);
 
-                try {
-                    const updatePromises = classStudents.map(async (studentEmail) => {
-                        let docData = { activeYear: newYear, activeTerm: newTerm, periods: {} };
-                        try {
-                            const doc = await db.collection('evaluations').doc(studentEmail).get();
-                            if (doc.exists) {
-                                docData = doc.data();
-                                docData.activeYear = newYear;
-                                docData.activeTerm = newTerm;
-                                if (!docData.periods) docData.periods = {};
-                            }
-                        } catch (e) {
-                            console.error("Chyba čtení u žáka: " + studentEmail);
+            try {
+                const updatePromises = classStudents.map(async (studentEmail) => {
+                    let docData = { activeYear: newYear, activeTerm: newTerm, periods: {} };
+                    try {
+                        const doc = await db.collection('evaluations').doc(studentEmail).get();
+                        if (doc.exists) {
+                            docData = doc.data();
+                            docData.activeYear = newYear;
+                            docData.activeTerm = newTerm;
+                            if (!docData.periods) docData.periods = {};
                         }
-
-                        if (!docData.periods[periodKey]) {
-                            docData.periods[periodKey] = {
-                                teacherScales: {}, studentScales: {}, categoryComments: {}, 
-                                colleagueObservations: {}, teacherComments: {}, topNote: "", bottomNote: ""
-                            };
-                        }
-
-                        return db.collection('evaluations').doc(studentEmail).set(docData, { merge: true });
-                    });
-
-                    await Promise.all(updatePromises);
-                    showToast("Období nastaveno pro všechny žáky třídy.");
-                    
-                    if(currentTargetEmail) {
-                        loadStudentData(currentTargetEmail);
+                    } catch (e) {
+                        console.error("Chyba čtení u žáka: " + studentEmail);
                     }
-                } catch(e) {
-                    console.error(e);
-                    showToast("Chyba při hromadném ukládání.", true);
+
+                    if (!docData.periods[periodKey]) {
+                        docData.periods[periodKey] = {
+                            teacherScales: {}, studentScales: {}, categoryComments: {}, 
+                            colleagueObservations: {}, teacherComments: {}, topNote: "", bottomNote: ""
+                        };
+                    }
+
+                    return db.collection('evaluations').doc(studentEmail).set(docData, { merge: true });
+                });
+
+                await Promise.all(updatePromises);
+                showToast("Období nastaveno pro všechny žáky třídy.");
+                
+                if(currentTargetEmail) {
+                    loadStudentData(currentTargetEmail);
                 }
+            } catch(e) {
+                console.error(e);
+                showToast("Chyba při hromadném ukládání.", true);
             }
             closeSettingsModal();
         }
@@ -984,7 +982,6 @@
         function renderSummary() {
             try {
                 const panel = document.getElementById('summary-panel');
-                const toggleBtn = document.getElementById('summaryToggleBtn');
                 const statsDiv = document.getElementById('summary-stats');
                 const textsDiv = document.getElementById('colleague-texts-list');
                 const contributorDiv = document.getElementById('contributor-list');
@@ -992,27 +989,16 @@
                 const currUser = auth.currentUser;
                 const currEmail = (currUser && currUser.email) ? currUser.email.toLowerCase() : "";
                 
-                // Změna zpět: Svodku vidí OPĚT POUZE třídní učitel
                 if (!isClassTeacher || !currEmail) { 
-                    hideEl('summary-panel'); 
-                    if(toggleBtn) toggleBtn.classList.add('hidden');
+                    panel.classList.add('hidden'); 
                     return; 
                 }
-                
-                if(toggleBtn) toggleBtn.classList.remove('hidden');
                 
                 if (isSummaryVisible) {
-                    showEl('summary-panel');
+                    panel.classList.remove('hidden');
                 } else {
-                    hideEl('summary-panel');
-                    return; 
-                }
-
-                // Skrytí tlačítek pro propisování průměrů/textů, pokud učitel není třídní
-                if (isClassTeacher) {
-                    showEl('summary-actions');
-                } else {
-                    hideEl('summary-actions');
+                    panel.classList.add('hidden');
+                    return;
                 }
                 
                 const obs = dbData.colleagueObservations || {};
@@ -1241,8 +1227,11 @@
                 dbData.teacherComments[email] = document.getElementById('myPersonalComment').value;
             }
             
+            const periodKey = `${dbData.schoolYear}_${dbData.term}`;
+            studentDocData.periods[periodKey] = dbData;
+            
             try {
-                await db.collection('evaluations').doc(currentTargetEmail).set(dbData, { merge: true });
+                await db.collection('evaluations').doc(currentTargetEmail).set(studentDocData, { merge: true });
                 showToast("Změny úspěšně uloženy.");
                 document.getElementById('schoolYearNoteDisplay').innerHTML = formatForPrint(dbData.topNote);
                 document.getElementById('summaryDisplay').innerHTML = formatForPrint(dbData.bottomNote);
