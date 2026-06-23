@@ -572,8 +572,6 @@
             bottomNote: "" 
         };
 
-        const ADMIN_EMAILS = ["frantisek.knop@skolagalaxie.cz"];
-
         window.onload = () => {
             try { lucide.createIcons(); } catch (e) { console.error("Lucide init error", e); }
         };
@@ -1186,6 +1184,7 @@
             el.style.height = el.scrollHeight + 'px'; 
         }
 
+        // Formátování textu pro tisk s odskokem na všech řádcích
         function formatForPrint(text) {
             if (!text) return "";
             return text.split('\n').map(line => {
@@ -1194,8 +1193,7 @@
             }).join('');
         }
 
-        async function downloadAllData() {
-            try {
+        function showToast(msg, isError = false) {
                 const snap = await db.collection('evaluations').get();
                 const allData = {}; 
                 snap.forEach(doc => { allData[doc.id] = doc.data(); });
