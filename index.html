@@ -72,7 +72,7 @@
                     <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Školní rok</label>
                     <select id="yearSelect" class="w-full p-3 border rounded-xl text-sm bg-slate-50 focus:ring-2 focus:ring-blue-500 outline-none font-medium">
                         <option value="2024/2025">2024/2025</option>
-                        <option value="2025/2026">2025/2026</option>
+                        <option value="2025/2026" selected>2025/2026</option>
                         <option value="2026/2027">2026/2027</option>
                         <option value="2027/2028">2027/2028</option>
                     </select>
@@ -81,7 +81,7 @@
                     <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Pololetí</label>
                     <select id="termSelect" class="w-full p-3 border rounded-xl text-sm bg-slate-50 focus:ring-2 focus:ring-blue-500 outline-none font-medium">
                         <option value="I. POLOLETÍ">I. POLOLETÍ</option>
-                        <option value="II. POLOLETÍ">II. POLOLETÍ</option>
+                        <option value="II. POLOLETÍ" selected>II. POLOLETÍ</option>
                     </select>
                 </div>
             </div>
@@ -218,7 +218,7 @@
             </div>
         </div>
 
-        <!-- STRANA 2 -->
+        <!-- STRANA 2: SEBEHODNOCENÍ -->
         <div id="page-2-container" class="max-w-[210mm] mx-auto p-10 bg-white my-8 shadow-md flex flex-col hidden font-print">
             <h2 id="page2-title" class="text-2xl font-black mb-8 text-center text-blue-900 uppercase border-b-4 border-blue-900 pb-3 tracking-wide">Sebehodnocení žáka</h2>
             
@@ -290,14 +290,12 @@
             el.style.height = el.scrollHeight + 'px'; 
         }
 
-        // Formátování textu pro tisk (odstavce s odskokem, 1. řádek bez odskoku kvůli oslovení)
+        // Formátování textu pro tisk (odsazení všech odstavců vč. prvního)
         function formatForPrint(text) {
             if (!text) return "";
-            return text.split('\n').map((line, index) => {
+            return text.split('\n').map(line => {
                 if(line.trim() === '') return '<div class="h-2 print:h-1"></div>';
-                // První řádek neodsazujeme, ostatní ano
-                const indentClass = index === 0 ? '' : 'indent-6';
-                return `<div class="${indentClass} text-justify">${line}</div>`;
+                return `<div class="indent-6 text-justify">${line}</div>`;
             }).join('');
         }
 
@@ -670,7 +668,7 @@
                         
                         if (!studentDocData.periods) {
                             studentDocData.periods = {};
-                            studentDocData.periods["2025/2026_I. POLOLETÍ"] = {
+                            studentDocData.periods["2025/2026_II. POLOLETÍ"] = {
                                 teacherScales: studentDocData.teacherScales || {},
                                 studentScales: studentDocData.studentScales || {},
                                 categoryComments: studentDocData.categoryComments || {},
@@ -680,19 +678,19 @@
                                 bottomNote: studentDocData.bottomNote || ""
                             };
                             studentDocData.activeYear = studentDocData.schoolYear || "2025/2026";
-                            studentDocData.activeTerm = studentDocData.term || "I. POLOLETÍ";
+                            studentDocData.activeTerm = studentDocData.term || "II. POLOLETÍ";
                         }
                     } else {
-                        studentDocData = { activeYear: "2025/2026", activeTerm: "I. POLOLETÍ", periods: {} };
+                        studentDocData = { activeYear: "2025/2026", activeTerm: "II. POLOLETÍ", periods: {} };
                     }
                 } catch (e) {
                     console.error("Firebase fetch error", e);
                     showToast("Nelze načíst data z Firebase.", true);
-                    studentDocData = { activeYear: "2025/2026", activeTerm: "I. POLOLETÍ", periods: {} };
+                    studentDocData = { activeYear: "2025/2026", activeTerm: "II. POLOLETÍ", periods: {} };
                 }
 
                 const currentYear = studentDocData.activeYear || "2025/2026";
-                const currentTerm = studentDocData.activeTerm || "I. POLOLETÍ";
+                const currentTerm = studentDocData.activeTerm || "II. POLOLETÍ";
                 const periodKey = `${currentYear}_${currentTerm}`;
 
                 if (!studentDocData.periods[periodKey]) {
@@ -749,8 +747,23 @@
                     if (isClassTeacher) settingsBtn.classList.remove('hidden');
                     else settingsBtn.classList.add('hidden');
                 }
+                
+                const summaryBtn = document.getElementById('summaryToggleBtn');
+                if (summaryBtn) {
+                    if (isClassTeacher) summaryBtn.classList.remove('hidden');
+                    else summaryBtn.classList.add('hidden');
+                }
             } else {
                 document.getElementById('summaryInput').disabled = true;
+                
+                const summaryBtn = document.getElementById('summaryToggleBtn');
+                if (summaryBtn) summaryBtn.classList.add('hidden');
+            }
+            
+            const clearBtn = document.getElementById('admin-clear-student-btn');
+            if (clearBtn) {
+                if (isAdmin || isClassTeacher) clearBtn.classList.remove('hidden');
+                else clearBtn.classList.add('hidden');
             }
             
             autoResize(document.getElementById('schoolYearNoteInput'));
@@ -768,7 +781,7 @@
 
         function openSettingsModal() {
             document.getElementById('yearSelect').value = dbData.schoolYear || "2025/2026";
-            document.getElementById('termSelect').value = dbData.term || "I. POLOLETÍ";
+            document.getElementById('termSelect').value = dbData.term || "II. POLOLETÍ";
             document.getElementById('settings-modal').classList.remove('hidden');
         }
 
@@ -854,7 +867,7 @@
                         const myObservations = allObservations[currEmail] || {};
                         const myObsValue = myObservations[q.id];
                         
-                        // Dynamický výpočet průměru pro tisk, aby se škála vybarvila i před manuálním propsáním
+                        // Dynamický výpočet průměru pro tisk
                         let sum = 0, tot = 0;
                         Object.values(allObservations).forEach(d => {
                             if(d && typeof d === 'object' && d[q.id] !== undefined) {
@@ -972,11 +985,6 @@
             dbData.categoryComments[cat] = val;
         }
 
-        function toggleSummary() {
-            isSummaryVisible = !isSummaryVisible;
-            renderSummary();
-        }
-
         function renderSummary() {
             try {
                 const panel = document.getElementById('summary-panel');
@@ -1006,7 +1014,6 @@
                 let contrHtml = '<span class="text-xs font-bold text-blue-300 mr-2 uppercase self-center">Přispěli:</span>';
                 allEmails.forEach(e => { 
                     contrHtml += `<div class="flex items-center gap-1.5 bg-blue-800 px-3 py-1 rounded-full border border-blue-700 shadow-sm"><span class="text-[10px] font-medium">${e}</span>`;
-                    // Křížek pro smazání se ukáže jen třídnímu učiteli
                     if (isClassTeacher) {
                         contrHtml += `<button onclick="openDeleteModal('${e}')" class="text-red-400 hover:text-red-200"><i data-lucide="x-circle" class="w-3.5 h-3.5"></i></button>`;
                     }
@@ -1115,7 +1122,6 @@
             const comms = dbData.teacherComments || {};
             let combined = "";
             
-            // Propisuje se pouze text, striktně bez jména učitele
             Object.values(comms).forEach(text => { 
                 if(typeof text === 'string' && text.trim() !== "") {
                     combined += `${text.trim()}\n\n`; 
@@ -1129,10 +1135,8 @@
                 
                 if (newContent) {
                     if (existingContent) {
-                        // Pokud už tam něco je, přidáme nové texty na konec s mezerou
                         sIn.value = existingContent + "\n\n" + newContent;
                     } else {
-                        // Pokud je to prázdné, rovnou to vložíme
                         sIn.value = newContent;
                     }
                     autoResize(sIn); 
@@ -1162,7 +1166,7 @@
             if(userRole === 'student' || isAdmin || isClassTeacher){ 
                 if(!dbData.studentScales) dbData.studentScales = {}; 
                 if (dbData.studentScales[id] === v) {
-                    delete dbData.studentScales[id]; // Odkliknutí hodnoty
+                    delete dbData.studentScales[id];
                 } else {
                     dbData.studentScales[id] = v; 
                 }
@@ -1176,21 +1180,6 @@
             dbData.categoryComments = {};
             renderStudentScales();
             showToast("Sebehodnocení vymazáno. Nezapomeňte kliknout na Uložit.");
-        }
-        
-        function autoResize(el) { 
-            if(!el) return; 
-            el.style.height = 'auto'; 
-            el.style.height = el.scrollHeight + 'px'; 
-        }
-
-        // Formátování textu pro tisk s odskokem na všech řádcích
-        function formatForPrint(text) {
-            if (!text) return "";
-            return text.split('\n').map(line => {
-                if(line.trim() === '') return '<div class="h-2 print:h-1"></div>';
-                return `<div class="indent-6 text-justify">${line}</div>`;
-            }).join('');
         }
 
         async function downloadAllData() {
@@ -1211,53 +1200,69 @@
             }
         }
 
-        function showToast(msg, isError = false) {
-            const t = document.getElementById('toast');
-            if (!t) return;
-            
-            if (isError) {
-                t.className = "fixed bottom-6 right-6 bg-red-600 text-white px-8 py-4 rounded-2xl shadow-2xl font-bold transform translate-y-24 opacity-0 transition-all duration-500 z-[100] flex items-center gap-3 no-print";
-                setHTML('toast', `<i data-lucide="alert-circle" class="w-5 h-5"></i> ${msg}`);
-            } else {
-                t.className = "fixed bottom-6 right-6 bg-emerald-600 text-white px-8 py-4 rounded-2xl shadow-2xl font-bold transform translate-y-24 opacity-0 transition-all duration-500 z-[100] flex items-center gap-3 no-print";
-                setHTML('toast', `<i data-lucide="check-circle-2" class="w-5 h-5"></i> ${msg}`);
-            }
-            
-            t.style.transform = 'translateY(0)'; 
-            t.style.opacity = '1'; 
-            try { lucide.createIcons(); } catch(e) {}
-            
-            setTimeout(() => { 
-                t.style.opacity = '0'; 
-                t.style.transform = 'translateY(24px)'; 
-            }, 4000);
-        }
-
         async function saveData() {
             if(!currentTargetEmail) return;
             const currUser = auth.currentUser;
             if(!currUser) return;
             const email = currUser.email.toLowerCase();
             
-            if(userRole === 'teacher') { 
-                if(isClassTeacher) {
-                    dbData.bottomNote = document.getElementById('summaryInput').value; 
-                    dbData.topNote = document.getElementById('schoolYearNoteInput').value; 
-                }
-                if(!dbData.teacherComments) dbData.teacherComments = {};
-                dbData.teacherComments[email] = document.getElementById('myPersonalComment').value;
-            }
-            
             const periodKey = `${dbData.schoolYear}_${dbData.term}`;
-            studentDocData.periods[periodKey] = dbData;
             
             try {
-                await db.collection('evaluations').doc(currentTargetEmail).set(studentDocData, { merge: true });
+                // 1. Těsně před uložením si stáhneme to nejnovější z databáze (ochrana proti přepsání cizích dat)
+                const docRef = db.collection('evaluations').doc(currentTargetEmail);
+                const docSnap = await docRef.get();
+                
+                let latestDocData = docSnap.exists ? docSnap.data() : { periods: {} };
+                if (!latestDocData.periods) latestDocData.periods = {};
+                let latestPeriod = latestDocData.periods[periodKey] || {
+                    teacherScales: {}, studentScales: {}, categoryComments: {}, 
+                    colleagueObservations: {}, teacherComments: {}, topNote: "", bottomNote: ""
+                };
+
+                // 2. Přimícháme pouze úpravy tohoto konkrétního uživatele
+                if(userRole === 'teacher' || isAdmin) { 
+                    if(isClassTeacher || isAdmin) {
+                        latestPeriod.bottomNote = document.getElementById('summaryInput').value; 
+                        latestPeriod.topNote = document.getElementById('schoolYearNoteInput').value; 
+                        latestPeriod.teacherScales = dbData.teacherScales || {};
+                        latestPeriod.studentScales = dbData.studentScales || {};
+                        latestPeriod.categoryComments = dbData.categoryComments || {};
+                    }
+                    if(!latestPeriod.teacherComments) latestPeriod.teacherComments = {};
+                    latestPeriod.teacherComments[email] = document.getElementById('myPersonalComment').value;
+                    
+                    if(!latestPeriod.colleagueObservations) latestPeriod.colleagueObservations = {};
+                    if(dbData.colleagueObservations && dbData.colleagueObservations[email] !== undefined) {
+                        latestPeriod.colleagueObservations[email] = dbData.colleagueObservations[email];
+                    }
+                }
+                
+                if (userRole === 'student') {
+                    latestPeriod.studentScales = dbData.studentScales || {};
+                    latestPeriod.categoryComments = dbData.categoryComments || {};
+                }
+                
+                // 3. Uložíme sloučený celek
+                latestDocData.periods[periodKey] = latestPeriod;
+                await docRef.set(latestDocData, { merge: true });
+                
+                // 4. Přepíšeme lokální paměť
+                dbData = latestPeriod;
+                studentDocData = latestDocData;
+                
                 showToast("Změny úspěšně uloženy.");
+                
                 document.getElementById('schoolYearNoteDisplay').innerHTML = formatForPrint(dbData.topNote);
                 document.getElementById('summaryDisplay').innerHTML = formatForPrint(dbData.bottomNote);
+                
+                if (userRole === 'teacher' || isAdmin) {
+                    renderTeacherScales();
+                    renderSummary();
+                }
+                
             } catch (e) {
-                showToast("Nelze uložit! Zkontrolujte Firebase pravidla (Rules). Chyba: " + e.message, true);
+                showToast("Nelze uložit! Zkontrolujte Firebase pravidla. Chyba: " + e.message, true);
             }
         }
     </script>
