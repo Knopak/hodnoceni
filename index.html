@@ -731,11 +731,11 @@
             const allComments = dbData.teacherComments || {};
             document.getElementById('myPersonalComment').value = allComments[currUserEmail] || "";
             
-            // Tady se nyní konečně správně aplikuje to odřádkování do HTML
             document.getElementById('schoolYearNoteDisplay').innerHTML = formatForPrint(dbData.topNote);
             document.getElementById('summaryDisplay').innerHTML = formatForPrint(dbData.bottomNote);
             
             if (userRole === 'teacher') {
+                document.getElementById('schoolYearNoteInput').disabled = !isClassTeacher;
                 disableEl('schoolYearNoteInput', !isClassTeacher);
                 disableEl('summaryInput', false); // Tímto odemkneme finální text všem učitelům
                 if (isClassTeacher) {
@@ -1200,6 +1200,14 @@
             el.style.height = el.scrollHeight + 'px'; 
         }
 
+        function formatForPrint(text) {
+            if (!text) return "";
+            return text.split('\n').map(line => {
+                if(line.trim() === '') return '<div class="h-2 print:h-1"></div>';
+                return `<div class="indent-6 text-justify">${line}</div>`;
+            }).join('');
+        }
+
         async function downloadAllData() {
             try {
                 const snap = await db.collection('evaluations').get();
@@ -1236,8 +1244,6 @@
             try {
                 await db.collection('evaluations').doc(currentTargetEmail).set(dbData, { merge: true });
                 showToast("Změny úspěšně uloženy.");
-                
-                // Po uložení se musí také text prohnat formátovací funkcí
                 document.getElementById('schoolYearNoteDisplay').innerHTML = formatForPrint(dbData.topNote);
                 document.getElementById('summaryDisplay').innerHTML = formatForPrint(dbData.bottomNote);
             } catch (e) {
