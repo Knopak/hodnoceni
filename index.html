@@ -214,11 +214,11 @@
             <div class="mt-10 flex-grow flex flex-col">
                 <label class="text-[10px] font-bold text-blue-800 uppercase no-print mb-1 ml-1 text-slate-400">Finální zpětná vazba pro tisk:</label>
                 <textarea id="summaryInput" class="w-full p-4 border border-slate-200 rounded-xl text-sm min-h-[300px] bg-yellow-50 focus:bg-white shadow-inner" placeholder="Tento text píše třídní učitel..."></textarea>
-                <div id="summaryDisplay" class="print-only text-justify text-sm leading-relaxed whitespace-pre-wrap border-t pt-4 font-print text-slate-800"></div>
+                <div id="summaryDisplay" class="print-only text-justify text-sm leading-relaxed border-t pt-4 font-print text-slate-800"></div>
             </div>
         </div>
 
-        <!-- STRANA 2: SEBEHODNOCENÍ -->
+        <!-- STRANA 2 -->
         <div id="page-2-container" class="max-w-[210mm] mx-auto p-10 bg-white my-8 shadow-md flex flex-col hidden font-print">
             <h2 id="page2-title" class="text-2xl font-black mb-8 text-center text-blue-900 uppercase border-b-4 border-blue-900 pb-3 tracking-wide">Sebehodnocení žáka</h2>
             
@@ -288,6 +288,17 @@
             if(!el) return; 
             el.style.height = 'auto'; 
             el.style.height = el.scrollHeight + 'px'; 
+        }
+
+        // Formátování textu pro tisk (odstavce s odskokem, 1. řádek bez odskoku kvůli oslovení)
+        function formatForPrint(text) {
+            if (!text) return "";
+            return text.split('\n').map((line, index) => {
+                if(line.trim() === '') return '<div class="h-2 print:h-1"></div>';
+                // První řádek neodsazujeme, ostatní ano
+                const indentClass = index === 0 ? '' : 'indent-6';
+                return `<div class="${indentClass} text-justify">${line}</div>`;
+            }).join('');
         }
 
         function showToast(msg, isError = false) {
@@ -707,25 +718,25 @@
             const currUser = auth.currentUser;
             const currUserEmail = (currUser && currUser.email) ? currUser.email.toLowerCase() : "";
 
-            toggleEl('print-container', !isStudent); 
-            showEl('page-2-container');
+            document.getElementById('print-container').classList.toggle('hidden', isStudent);
+            document.getElementById('page-2-container').classList.remove('hidden');
             
-            const p2Title = isStudent 
+            document.getElementById('page2-title').innerHTML = isStudent 
                 ? `Moje sebehodnocení<br><span class="text-xl text-black font-black mt-2 inline-block">${name}</span>` 
-                : `Sebehodnocení žáka<br><span class="text-xl text-black font-black mt-2 inline-block">${name}</span>`;
-            setHTML('page2-title', p2Title);
+                : `Sebehodnocení žáka (Strana 2)<br><span class="text-xl text-black font-black mt-2 inline-block">${name}</span>`;
             
-            setText('schoolYearTermDisplay', `Školní rok: ${dbData.schoolYear} - ${dbData.term}`);
-            
-            setVal('schoolYearNoteInput', dbData.topNote || "");
-            setVal('summaryInput', dbData.bottomNote || "");
+            document.getElementById('schoolYearNoteInput').value = dbData.topNote || "";
+            document.getElementById('summaryInput').value = dbData.bottomNote || "";
             
             const allComments = dbData.teacherComments || {};
-            setVal('myPersonalComment', allComments[currUserEmail] || "");
+            document.getElementById('myPersonalComment').value = allComments[currUserEmail] || "";
             
-            setText('schoolYearNoteDisplay', dbData.topNote || "");
-            setText('summaryDisplay', dbData.bottomNote || "");
+            // Tady se nyní konečně správně aplikuje to odřádkování do HTML
+            document.getElementById('schoolYearNoteDisplay').innerHTML = formatForPrint(dbData.topNote);
+            document.getElementById('summaryDisplay').innerHTML = formatForPrint(dbData.bottomNote);
             
+            if (userRole === 'teacher') {
+                document.getElementById('schoolYearNoteInput').disabled = !isClassTeacher;
             if (userRole === 'teacher') {
                 disableEl('schoolYearNoteInput', !isClassTeacher);
                 disableEl('summaryInput', false); // Tímto odemkneme finální text všem učitelům
@@ -1216,28 +1227,21 @@
             const email = currUser.email.toLowerCase();
             
             if(userRole === 'teacher') { 
-                // Finální pole pro tisk ukládají a upravují všichni učitelé
-                const bNote = document.getElementById('summaryInput');
-                if (bNote) dbData.bottomNote = bNote.value;
-                
-                // Úvodní slovo může měnit jen třídní
                 if(isClassTeacher) {
-                    const tNote = document.getElementById('schoolYearNoteInput');
-                    if (tNote) dbData.topNote = tNote.value; 
+                    dbData.bottomNote = document.getElementById('summaryInput').value; 
+                    dbData.topNote = document.getElementById('schoolYearNoteInput').value; 
                 }
                 if(!dbData.teacherComments) dbData.teacherComments = {};
-                const myComm = document.getElementById('myPersonalComment');
-                if (myComm) dbData.teacherComments[email] = myComm.value;
+                dbData.teacherComments[email] = document.getElementById('myPersonalComment').value;
             }
             
-            const periodKey = `${dbData.schoolYear}_${dbData.term}`;
-            studentDocData.periods[periodKey] = dbData;
-            
             try {
-                await db.collection('evaluations').doc(currentTargetEmail).set(studentDocData, { merge: true });
+                await db.collection('evaluations').doc(currentTargetEmail).set(dbData, { merge: true });
                 showToast("Změny úspěšně uloženy.");
-                setText('schoolYearNoteDisplay', dbData.topNote);
-                setText('summaryDisplay', dbData.bottomNote);
+                
+                // Po uložení se musí také text prohnat formátovací funkcí
+                document.getElementById('schoolYearNoteDisplay').innerHTML = formatForPrint(dbData.topNote);
+                document.getElementById('summaryDisplay').innerHTML = formatForPrint(dbData.bottomNote);
             } catch (e) {
                 showToast("Nelze uložit! Zkontrolujte Firebase pravidla (Rules). Chyba: " + e.message, true);
             }
