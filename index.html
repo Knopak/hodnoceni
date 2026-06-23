@@ -736,8 +736,6 @@
             document.getElementById('summaryDisplay').innerHTML = formatForPrint(dbData.bottomNote);
             
             if (userRole === 'teacher') {
-                document.getElementById('schoolYearNoteInput').disabled = !isClassTeacher;
-            if (userRole === 'teacher') {
                 disableEl('schoolYearNoteInput', !isClassTeacher);
                 disableEl('summaryInput', false); // Tímto odemkneme finální text všem učitelům
                 if (isClassTeacher) {
