@@ -1222,13 +1222,18 @@
 
                 // 2. Přimícháme pouze úpravy tohoto konkrétního uživatele
                 if(userRole === 'teacher' || isAdmin) { 
+                    
+                    // Finální text odemčen pro ukládání VŠEM učitelům
+                    latestPeriod.bottomNote = document.getElementById('summaryInput').value; 
+
+                    // Následující položky ukládá pouze třídní učitel nebo admin
                     if(isClassTeacher || isAdmin) {
-                        latestPeriod.bottomNote = document.getElementById('summaryInput').value; 
                         latestPeriod.topNote = document.getElementById('schoolYearNoteInput').value; 
                         latestPeriod.teacherScales = dbData.teacherScales || {};
                         latestPeriod.studentScales = dbData.studentScales || {};
                         latestPeriod.categoryComments = dbData.categoryComments || {};
                     }
+                    
                     if(!latestPeriod.teacherComments) latestPeriod.teacherComments = {};
                     latestPeriod.teacherComments[email] = document.getElementById('myPersonalComment').value;
                     
