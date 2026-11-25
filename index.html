@@ -27,20 +27,62 @@
         .scale-btn:not(:disabled):hover { border-color: #3b82f6; }
         .scale-btn:active { transform: scale(0.95); }
 
+        .print-table-header, .print-table-footer { display: none; }
+
+        /* STYLY RÁMEČKŮ STRÁNKY (náhled na obrazovce i tisk) */
+        .page-frame-none { border: none !important; border-image: none !important; }
+        .page-frame-solid { border: 3px solid #2563eb; border-image: none; }
+        .page-frame-double { border: 6px double #2563eb; border-image: none; }
+        .page-frame-wave {
+            border: 14px solid transparent;
+            border-image-source: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90' viewBox='0 0 90 90'%3E%3Cg stroke='%232563eb' stroke-width='3.5' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15,30 Q15,15 30,15 M60,15 Q75,15 75,30 M75,60 Q75,75 60,75 M30,75 Q15,75 15,60'/%3E%3Cpath d='M30,15 Q37.5,5 45,15 T60,15'/%3E%3Cpath d='M30,75 Q37.5,65 45,75 T60,75'/%3E%3Cpath d='M15,30 Q5,37.5 15,45 T15,60'/%3E%3Cpath d='M75,30 Q65,37.5 75,45 T75,60'/%3E%3C/g%3E%3C/svg%3E");
+            border-image-slice: 30;
+            border-image-width: 14px;
+            border-image-repeat: round;
+        }
+        .page-frame-zigzag {
+            border: 14px solid transparent;
+            border-image-source: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90' viewBox='0 0 90 90'%3E%3Cg stroke='%232563eb' stroke-width='3.5' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15,30 L15,15 L30,15 M60,15 L75,15 L75,30 M75,60 L75,75 L60,75 M30,75 L15,75 L15,60'/%3E%3Cpath d='M30,15 L37.5,6 L52.5,24 L60,15'/%3E%3Cpath d='M30,75 L37.5,66 L52.5,84 L60,75'/%3E%3Cpath d='M15,30 L6,37.5 L24,52.5 L15,60'/%3E%3Cpath d='M75,30 L66,37.5 L84,52.5 L75,60'/%3E%3C/g%3E%3C/svg%3E");
+            border-image-slice: 30;
+            border-image-width: 14px;
+            border-image-repeat: round;
+        }
+        .page-frame-hearts {
+            border: 14px solid transparent;
+            border-image-source: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90' viewBox='0 0 90 90'%3E%3Cg fill='%23e11d48'%3E%3Cpath transform='translate(15,15)' d='M0,7 C-1,6 -9,0.5 -9,-4 C-9,-7.2 -6.6,-9 -3.8,-9 C-1.8,-9 -0.5,-7.6 0,-6 C0.5,-7.6 1.8,-9 3.8,-9 C6.6,-9 9,-7.2 9,-4 C9,0.5 1,6 0,7 Z'/%3E%3Cpath transform='translate(45,15)' d='M0,7 C-1,6 -9,0.5 -9,-4 C-9,-7.2 -6.6,-9 -3.8,-9 C-1.8,-9 -0.5,-7.6 0,-6 C0.5,-7.6 1.8,-9 3.8,-9 C6.6,-9 9,-7.2 9,-4 C9,0.5 1,6 0,7 Z'/%3E%3Cpath transform='translate(75,15)' d='M0,7 C-1,6 -9,0.5 -9,-4 C-9,-7.2 -6.6,-9 -3.8,-9 C-1.8,-9 -0.5,-7.6 0,-6 C0.5,-7.6 1.8,-9 3.8,-9 C6.6,-9 9,-7.2 9,-4 C9,0.5 1,6 0,7 Z'/%3E%3Cpath transform='translate(15,45)' d='M0,7 C-1,6 -9,0.5 -9,-4 C-9,-7.2 -6.6,-9 -3.8,-9 C-1.8,-9 -0.5,-7.6 0,-6 C0.5,-7.6 1.8,-9 3.8,-9 C6.6,-9 9,-7.2 9,-4 C9,0.5 1,6 0,7 Z'/%3E%3Cpath transform='translate(75,45)' d='M0,7 C-1,6 -9,0.5 -9,-4 C-9,-7.2 -6.6,-9 -3.8,-9 C-1.8,-9 -0.5,-7.6 0,-6 C0.5,-7.6 1.8,-9 3.8,-9 C6.6,-9 9,-7.2 9,-4 C9,0.5 1,6 0,7 Z'/%3E%3Cpath transform='translate(15,75)' d='M0,7 C-1,6 -9,0.5 -9,-4 C-9,-7.2 -6.6,-9 -3.8,-9 C-1.8,-9 -0.5,-7.6 0,-6 C0.5,-7.6 1.8,-9 3.8,-9 C6.6,-9 9,-7.2 9,-4 C9,0.5 1,6 0,7 Z'/%3E%3Cpath transform='translate(45,75)' d='M0,7 C-1,6 -9,0.5 -9,-4 C-9,-7.2 -6.6,-9 -3.8,-9 C-1.8,-9 -0.5,-7.6 0,-6 C0.5,-7.6 1.8,-9 3.8,-9 C6.6,-9 9,-7.2 9,-4 C9,0.5 1,6 0,7 Z'/%3E%3Cpath transform='translate(75,75)' d='M0,7 C-1,6 -9,0.5 -9,-4 C-9,-7.2 -6.6,-9 -3.8,-9 C-1.8,-9 -0.5,-7.6 0,-6 C0.5,-7.6 1.8,-9 3.8,-9 C6.6,-9 9,-7.2 9,-4 C9,0.5 1,6 0,7 Z'/%3E%3C/g%3E%3C/svg%3E");
+            border-image-slice: 30;
+            border-image-width: 14px;
+            border-image-repeat: round;
+        }
+        .page-frame-stars {
+            border: 14px solid transparent;
+            border-image-source: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90' viewBox='0 0 90 90'%3E%3Cg fill='%232563eb'%3E%3Cpath transform='translate(15,15)' d='M0,-9 L2.2,-3.1 L8.6,-2.8 L3.6,1.2 L5.3,7.3 L0,3.8 L-5.3,7.3 L-3.6,1.2 L-8.6,-2.8 L-2.2,-3.1 Z'/%3E%3Cpath transform='translate(45,15)' d='M0,-9 L2.2,-3.1 L8.6,-2.8 L3.6,1.2 L5.3,7.3 L0,3.8 L-5.3,7.3 L-3.6,1.2 L-8.6,-2.8 L-2.2,-3.1 Z'/%3E%3Cpath transform='translate(75,15)' d='M0,-9 L2.2,-3.1 L8.6,-2.8 L3.6,1.2 L5.3,7.3 L0,3.8 L-5.3,7.3 L-3.6,1.2 L-8.6,-2.8 L-2.2,-3.1 Z'/%3E%3Cpath transform='translate(15,45)' d='M0,-9 L2.2,-3.1 L8.6,-2.8 L3.6,1.2 L5.3,7.3 L0,3.8 L-5.3,7.3 L-3.6,1.2 L-8.6,-2.8 L-2.2,-3.1 Z'/%3E%3Cpath transform='translate(75,45)' d='M0,-9 L2.2,-3.1 L8.6,-2.8 L3.6,1.2 L5.3,7.3 L0,3.8 L-5.3,7.3 L-3.6,1.2 L-8.6,-2.8 L-2.2,-3.1 Z'/%3E%3Cpath transform='translate(15,75)' d='M0,-9 L2.2,-3.1 L8.6,-2.8 L3.6,1.2 L5.3,7.3 L0,3.8 L-5.3,7.3 L-3.6,1.2 L-8.6,-2.8 L-2.2,-3.1 Z'/%3E%3Cpath transform='translate(45,75)' d='M0,-9 L2.2,-3.1 L8.6,-2.8 L3.6,1.2 L5.3,7.3 L0,3.8 L-5.3,7.3 L-3.6,1.2 L-8.6,-2.8 L-2.2,-3.1 Z'/%3E%3Cpath transform='translate(75,75)' d='M0,-9 L2.2,-3.1 L8.6,-2.8 L3.6,1.2 L5.3,7.3 L0,3.8 L-5.3,7.3 L-3.6,1.2 L-8.6,-2.8 L-2.2,-3.1 Z'/%3E%3C/g%3E%3C/svg%3E");
+            border-image-slice: 30;
+            border-image-width: 14px;
+            border-image-repeat: round;
+        }
+
         @media print {
-            @page { size: A4; margin: 20mm 15mm; }
+            @page { size: A4; margin: 10mm; }
             html, body { background-color: white !important; margin: 0 !important; padding: 0 !important; font-size: 12pt; width: 100%; height: auto !important; }
             .no-print { display: none !important; }
             .print-only { display: block !important; }
             .print-flex { display: flex !important; }
-            #print-container { margin: 0 !important; padding: 0 !important; box-shadow: none !important; width: 100% !important; page-break-after: always; break-after: page; display: block !important; border: none !important; }
-            #page-2-container { margin: 0 !important; padding: 0 !important; display: block !important; box-shadow: none !important; width: 100% !important; page-break-after: avoid; break-after: avoid; border: none !important; }
+            .print-table-header { display: table-header-group !important; }
+            .print-table-footer { display: table-footer-group !important; }
+            #print-page-frame { position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 9999; box-sizing: border-box; }
+            #print-page-frame.page-frame-none { display: none !important; }
+            #print-container { margin: 0 !important; padding: 0 9mm !important; box-shadow: none !important; width: 100% !important; page-break-after: always; break-after: page; display: block !important; border: none !important; border-image: none !important; }
+            #page-2-container { margin: 0 !important; padding: 0 9mm !important; display: block !important; box-shadow: none !important; width: 100% !important; page-break-after: avoid; break-after: avoid; border: none !important; border-image: none !important; }
             textarea { display: none !important; }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
         }
     </style>
 </head>
 <body>
+
+    <!-- RÁMEČEK KOLEM KAŽDÉ VYTIŠTĚNÉ STRÁNKY -->
+    <div id="print-page-frame" class="print-only page-frame-solid"></div>
 
     <!-- MODAL PRO SMAZÁNÍ -->
     <div id="delete-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[200] hidden flex items-center justify-center p-4 no-print">
@@ -125,6 +167,18 @@
                 </div>
                 
                 <div class="flex items-center gap-2">
+                    <div id="frame-picker-wrap" class="hidden flex items-center gap-1.5 bg-slate-50 border rounded-lg px-2 py-1" title="Styl rámečku stránky">
+                        <i data-lucide="frame" class="w-4 h-4 text-blue-600"></i>
+                        <select id="frameStyleSelect" onchange="applyFrameStyle(this.value)" class="bg-transparent text-xs font-bold text-slate-700 outline-none cursor-pointer py-1">
+                            <option value="solid">Rovná čára</option>
+                            <option value="double">Dvojitá čára</option>
+                            <option value="wave">Vlnka</option>
+                            <option value="zigzag">Cikcak</option>
+                            <option value="hearts">Srdíčka</option>
+                            <option value="stars">Hvězdičky</option>
+                            <option value="none">Bez rámečku</option>
+                        </select>
+                    </div>
                     <button id="settingsBtn" onclick="openSettingsModal()" class="hidden bg-slate-100 text-slate-700 px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-slate-200 shadow-sm transition-colors" title="Nastavení období">
                         <i data-lucide="settings" class="w-4 h-4"></i> <span class="hidden md:inline">Nastavení</span>
                     </button>
@@ -169,102 +223,113 @@
         </div>
 
         <!-- ČÁST 1 (STRANA 1, příp. 1–2): HLAVIČKA A SLOVNÍ HODNOCENÍ (VŠECHNY TEXTY U SEBE) -->
-        <div id="print-container" class="max-w-[210mm] mx-auto p-10 bg-white my-8 shadow-md flex flex-col hidden">
-            <div class="flex justify-center mb-6">
-                <img src="https://github.com/Knopak/hodnoceni/blob/main/logo.jpg?raw=true" alt="ZŠ Galaxie" class="h-16 object-contain">
-            </div>
-            
-            <div class="text-center mb-6">
-                <div class="inline-block border-[4px] border-blue-600 px-12 py-2 mb-4">
-                    <span id="studentNameDisplay" class="text-3xl font-black text-black uppercase tracking-wider">Vyberte žáka</span>
-                </div>
-                <div class="flex justify-between items-center text-sm font-bold text-slate-700 px-4 mt-2 font-print uppercase tracking-tight">
-                    <div id="schoolYearTermDisplay">Školní rok: -</div>
-                    <div id="classNameDisplay">Třída: -</div>
-                </div>
-                <div class="w-full border-b-2 border-slate-300 my-6"></div>
-                
-                <!-- Úvodní slovo -->
-                <div class="text-left bg-slate-50 p-4 rounded-xl border border-slate-100 no-print">
-                    <label class="text-[10px] font-bold text-blue-800 uppercase block mb-1">Úvodní slovo třídního učitele:</label>
-                    <textarea id="schoolYearNoteInput" class="w-full p-3 border rounded-lg text-sm bg-white shadow-sm focus:ring-2 focus:ring-blue-500" rows="3"></textarea>
-                </div>
-                <div id="schoolYearNoteDisplay" class="print-only text-justify text-sm print:text-[12pt] leading-relaxed text-slate-800 font-print"></div>
-            </div>
+        <div id="print-container" class="max-w-[210mm] mx-auto p-10 bg-white my-8 shadow-md flex flex-col hidden page-frame-solid">
+            <table class="w-full border-collapse">
+                <thead class="print-table-header"><tr><td class="h-[9mm] p-0"></td></tr></thead>
+                <tfoot class="print-table-footer"><tr><td class="h-[9mm] p-0"></td></tr></tfoot>
+                <tbody><tr><td class="p-0 align-top">
+                    <div class="flex justify-center mb-6">
+                        <img src="https://github.com/Knopak/hodnoceni/blob/main/logo.jpg?raw=true" alt="ZŠ Galaxie" class="h-16 object-contain">
+                    </div>
+                    
+                    <div class="text-center mb-6">
+                        <div class="inline-block px-4 py-1 mb-2">
+                            <span id="studentNameDisplay" class="text-3xl font-black text-black uppercase tracking-wider">Vyberte žáka</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm font-bold text-slate-700 px-4 mt-2 font-print uppercase tracking-tight">
+                            <div id="schoolYearTermDisplay">Školní rok: -</div>
+                            <div id="classNameDisplay">Třída: -</div>
+                        </div>
+                        <div class="w-full border-b-2 border-slate-300 my-6"></div>
+                        
+                        <!-- Úvodní slovo -->
+                        <div class="text-left bg-slate-50 p-4 rounded-xl border border-slate-100 no-print">
+                            <label class="text-[10px] font-bold text-blue-800 uppercase block mb-1">Úvodní slovo třídního učitele:</label>
+                            <textarea id="schoolYearNoteInput" class="w-full p-3 border rounded-lg text-sm bg-white shadow-sm focus:ring-2 focus:ring-blue-500" rows="3"></textarea>
+                        </div>
+                        <div id="schoolYearNoteDisplay" class="print-only text-justify text-sm print:text-[12pt] leading-relaxed text-slate-800 font-print"></div>
+                    </div>
 
-            <!-- Osobní postřeh konkrétního učitele (pouze na obrazovce) -->
-            <div class="mt-4 p-4 bg-blue-50 rounded-xl border border-blue-100 no-print">
-                <label class="text-[10px] font-bold text-blue-800 uppercase block mb-1">Můj postřeh k žákovi (ostatní uvidí ve svodce):</label>
-                <textarea id="myPersonalComment" class="w-full p-3 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500" rows="3"></textarea>
-            </div>
+                    <!-- Osobní postřeh konkrétního učitele (pouze na obrazovce) -->
+                    <div class="mt-4 p-4 bg-blue-50 rounded-xl border border-blue-100 no-print">
+                        <label class="text-[10px] font-bold text-blue-800 uppercase block mb-1">Můj postřeh k žákovi (ostatní uvidí ve svodce):</label>
+                        <textarea id="myPersonalComment" class="w-full p-3 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500" rows="3"></textarea>
+                    </div>
 
-            <!-- Finální tisková zpětná vazba (hned pod úvodním slovem) -->
-            <div class="mt-6 print:mt-3 flex-grow flex flex-col">
-                <label class="text-[10px] font-bold text-blue-800 uppercase no-print mb-1 ml-1 text-slate-400">Finální zpětná vazba pro tisk:</label>
-                <textarea id="summaryInput" class="w-full p-4 border border-slate-200 rounded-xl text-sm min-h-[300px] bg-yellow-50 focus:bg-white shadow-inner" placeholder="Tento text píše třídní učitel..."></textarea>
-                <div id="summaryDisplay" class="print-only text-justify text-sm print:text-[12pt] leading-relaxed font-print text-slate-800"></div>
-            </div>
+                    <!-- Finální tisková zpětná vazba (hned pod úvodním slovem) -->
+                    <div class="mt-6 print:mt-3 flex-grow flex flex-col">
+                        <label class="text-[10px] font-bold text-blue-800 uppercase no-print mb-1 ml-1 text-slate-400">Finální zpětná vazba pro tisk:</label>
+                        <textarea id="summaryInput" class="w-full p-4 border border-slate-200 rounded-xl text-sm min-h-[300px] bg-yellow-50 focus:bg-white shadow-inner" placeholder="Tento text píše třídní učitel..."></textarea>
+                        <div id="summaryDisplay" class="print-only text-justify text-sm print:text-[12pt] leading-relaxed font-print text-slate-800"></div>
+                    </div>
+                </td></tr></tbody>
+            </table>
         </div>
 
         <!-- ČÁST 2 (SAMOSTATNÁ STRANA 2 nebo 3): HODNOCENÍ ŠKOLY + SEBEHODNOCENÍ ŽÁKA + VYSVĚTLIVKY -->
-        <div id="page-2-container" class="max-w-[210mm] mx-auto p-10 bg-white my-8 shadow-md flex flex-col hidden font-print">
-            
-            <!-- Nadpis pouze pro žáka na obrazovce (při tisku učitelem je jméno na 1. straně) -->
-            <h2 id="page2-title" class="text-2xl font-black mb-6 text-center text-blue-900 uppercase border-b-4 border-blue-900 pb-3 tracking-wide no-print hidden">Sebehodnocení žáka</h2>
+        <div id="page-2-container" class="max-w-[210mm] mx-auto p-10 bg-white my-8 shadow-md flex flex-col hidden font-print page-frame-solid">
+            <table class="w-full border-collapse">
+                <thead class="print-table-header"><tr><td class="h-[9mm] p-0"></td></tr></thead>
+                <tfoot class="print-table-footer"><tr><td class="h-[9mm] p-0"></td></tr></tfoot>
+                <tbody><tr><td class="p-0 align-top">
+                    <!-- Nadpis pouze pro žáka na obrazovce (při tisku učitelem je jméno na 1. straně) -->
+                    <h2 id="page2-title" class="text-2xl font-black mb-6 text-center text-blue-900 uppercase border-b-4 border-blue-900 pb-3 tracking-wide no-print hidden">Sebehodnocení žáka</h2>
 
-            <!-- 1. HODNOCENÍ UČITELŮ (skryté pro žáka) -->
-            <div id="teacher-eval-block" class="mb-6 print:mb-4">
-                <h2 class="text-xs font-bold mb-3 print:mb-2 text-center uppercase tracking-widest border-b pb-1.5 text-slate-500 font-print">Hodnocení školy</h2>
-                <div id="teacherSectionsContainer" class="grid grid-cols-1 md:grid-cols-3 print:grid-cols-3 gap-4 print:gap-3"></div>
-            </div>
+                    <!-- 1. HODNOCENÍ UČITELŮ (skryté pro žáka) -->
+                    <div id="teacher-eval-block" class="mb-6 print:mb-4">
+                        <h2 class="text-xs font-bold mb-3 print:mb-2 text-center uppercase tracking-widest border-b pb-1.5 text-slate-500 font-print">Hodnocení školy</h2>
+                        <div id="teacherSectionsContainer" class="grid grid-cols-1 md:grid-cols-3 print:grid-cols-3 gap-4 print:gap-3"></div>
+                    </div>
 
-            <!-- 2. SEBEHODNOCENÍ ŽÁKA (graficky shodné s hodnocením učitelů) -->
-            <div id="student-eval-block">
-                <div class="relative flex items-center justify-center border-b pb-1.5 mb-3 print:mb-2">
-                    <h2 class="text-xs font-bold text-center uppercase tracking-widest text-slate-500 font-print">Sebehodnocení žáka</h2>
-                    <div id="admin-clear-student-btn" class="hidden no-print absolute right-0">
-                        <button onclick="clearStudentSelfEval()" class="text-red-500 hover:text-red-700 text-[10px] font-bold border border-red-200 hover:bg-red-50 px-2.5 py-1 rounded-lg transition-colors shadow-sm">
-                            Vymazat sebehodnocení
-                        </button>
+                    <!-- 2. SEBEHODNOCENÍ ŽÁKA (graficky shodné s hodnocením učitelů) -->
+                    <div id="student-eval-block">
+                        <div class="relative flex items-center justify-center border-b pb-1.5 mb-3 print:mb-2">
+                            <h2 class="text-xs font-bold text-center uppercase tracking-widest text-slate-500 font-print">Sebehodnocení žáka</h2>
+                            <div id="admin-clear-student-btn" class="hidden no-print absolute right-0">
+                                <button onclick="clearStudentSelfEval()" class="text-red-500 hover:text-red-700 text-[10px] font-bold border border-red-200 hover:bg-red-50 px-2.5 py-1 rounded-lg transition-colors shadow-sm">
+                                    Vymazat sebehodnocení
+                                </button>
+                            </div>
+                        </div>
+                        <div id="studentSectionsContainer" class="grid grid-cols-1 md:grid-cols-3 print:grid-cols-3 gap-4 print:gap-3"></div>
                     </div>
-                </div>
-                <div id="studentSectionsContainer" class="grid grid-cols-1 md:grid-cols-3 print:grid-cols-3 gap-4 print:gap-3"></div>
-            </div>
 
-            <!-- SPOLEČNÁ LEGENDA PRO TISK -->
-            <div class="hidden print-flex justify-center gap-8 mt-4 pt-2 border-t border-slate-200 text-[8pt] text-slate-500 font-print font-bold">
-                <div class="flex items-center gap-1.5"><div class="w-2.5 h-2.5 border border-slate-400"></div> Ne</div>
-                <div class="flex items-center gap-1.5"><div class="w-2.5 h-2.5 border border-slate-400"></div> Spíše ne</div>
-                <div class="flex items-center gap-1.5"><div class="w-2.5 h-2.5 border border-slate-400"></div> Spíše ano</div>
-                <div class="flex items-center gap-1.5"><div class="w-2.5 h-2.5 border border-slate-400 bg-[#1d4ed8]"></div> Ano</div>
-            </div>
+                    <!-- SPOLEČNÁ LEGENDA PRO TISK -->
+                    <div class="hidden print-flex justify-center gap-8 mt-4 pt-2 border-t border-slate-200 text-[8pt] text-slate-500 font-print font-bold">
+                        <div class="flex items-center gap-1.5"><div class="w-2.5 h-2.5 border border-slate-400"></div> Ne</div>
+                        <div class="flex items-center gap-1.5"><div class="w-2.5 h-2.5 border border-slate-400"></div> Spíše ne</div>
+                        <div class="flex items-center gap-1.5"><div class="w-2.5 h-2.5 border border-slate-400"></div> Spíše ano</div>
+                        <div class="flex items-center gap-1.5"><div class="w-2.5 h-2.5 border border-slate-400 bg-[#1d4ed8]"></div> Ano</div>
+                    </div>
 
-            <!-- 3. VYSVĚTLIVKY POJMŮ (pod oběma tabulkami ve 3 sloupcích) -->
-            <div id="legends-section" class="mt-6 print:mt-4 pt-4 print:pt-3 border-t border-slate-200 break-inside-avoid">
-                <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest text-center mb-3 print:mb-2 font-print">Vysvětlení pojmů</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 print:grid-cols-3 gap-4 print:gap-3 text-[8px] print:text-[6.8pt] leading-snug print:leading-tight text-slate-600 print:text-slate-700 font-print text-left">
-                    <div class="bg-slate-50 print:bg-transparent p-3 print:p-0 rounded-xl">
-                        <div class="font-bold text-blue-900 uppercase text-[9px] print:text-[7.5pt] mb-1.5 print:mb-1 border-b border-slate-200 pb-0.5">Ve vztahu k sobě</div>
-                        <div class="mb-1 print:mb-0.5"><strong>Vyjadřuji své myšlenky...:</strong> Umím říct, co si myslím nebo jak se cítím. Vím, kdy je čas na vtipkování a kdy je potřeba mluvit vážně.</div>
-                        <div class="mb-1 print:mb-0.5"><strong>Rozpoznám vhodné chování...:</strong> Poznám, co se v danou chvíli sluší a co ne, jak v hodině, tak i o přestávce. Když mě někdo provokuje, dokážu se ovládnout a reagovat správně.</div>
-                        <div><strong>Umím přijmout zpětnou vazbu...:</strong> Když mi učitel nebo spolužák řekne, co dělám dobře a co mi nejde, neurazím se. Místo toho se zamyslím, jak mohu ocenění, rady a doporučení využít.</div>
+                    <!-- 3. VYSVĚTLIVKY POJMŮ (pod oběma tabulkami ve 3 sloupcích) -->
+                    <div id="legends-section" class="mt-6 print:mt-4 pt-4 print:pt-3 border-t border-slate-200 break-inside-avoid">
+                        <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest text-center mb-3 print:mb-2 font-print">Vysvětlení pojmů</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 print:grid-cols-3 gap-4 print:gap-3 text-[8px] print:text-[6.8pt] leading-snug print:leading-tight text-slate-600 print:text-slate-700 font-print text-left">
+                            <div class="bg-slate-50 print:bg-transparent p-3 print:p-0 rounded-xl">
+                                <div class="font-bold text-blue-900 uppercase text-[9px] print:text-[7.5pt] mb-1.5 print:mb-1 border-b border-slate-200 pb-0.5">Ve vztahu k sobě</div>
+                                <div class="mb-1 print:mb-0.5"><strong>Vyjadřuji své myšlenky...:</strong> Umím říct, co si myslím nebo jak se cítím. Vím, kdy je čas na vtipkování a kdy je potřeba mluvit vážně.</div>
+                                <div class="mb-1 print:mb-0.5"><strong>Rozpoznám vhodné chování...:</strong> Poznám, co se v danou chvíli sluší a co ne, jak v hodině, tak i o přestávce. Když mě někdo provokuje, dokážu se ovládnout a reagovat správně.</div>
+                                <div><strong>Umím přijmout zpětnou vazbu...:</strong> Když mi učitel nebo spolužák řekne, co dělám dobře a co mi nejde, neurazím se. Místo toho se zamyslím, jak mohu ocenění, rady a doporučení využít.</div>
+                            </div>
+                            <div class="bg-slate-50 print:bg-transparent p-3 print:p-0 rounded-xl">
+                                <div class="font-bold text-blue-900 uppercase text-[9px] print:text-[7.5pt] mb-1.5 print:mb-1 border-b border-slate-200 pb-0.5">Ve vztahu k druhým</div>
+                                <div class="mb-1 print:mb-0.5"><strong>Dodržuji pravidla...:</strong> Respektuji pravidla třídy a školy. Nikdo mě nemusí napomínat, abych dělal/a to, na čem jsme se jako skupina dohodli.</div>
+                                <div class="mb-1 print:mb-0.5"><strong>Spolupracuji s ostatními:</strong> Dokážu se domluvit na společném postupu a splnit svou část úkolu. V týmu uznávám a neshazuji práci ostatních, ale pomáhám. Při rozhodování přispívám svým názorem.</div>
+                                <div class="mb-1 print:mb-0.5"><strong>Poskytuji zpětnou vazbu:</strong> Umím spolužáka konkrétně ocenit, dát mu radu či doporučení.</div>
+                                <div><strong>Přispívám k bezpečnému prostředí...:</strong> Ostatní se v mé přítomnosti cítí dobře a beze strachu. Nikoho neshazuji, neposmívám se a nevyčleňuji z kolektivu.</div>
+                            </div>
+                            <div class="bg-slate-50 print:bg-transparent p-3 print:p-0 rounded-xl">
+                                <div class="font-bold text-blue-900 uppercase text-[9px] print:text-[7.5pt] mb-1.5 print:mb-1 border-b border-slate-200 pb-0.5">Při učení</div>
+                                <div class="mb-1 print:mb-0.5"><strong>Zodpovědně přistupuji...:</strong> Do školy přicházím připravený/á. Mám v pořádku pomůcky, dávám v hodině pozor a snažím se úkoly plnit včas a nejlépe, jak dovedu.</div>
+                                <div class="mb-1 print:mb-0.5"><strong>Vytrvám v práci...:</strong> Když mi něco nejde hned napoprvé, nevzdávám se. Zkusím hledat řešení a nebojím se požádat o pomoc.</div>
+                                <div class="mb-1 print:mb-0.5"><strong>Čtu s porozuměním:</strong> Když si přečtu text nebo zadání úkolu, dokážu vlastními slovy říct, o čem to bylo a co mám vlastně udělat.</div>
+                                <div><strong>Srozumitelně prezentuji...:</strong> Umím ostatním ukázat a vysvětlit, co jsem vytvořil/a nebo na co jsem přišel/přišla, aby tomu všichni rozuměli. Můj přednes je dostatečně hlasitý, udržuji oční kontakt, volím vhodná slova a vím, o čem mluvím.</div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="bg-slate-50 print:bg-transparent p-3 print:p-0 rounded-xl">
-                        <div class="font-bold text-blue-900 uppercase text-[9px] print:text-[7.5pt] mb-1.5 print:mb-1 border-b border-slate-200 pb-0.5">Ve vztahu k druhým</div>
-                        <div class="mb-1 print:mb-0.5"><strong>Dodržuji pravidla...:</strong> Respektuji pravidla třídy a školy. Nikdo mě nemusí napomínat, abych dělal/a to, na čem jsme se jako skupina dohodli.</div>
-                        <div class="mb-1 print:mb-0.5"><strong>Spolupracuji s ostatními:</strong> Dokážu se domluvit na společném postupu a splnit svou část úkolu. V týmu uznávám a neshazuji práci ostatních, ale pomáhám. Při rozhodování přispívám svým názorem.</div>
-                        <div class="mb-1 print:mb-0.5"><strong>Poskytuji zpětnou vazbu:</strong> Umím spolužáka konkrétně ocenit, dát mu radu či doporučení.</div>
-                        <div><strong>Přispívám k bezpečnému prostředí...:</strong> Ostatní se v mé přítomnosti cítí dobře a beze strachu. Nikoho neshazuji, neposmívám se a nevyčleňuji z kolektivu.</div>
-                    </div>
-                    <div class="bg-slate-50 print:bg-transparent p-3 print:p-0 rounded-xl">
-                        <div class="font-bold text-blue-900 uppercase text-[9px] print:text-[7.5pt] mb-1.5 print:mb-1 border-b border-slate-200 pb-0.5">Při učení</div>
-                        <div class="mb-1 print:mb-0.5"><strong>Zodpovědně přistupuji...:</strong> Do školy přicházím připravený/á. Mám v pořádku pomůcky, dávám v hodině pozor a snažím se úkoly plnit včas a nejlépe, jak dovedu.</div>
-                        <div class="mb-1 print:mb-0.5"><strong>Vytrvám v práci...:</strong> Když mi něco nejde hned napoprvé, nevzdávám se. Zkusím hledat řešení a nebojím se požádat o pomoc.</div>
-                        <div class="mb-1 print:mb-0.5"><strong>Čtu s porozuměním:</strong> Když si přečtu text nebo zadání úkolu, dokážu vlastními slovy říct, o čem to bylo a co mám vlastně udělat.</div>
-                        <div><strong>Srozumitelně prezentuji...:</strong> Umím ostatním ukázat a vysvětlit, co jsem vytvořil/a nebo na co jsem přišel/přišla, aby tomu všichni rozuměli. Můj přednes je dostatečně hlasitý, udržuji oční kontakt, volím vhodná slova a vím, o čem mluvím.</div>
-                    </div>
-                </div>
-            </div>
+                </td></tr></tbody>
+            </table>
         </div>
     </div>
 
@@ -437,6 +502,7 @@
             userRole = mode==='student' ? 'student' : 'teacher';
             isAdmin = mode==='admin'; isClassTeacher=false;
             toggleEl('backupBtn', hasActualRole('admin'));
+            toggleEl('frame-picker-wrap', userRole === 'teacher');
             if(userRole==='teacher') setupTeacherUI(); else setupStudentUI(auth.currentUser.email.toLowerCase());
             ensureModeSwitcher();
         }
@@ -460,26 +526,26 @@
             { id: "l4", cat: "Při učení", textTeacher: "Dokážeš srozumitelně prezentovat výsledky své práce.", textStudent: "Dokážu srozumitelně prezentovat výsledky své práce." }
         ];
 
-        const SCALE_LABELS = ['Ne', 'Spíše ne', 'Spíše ano', 'Ano'];
-        const ACTIVE_COLOR = '#1d4ed8'; 
-        const INACTIVE_COLOR = '#f1f5f9';
+        const FRAME_STYLES = ['solid', 'double', 'wave', 'zigzag', 'hearts', 'stars', 'none'];
 
-        let userRole = null;
-        let isClassTeacher = false;
-        let currentTargetEmail = null;
-        let deleteCandidateEmail = null;
-        let isSummaryVisible = false;
-        let isAdmin = false;
-        
-        let studentDocData = {};
-        let dbData = { 
-            teacherScales: {}, 
-            studentScales: {}, 
-            categoryComments: {}, 
-            colleagueObservations: {}, 
-            teacherComments: {}, 
-            topNote: "", 
-            bottomNote: "" 
+        function applyFrameStyle(style) {
+            const safeStyle = FRAME_STYLES.includes(style) ? style : 'solid';
+            localStorage.setItem('hodnoceni-frame-style', safeStyle);
+            const sel = document.getElementById('frameStyleSelect');
+            if (sel) sel.value = safeStyle;
+
+            const targets = ['print-page-frame', 'print-container', 'page-2-container'];
+            targets.forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                FRAME_STYLES.forEach(s => el.classList.remove(`page-frame-${s}`));
+                el.classList.add(`page-frame-${safeStyle}`);
+            });
+        }
+
+        window.onload = () => {
+            try { lucide.createIcons(); } catch (e) { console.error("Lucide init error", e); }
+            applyFrameStyle(localStorage.getItem('hodnoceni-frame-style') || 'solid');
         };
 
         window.onload = () => {
