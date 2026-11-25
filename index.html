@@ -29,7 +29,7 @@
 
         @media print {
             @page { size: A4; margin: 20mm 15mm; }
-            html, body { background-color: white !important; margin: 0 !important; padding: 0 !important; font-size: 10pt; width: 100%; height: auto !important; }
+            html, body { background-color: white !important; margin: 0 !important; padding: 0 !important; font-size: 12pt; width: 100%; height: auto !important; }
             .no-print { display: none !important; }
             .print-only { display: block !important; }
             .print-flex { display: flex !important; }
@@ -189,7 +189,7 @@
                     <label class="text-[10px] font-bold text-blue-800 uppercase block mb-1">Úvodní slovo třídního učitele:</label>
                     <textarea id="schoolYearNoteInput" class="w-full p-3 border rounded-lg text-sm bg-white shadow-sm focus:ring-2 focus:ring-blue-500" rows="3"></textarea>
                 </div>
-                <div id="schoolYearNoteDisplay" class="print-only text-justify text-sm leading-relaxed text-slate-800 font-print"></div>
+                <div id="schoolYearNoteDisplay" class="print-only text-justify text-sm print:text-[12pt] leading-relaxed text-slate-800 font-print"></div>
             </div>
 
             <!-- Osobní postřeh konkrétního učitele (pouze na obrazovce) -->
@@ -202,7 +202,7 @@
             <div class="mt-6 print:mt-3 flex-grow flex flex-col">
                 <label class="text-[10px] font-bold text-blue-800 uppercase no-print mb-1 ml-1 text-slate-400">Finální zpětná vazba pro tisk:</label>
                 <textarea id="summaryInput" class="w-full p-4 border border-slate-200 rounded-xl text-sm min-h-[300px] bg-yellow-50 focus:bg-white shadow-inner" placeholder="Tento text píše třídní učitel..."></textarea>
-                <div id="summaryDisplay" class="print-only text-justify text-sm leading-relaxed font-print text-slate-800"></div>
+                <div id="summaryDisplay" class="print-only text-justify text-sm print:text-[12pt] leading-relaxed font-print text-slate-800"></div>
             </div>
         </div>
 
